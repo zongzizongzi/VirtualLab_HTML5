@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>圆度评估</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="main-div" >
+    <div class="title_1"><b>圆度误差评估方法</b></div>
+    <div class="back_1" ><a href="index.html">←返回目录</a></div>
+    <div style="font: normal 20px Microsoft YaHei ;padding-bottom: 5px;"><b>
+        评估方法：</b>
+        <input type="radio" name="evalMethod" value="square" checked="checked">最小二乘法
+        <input type="radio" name="evalMethod" value="outside">最小外接圆法
+        <input type="radio" name="evalMethod" value="inside">最大内接圆法
+        <input type="radio" name="evalMethod" value="area" >最小区域法
+
+    </div>
+    <div class="textDiv" id="textDiv" style="height: 200px" ></div>
+    <div style="">
+        <canvas id="myCanvas" width="300" height="275"></canvas>
+    </div>
+    <!--<div>
+        <table id="MessageTable">
+            <tr><div style="height: 20px"></div></tr>
+            <tr>
+                <td>u1(μm)</td>
+                <td>u2(μm)</td>
+                <td>R(mm)</td>
+                <td>圆度误差(μm)</td>
+            </tr>
+            <tr>
+                <td id="u1">0</td>
+                <td id="u2">0</td>
+                <td id="r">0</td>
+                <td id="f">0</td>
+            </tr>
+        </table>
+    </div>-->
+    <div class="textDiv">
+        &emsp; &emsp;根据实际零件功能的需求，圆度误差的评定方法还有很多种。
+        这些评定方法中，对同一被测实际圆按最小区域法所评定的圆度误差值最小，能最大限度地通过合格件，同时也具有唯一性。因而，最小区域评定法是判定圆度合格性的最后仲裁依据。
+    </div>
+</div>
+
+<!--虚拟仪器库-->
+<script src="js/VILibrary.js"></script>
+<!--js简写方法-->
+<script src="js/jquery-3.1.1.min.js"></script>
+<!--弹出框-->
+<script src="js/layui/lay/dest/layui.all.js"></script>
+
+
+<script type="text/javascript">
+    'use strict';
+
+    let RdEvalVI = new VILibrary.VI. NyquistVI($('#myCanvas'));
+    let r=[4.632265176000097, 6.7852682963307975, 9.237150147513018, 1.2048206947147766, 8.694909392073832, 0.8602348842912955, 1.092396240458131, 7.524248791372823, 6.064463930207276, 8.403543178779936, 9.064076183711885, 7.186093801673246, 0.07142342786907285, 2.0355749810242374, 3.3808593296055345, 5.4704628977496395, 3.977736005181536, 4.901047516406023, 0.27178415462677075, 9.613774289717709, 4.575486747843627, 7.005064206334744, 6.531478730382365, 5.436546045454664, 3.195381712931633, 4.639868372707849, 0.26846545773203667, 6.842475986681881, 3.0260480945498514, 5.601074299616366, 7.011113973954819, 7.937245522337754, 2.1337424034952224, 2.000648670064402, 8.61770885780106, 3.664313954805043, 4.748301542946043, 2.092921559320715, 2.2371882238685137, 2.9944529771798667]
+    RdEvalVI.setData(r);
+    let method="square";
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    let WIDTH=canvas.width,HEIGHT=canvas.height;
+    changeText();
+
+    $(document).ready(function() {
+        $('input[type=radio][name=evalMethod]').change(function() {
+            method=this.value;
+            changeText()
+        });
+    });
+    function changeText() {
+        switch (method){
+            case"area":{
+                $("#textDiv").html(/* document.getElementById(textDiv).innerHTML=*/'<p>&emsp; &emsp; 最小区域法评定圆度误差，其评定准则为：用两同心圆包容实际轮廓，且至少有4个实测点内外相间的分布在两圆周上(符合交叉准则)，' +
+                    '则两同心圆之间的区域为最小区域，圆度误差即为两同心圆的半径差。</p>' +
+                    '<p>&emsp; &emsp; 交叉准则:实际平面与两平行平面的接触点，投影在一个面上呈两线段交叉型，即两个等值的最高点的连线与两个等值的最低点的连线有内交。' +
+                    '只有满足交叉准则的要求才可以使用最小区域法来计算。</p>');
+                RdEvalVI.area();
+                break;
+            }
+
+            case "outside":{
+                $("#textDiv").html("<p>&emsp; &emsp; 最小外接圆是指包容实际轮廓时，具有半径为最小的圆，该方法主要用来评定外表面的圆度误差。" +
+                    "其圆度误差值为实际轮廓上各点至最小外接圆中心的最大半径和最小半径之差。</p>" +
+                    "<p>&emsp; &emsp;  判别最小外接圆的准则有两个：一是外接圆与误差曲线有三点接触，且由此三点连成的三角形为锐角三角形，或圆心位于三角形内；二是外接圆与误差曲线上两点接触，且两点连线通过圆心。</p>" +
+                    "<p><b>&emsp; &emsp;最小外接圆法主要用于圆柱外表面圆度误差评定，最小外接圆体现了被测轴所能通过的最小配合孔的规则，由此所得圆度误差可视为被测轴与最小配合孔之间的最大间隙。</b></p>")
+                RdEvalVI.outside();
+                break;
+            }
+            case "inside":{
+                $("#textDiv").html("<p>&emsp; &emsp; 最大内切圆指内切于被测实际轮廓，或者内切于轮廓曲线误差，且半径为最大的圆。该方法主要用来评定内表面的圆度误差。" +
+                    "其圆度误差值为实际轮廓上各点至最大内切圆中心的最大半径与最小半径之差。</p><p>&emsp; &emsp; 判别最大内切圆的准则仍然可以用三点法或两点法。</p>" +
+                    "<p><b>&emsp; &emsp; 最大内接圆法主要用于圆柱内表面圆度误差评定。 最大内接圆体现了被测孔所能通过的最大配合轴，由此所得圆度误差可视为被测孔与最小配合轴之间的最大间隙。</b></p>")
+                RdEvalVI.inside();
+                break;
+            }
+            case "square":{
+            $("#textDiv").html("<p>&emsp; &emsp; 这种评定方法是以最小二乘圆作为评定的基准，使实际轮廓上各测点至理想圆的圆周之间距离的平方和为最小。" +
+                "与最小二乘圆同心作实际轮廓的外接圆和内接圆，将内、外接圆的半径差作为圆度误差</p>" +
+                "<p>&emsp; &emsp; 最小二乘圆法作为近似评定方法方便便捷，有确定的解。但不是严格的符合标准中规定的误差定义，所评定的圆度误差结果也不是最小。 </p>" +
+                "<p></p>");
+            RdEvalVI.square(1);
+            break;
+        }
+            default:alert("请选择评估方法")
+        }
+    }
+
+</script>
+</body>
+</html>

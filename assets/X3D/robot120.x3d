@@ -1,0 +1,46 @@
+<x3d id="120X3d" style="width: 100%;height: 100%;">
+                 <scene>
+                     <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+                     <Viewpoint position="47.96688 79.29383 1405.52200" orientation="-0.80979 0.47664 -0.34214 0.07007"></Viewpoint>
+                     <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+
+                     <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+                     <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+                     <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+                     <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+                     <transform  translation="0,-500,0">
+                         <inline url="platform.x3d"> </inline>
+                     </transform>
+                     <transform  translation="0,-500,0" >
+                         <inline url="base.x3d" DEF="BASE" nameSpaceName="BASE" mapDEFToID="true" onclick="changeTransparency()"> </inline>
+                         <appearance>
+                             <material id="baseMaterial"></material>
+                         </appearance>
+                         <transform DEF="link1" rotation="0,1,0,0">
+                             <inline url="link1.x3d"> </inline>
+                             <transform translation="0,290,0">
+                                 <transform DEF="link2" id="link2" rotation="0,0,1,0">
+                                         <inline url="link2.x3d"> </inline>
+                                         <transform translation="0,270,0" DEF="link3"  id="link3" rotation="0,0,1,0">
+                                             <inline url="link3.x3d"> </inline>
+                                             <transform translation="302,70,0" DEF="link4" id="link4" rotation="1,0,0,0">
+                                                 <inline url="link4.x3d"> </inline>
+                                                 <transform translation="0,0,0" DEF="link5" id="link5" rotation="0,0,1,0">
+                                                     <inline url="link5.x3d"> </inline>
+                                                     <transform translation="59,0,0" DEF="link6" id="link6" rotation="1,0,0,0">
+                                                         <inline url="link6.x3d"> </inline>
+                                                     </transform>
+                                                 </transform>
+                                             </transform>
+                                         </transform>
+                                     </transform>
+                             </transform>
+                         </transform>
+                     </transform>
+
+                     <timeSensor id="time" DEF="time" cycleInterval="2" loop="true" enabled="false"></timeSensor>
+                     <OrientationInterpolator DEF="move" key="0 0.25 0.5 0.75 1" keyValue="0 1 0 0,0 1 0 -0.8,0 1 0 -1.6,0 1 0 -0.8,0 1 0 0"></OrientationInterpolator>
+                     <Route fromNode="time" fromField ="fraction_changed" toNode="move" toField="set_fraction"></Route>
+                     <Route fromNode="move" fromField ="value_changed" toNode="link1" toField="rotation"></Route>
+                 </scene>
+</x3d>

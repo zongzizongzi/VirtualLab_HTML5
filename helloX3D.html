@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My first X3DOM page</title>
+    <script type='text/javascript' src='http://www.x3dom.org/download/x3dom.js'></script>
+    <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'>
+    <style>
+        x3d
+        {
+            border:2px solid darkorange;
+        }
+
+        body
+        {
+            font-size:110%;
+            font-family:verdana, sans-serif;
+            background-image: url('img/1.png');
+            margin: 3em;
+            color: lightgray;
+        }
+        h1
+        {
+            color: darkorange;
+        }
+    </style>
+    <script>
+        function snapBall(eventObject)
+        {
+            //Check if type and output of the eventObject are correct
+            //There may be multiple eventObjects but only one of them contains the value we need
+            console.log(eventObject.type != "outputchange" || eventObject.fieldName != "value_changed");
+            if(eventObject.type != "outputchange" || eventObject.fieldName != "value_changed")
+
+                return;
+            //Get the value...
+            var value = eventObject.value;
+            //...and create a copy with the manipulated coordinates
+            var newPos = new x3dom.fields.SFVec3f(2, Math.round(value.y), 0);
+
+            //Set the newly created array as new position for the second ball
+            document.getElementById("ball2").setAttribute('translation', newPos.toString());
+        }
+    </script>
+</head>
+<body>
+<h1>Hello, X3DOM!</h1>
+<p>
+    This is my first html page with some 3d objects.
+</p>
+<x3d width='600px' height='400px' >
+    <scene onclick="changeColor();">
+        <transform DEF="center">
+            <cylinderSensor DEF="rotate1"  enabled='true' ></cylinderSensor>
+            <transform>
+                <shape >
+                    <appearance>
+                        <!--<material id="color" diffuseColor='1 0 0'></material>-->
+                        <ImageTexture  url="img/mic.png"></ImageTexture>
+                    </appearance>
+                    <box></box>
+                </shape>
+                <transform  DEF="ball" id="ball">
+                    <cylinderSensor DEF="rotate2"  enabled='true' ></cylinderSensor>
+                    <transform translation='-2 0 0'>
+                        <shape>
+                            <appearance>
+                                <material diffuseColor='0 1 0'></material>
+                            </appearance>
+                            <box></box>
+                        </shape>
+                    </transform>
+
+                </transform>
+            </transform>
+
+        </transform>
+
+
+        <transform translation='3 0 0' DEF="ball2" id="ball2">
+            <shape>
+                <appearance>
+                    <material diffuseColor='0 0 1'></material>
+                </appearance>
+                <sphere></sphere>
+            </shape>
+        </transform>
+
+        <timeSensor DEF="time" cycleInterval="4" loop="true"></timeSensor>
+        <PositionInterpolator DEF="move" key="0 0.5 1" keyValue="-2 -2.5 0  -2 2.5 0  -2 -2.5 0" onoutputchange="snapBall(event)"></PositionInterpolator>
+
+
+        <!--<Route fromNode="time" fromField ="fraction_changed" toNode="move" toField="set_fraction"> </Route>-->
+        <!--<Route fromNode="move" fromField ="value_changed" toNode="ball" toField="translation"> </Route>-->
+        <Route fromNode="rotate1" fromField ="rotation_changed" toNode="center" toField="rotation"> </Route>
+        <Route fromNode="rotate2" fromField ="rotation_changed" toNode="ball" toField="rotation"> </Route>
+    </scene>
+
+</x3d>
+<script>
+    function changeColor()
+    {
+        if(document.getElementById("color").getAttribute('diffuseColor')=="1 0 0")
+            document.getElementById("color").setAttribute('diffuseColor', '0 0 1');
+        else
+            document.getElementById("color").setAttribute('diffuseColor', '1 0 0');
+    }
+</script>
+</body>
+</html>

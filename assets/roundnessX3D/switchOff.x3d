@@ -1,0 +1,434 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE X3D PUBLIC 'ISO//Web3D//DTD X3D 3.0//EN' 'http://www.web3d.org/specifications/x3d-3.0.dtd'>
+<X3D xmlns:xsd='http://www.w3.org/2001/XMLSchema-instance' profile='Full' version='3.0' xsd:noNamespaceSchemaLocation='http://www.web3d.org/specifications/x3d-3.0.xsd'>
+	<Scene DEF='scene'>
+		<Background skyColor='0.000 0.000 0.000'/>
+		<Transform DEF='V2Grp001' translation='60.000 0.000 -10.000' rotation='-0.577 0.577 -0.577 -2.094' >
+			<Transform DEF='whole001' >
+				<Transform DEF='V2Xfm001' >
+					<Transform DEF='floor001' translation='0.000 0.000 66.000' >
+					</Transform>
+					<Transform DEF='yuduyi001' translation='10.000 60.000 0.000' >
+						<Transform DEF='jizuo001' translation='0.000 -30.000 27.500' >
+						</Transform>
+						<Transform DEF='V2Xfm011' translation='34.000 30.000 59.000' >
+						</Transform>
+						<Transform DEF='V2Xfm012' translation='-34.000 30.000 59.000' >
+						</Transform>
+						<Transform DEF='V2Xfm013' translation='34.000 -90.000 59.000' >
+						</Transform>
+						<Transform DEF='V2Xfm014' translation='-34.000 -90.000 59.000' >
+						</Transform>
+						<Transform DEF='V2Xfm016' translation='0.000 40.000 -0.000' >
+							<Transform DEF='V2Xfm017' >
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm018' translation='0.000 -75.000 -80.000' >
+						</Transform>
+						<Transform DEF='V2Xfm019' translation='-40.500 -75.000 -80.000' >
+							<Transform DEF='V2Xfm020' >
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm021' translation='40.500 -75.000 -80.000' >
+							<Transform DEF='V2Xfm022' >
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm023' translation='-10.000 0.000 0.000' >
+						</Transform>
+						<Transform DEF='V2Xfm024' translation='0.000 -57.000 0.000' >
+							<Transform DEF='V2Xfm025' rotation='-0.000 -1.000 -0.000 -1.570' >
+								<Transform DEF='b001' >
+									<Transform DEF='V2Xfm026' translation='2.000 0.000 -0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm027' translation='4.000 0.000 0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm028' translation='6.000 0.000 0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm029' translation='8.000 0.000 0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm030' translation='10.000 0.000 -0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm031' translation='12.000 0.000 0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm032' translation='14.000 0.000 -0.000' >
+									</Transform>
+									<Transform DEF='V2Xfm033' translation='16.000 0.000 0.000' >
+									</Transform>
+								</Transform>
+								<Transform DEF='V2Xfm034' translation='18.000 0.000 -0.000' >
+									<Transform DEF='V2Xfm035' >
+										<Transform DEF='V2Xfm036' translation='2.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm037' translation='4.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm038' translation='6.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm039' translation='8.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm040' translation='10.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm041' translation='12.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm042' translation='14.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm043' translation='16.000 0.000 0.000' >
+										</Transform>
+									</Transform>
+								</Transform>
+								<Transform DEF='V2Xfm044' translation='36.000 0.000 -0.000' >
+									<Transform DEF='V2Xfm045' >
+										<Transform DEF='V2Xfm046' translation='2.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm047' translation='4.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm048' translation='6.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm049' translation='8.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm050' translation='10.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm051' translation='12.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm052' translation='14.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm053' translation='16.000 0.000 0.000' >
+										</Transform>
+									</Transform>
+								</Transform>
+								<Transform DEF='V2Xfm054' translation='54.000 0.000 0.000' >
+									<Transform DEF='V2Xfm055' >
+										<Transform DEF='V2Xfm056' translation='2.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm057' translation='4.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm058' translation='6.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm059' translation='8.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm060' translation='10.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm061' translation='12.000 0.000 0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm062' translation='14.000 0.000 -0.000' >
+										</Transform>
+										<Transform DEF='V2Xfm063' translation='16.000 0.000 0.000' >
+										</Transform>
+									</Transform>
+								</Transform>
+								<Transform DEF='V2Xfm064' translation='72.000 0.000 -0.000' >
+								</Transform>
+								<Transform DEF='V2Xfm065' translation='74.000 0.000 -0.000' >
+								</Transform>
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm066' >
+							<Transform DEF='V2Xfm067' translation='0.000 39.000 -0.250' >
+							</Transform>
+							<Transform DEF='V2Xfm068' translation='0.000 -2.500 0.000' >
+								<Transform DEF='V2Xfm069' translation='0.000 39.000 -0.250' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm070' translation='0.000 -5.000 0.000' >
+								<Transform DEF='V2Xfm071' translation='0.000 39.000 -0.250' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm072' translation='0.000 -7.500 0.000' >
+								<Transform DEF='V2Xfm073' translation='0.000 39.000 -0.250' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm074' translation='0.000 -10.000 0.000' >
+								<Transform DEF='V2Xfm075' translation='0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm076' translation='0.000 -12.500 0.000' >
+								<Transform DEF='V2Xfm077' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm078' translation='0.000 -40.000 0.000' >
+								<Transform DEF='V2Xfm079' translation='0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm080' translation='0.000 -15.000 0.000' >
+								<Transform DEF='V2Xfm081' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm082' translation='0.000 -17.500 0.000' >
+								<Transform DEF='V2Xfm083' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm084' translation='0.000 -20.000 0.000' >
+								<Transform DEF='V2Xfm085' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm086' translation='0.000 -22.500 0.000' >
+								<Transform DEF='V2Xfm087' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm088' translation='0.000 -25.000 0.000' >
+								<Transform DEF='V2Xfm089' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm090' translation='0.000 -27.500 0.000' >
+								<Transform DEF='V2Xfm091' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm092' translation='0.000 -30.000 0.000' >
+								<Transform DEF='V2Xfm093' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm094' translation='0.000 -32.500 0.000' >
+								<Transform DEF='V2Xfm095' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm096' translation='0.000 -35.000 0.000' >
+								<Transform DEF='V2Xfm097' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm098' translation='0.000 -37.500 0.000' >
+								<Transform DEF='V2Xfm099' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm100' translation='0.000 -42.500 0.000' >
+								<Transform DEF='V2Xfm101' translation='0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm102' translation='0.000 -45.000 0.000' >
+								<Transform DEF='V2Xfm103' translation='0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm104' translation='0.000 -45.000 0.000' >
+							<Transform DEF='V2Xfm105' translation='0.000 39.000 -1.000' >
+							</Transform>
+							<Transform DEF='V2Xfm106' translation='0.000 -2.500 -0.000' >
+								<Transform DEF='V2Xfm107' translation='-0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm108' translation='0.000 -5.000 -0.000' >
+								<Transform DEF='V2Xfm109' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm110' translation='0.000 -7.500 0.000' >
+								<Transform DEF='V2Xfm111' translation='-0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm112' translation='0.000 -10.000 0.000' >
+								<Transform DEF='V2Xfm113' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm114' translation='0.000 -12.500 0.000' >
+								<Transform DEF='V2Xfm115' translation='-0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm116' translation='0.000 -40.000 -0.000' >
+								<Transform DEF='V2Xfm117' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm118' translation='0.000 -15.000 0.000' >
+								<Transform DEF='V2Xfm119' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm120' translation='0.000 -17.500 0.000' >
+								<Transform DEF='V2Xfm121' translation='-0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm122' translation='0.000 -20.000 -0.000' >
+								<Transform DEF='V2Xfm123' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm124' translation='0.000 -22.500 -0.000' >
+								<Transform DEF='V2Xfm125' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm126' translation='0.000 -25.000 -0.000' >
+								<Transform DEF='V2Xfm127' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm128' translation='0.000 -27.500 -0.000' >
+								<Transform DEF='V2Xfm129' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm130' translation='0.000 -30.000 -0.000' >
+								<Transform DEF='V2Xfm131' translation='0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm132' translation='0.000 -32.500 -0.000' >
+								<Transform DEF='V2Xfm133' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm134' translation='0.000 -35.000 -0.000' >
+								<Transform DEF='V2Xfm135' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm136' translation='0.000 -37.500 -0.000' >
+								<Transform DEF='V2Xfm137' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm138' translation='0.000 -42.500 -0.000' >
+								<Transform DEF='V2Xfm139' translation='0.000 39.000 -0.750' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm140' translation='0.000 -45.000 -0.000' >
+								<Transform DEF='V2Xfm141' translation='0.000 39.000 -1.000' >
+								</Transform>
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm142' translation='-39.000 -10.000 -0.750' >
+						</Transform>
+						<Transform DEF='huizhuantai001' >
+							<Transform DEF='V2Xfm143' translation='0.000 -0.000 -4.500' >
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm144' translation='0.000 -0.000 -2.000' >
+							<Transform DEF='V2Xfm145' rotation='-0.000 -1.000 -0.000 -1.570' >
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm147' translation='0.000 -6.000 -2.250' >
+						</Transform>
+						<Transform DEF='V2Xfm148' translation='0.000 35.000 -5.000' >
+						</Transform>
+						<Transform DEF='V2Xfm149' translation='0.000 35.500 -7.250' >
+						</Transform>
+						<Transform DEF='z005' >
+							<Transform DEF='V2Xfm150' translation='0.000 30.000 -12.000' rotation='-1.000 -0.000 0.000 -1.570' >
+								<Transform DEF='V2Xfm151' translation='0.000 0.000 -4.000' >
+								</Transform>
+								<Transform DEF='V2Xfm152' translation='0.000 0.000 -6.500' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm153' translation='30.000 0.000 -12.000' rotation='0.000 1.000 -0.000 -1.570' >
+								<Transform DEF='V2Xfm154' translation='0.000 -0.000 -4.000' >
+								</Transform>
+								<Transform DEF='V2Xfm155' translation='0.000 -0.000 -6.500' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm156' translation='-30.000 0.000 -12.000' rotation='-0.000 -1.000 -0.000 -1.570' >
+								<Transform DEF='V2Xfm157' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm158' translation='0.000 -30.000 -12.000' rotation='-1.000 -0.000 0.000 -1.570' >
+								<Transform DEF='V2Xfm159' >
+								</Transform>
+							</Transform>
+							<Transform DEF='V2Xfm160' >
+								<Transform DEF='V2Xfm161' translation='0.000 0.000 -12.000' >
+								</Transform>
+								<Transform DEF='zhuandongtai001' >
+									<Transform DEF='tiaozhengtai001' >
+										<Transform DEF='V2Xfm162' >
+											<Transform DEF='V2Xfm163' translation='0.000 0.000 -19.500' >
+											</Transform>
+											<Transform DEF='V2Xfm164' translation='0.000 0.000 -22.000' >
+												<Transform DEF='V2Xfm165' >
+													<Transform DEF='V2Xfm166' rotation='-0.000 -1.000 -0.000 -1.570' >
+													</Transform>
+												</Transform>
+											</Transform>
+											<Transform DEF='V2Xfm168' translation='0.000 0.000 -22.000' >
+											</Transform>
+											<Transform DEF='V2Xfm169' translation='12.000 0.000 -22.000' >
+											</Transform>
+											<Transform DEF='V2Xfm170' translation='-0.000 12.000 -22.000' >
+											</Transform>
+											<Transform DEF='V2Xfm171' translation='0.000 -12.000 -22.000' >
+											</Transform>
+											<Transform DEF='V2Xfm172' translation='-12.000 0.000 -22.000' >
+											</Transform>
+										</Transform>
+									</Transform>
+								</Transform>
+							</Transform>
+						</Transform>
+						<Transform DEF='beichewu001' >
+							<Transform DEF='V2Xfm173' translation='5.000 5.000 -24.500' >
+								<Transform DEF='V2Xfm174' translation='0.000 0.000 -2.000' >
+								</Transform>
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm176' translation='45.000 -80.000 -30.000' >
+							<Transform DEF='V2Xfm177' rotation='0.000 1.000 -0.000 -1.570' >
+								<Transform DEF='power001' scale='0.400 0.400 0.400' >
+									<Transform DEF='V2Xfm178' translation='0.000 0.000 -10.000' rotation='1.000 0.000 0.000 -1.571' scale='0.800 0.800 0.800' >
+										<Transform DEF='switch001' rotation='-0.000 0.000 -1.000 -0.350' >
+											<Transform DEF='VExtr042' rotation='-0.000 0.000 1.000 -0.083' >
+												<Shape>
+													<Appearance DEF='Material__2' >
+														<Material diffuseColor='1.000 0.000 0.000' specularColor='0.000 0.000 0.000' transparency='0.000' shininess='0.145' />
+													</Appearance>
+													<IndexedFaceSet DEF='VExtr042_0-GEOMETRY' solid='false' coordIndex='0 1 2 -1   3 4 5 -1   6 7 8 -1   9 10 11 -1   12 13 14 -1   15 16 17 -1   18 19 20 -1   21 22 23 -1   24 25 26 -1   27 28 29 -1   30 31 32 -1   33 34 35 -1   36 37 38 -1   39 40 41 -1   42 43 44 -1   45 46 47 -1   48 49 50 -1   51 52 53 -1   54 55 56 -1   57 58 59 -1   60 61 62 -1   63 64 65 -1   66 67 68 -1   69 70 71 -1   72 73 74 -1   75 76 77 -1   ' >
+														<Coordinate point='11.999996 -0.000015 7.500046, 11.999992 1.999985 7.500015, 11.999992 1.999985 -7.499939, 11.999992 1.999985 -7.499939, 11.999996 -0.000015 -7.499969, 11.999996 -0.000015 7.500046, 11.999992 1.999985 7.500015, 10.999992 8.999985 7.500031, 10.999992 8.999985 -7.499969, 10.999992 8.999985 -7.499969, 11.999992 1.999985 -7.499939, 11.999992 1.999985 7.500015, 10.999992 8.999985 7.500031, -0.000004 7.999969 7.500031, -0.000004 7.999985 -7.499969, -0.000004 7.999985 -7.499969, 10.999992 8.999985 -7.499969, 10.999992 8.999985 7.500031, -0.000004 7.999969 7.500031, -11.000011 8.999985 7.500031, -11.000011 9.000000 -7.499969, -11.000011 9.000000 -7.499969, -0.000004 7.999985 -7.499969, -0.000004 7.999969 7.500031, -11.000011 8.999985 7.500031, -12.000004 1.999985 7.500031, -12.000000 1.999985 -7.499969, -12.000000 1.999985 -7.499969, -11.000011 9.000000 -7.499969, -11.000011 8.999985 7.500031, -12.000004 1.999985 7.500031, -12.000004 -0.000015 7.500031, -12.000004 -0.000015 -7.500000, -12.000004 -0.000015 -7.500000, -12.000000 1.999985 -7.499969, -12.000004 1.999985 7.500031, 11.999996 -0.000015 7.500046, -0.000008 -0.000015 7.500031, 11.999992 1.999985 7.500015, 11.999992 1.999985 7.500015, -0.000008 -0.000015 7.500031, 10.999992 8.999985 7.500031, 10.999992 8.999985 7.500031, -0.000008 -0.000015 7.500031, -0.000004 7.999969 7.500031, -0.000004 7.999969 7.500031, -0.000008 -0.000015 7.500031, -11.000011 8.999985 7.500031, -11.000011 8.999985 7.500031, -0.000008 -0.000015 7.500031, -12.000004 1.999985 7.500031, -12.000004 1.999985 7.500031, -0.000008 -0.000015 7.500031, -12.000004 -0.000015 7.500031, -12.000004 -0.000015 7.500031, -0.000008 -0.000015 7.500031, 11.999996 -0.000015 7.500046, 11.999996 -0.000015 -7.499969, 11.999992 1.999985 -7.499939, -0.000008 -0.000015 -7.499969, 11.999992 1.999985 -7.499939, 10.999992 8.999985 -7.499969, -0.000008 -0.000015 -7.499969, 10.999992 8.999985 -7.499969, -0.000004 7.999985 -7.499969, -0.000008 -0.000015 -7.499969, -0.000004 7.999985 -7.499969, -11.000011 9.000000 -7.499969, -0.000008 -0.000015 -7.499969, -11.000011 9.000000 -7.499969, -12.000000 1.999985 -7.499969, -0.000008 -0.000015 -7.499969, -12.000000 1.999985 -7.499969, -12.000004 -0.000015 -7.500000, -0.000008 -0.000015 -7.499969, -12.000004 -0.000015 -7.500000, 11.999996 -0.000015 -7.499969, -0.000008 -0.000015 -7.499969'/>
+														<Normal vector='-0.000054 0.964295 -0.264832, -0.000054 0.964295 -0.264832, -0.000054 0.964295 -0.264832, -0.000054 0.964295 -0.264832, -0.000054 0.964295 -0.264832, -0.000054 0.964295 -0.264832, -0.000081 0.917150 -0.398543, -0.000081 0.917150 -0.398543, -0.000081 0.917150 -0.398543, -0.000081 0.917150 -0.398543, -0.000081 0.917150 -0.398543, -0.000081 0.917150 -0.398543, -0.000191 -0.351048 -0.936357, -0.000191 -0.351048 -0.936357, -0.000191 -0.351048 -0.936357, -0.000191 -0.351048 -0.936357, -0.000191 -0.351048 -0.936357, -0.000191 -0.351048 -0.936357, -0.000200 -0.176442 -0.984311, -0.000200 -0.176442 -0.984311, -0.000200 -0.176442 -0.984311, -0.000200 -0.176442 -0.984311, -0.000200 -0.176442 -0.984311, -0.000200 -0.176442 -0.984311, 0.000026 -0.992056 0.125799, 0.000026 -0.992056 0.125799, 0.000026 -0.992056 0.125799, 0.000026 -0.992056 0.125799, 0.000026 -0.992056 0.125799, 0.000026 -0.992056 0.125799, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 1.000000 0.000000 -0.000204, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, -1.000000 -0.000000 0.000204, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832, 0.000054 -0.964295 0.264832'/>
+													</IndexedFaceSet>
+												</Shape>
+											</Transform>
+										</Transform>
+									</Transform>
+								</Transform>
+							</Transform>
+						</Transform>
+						<Transform DEF='V2Xfm179' translation='-10.000000 -52.000004 -45.000000' >
+							<Transform DEF='z006' >
+								<Transform DEF='zhuandong001' translation='12.500000 2.500004 0.000000' >
+									<Transform DEF='V2Xfm180' rotation='0.000000 1.000000 -0.000000 -1.570000' >
+										<Transform DEF='V2Xfm181' translation='-0.000004 0.000000 -5.000000' >
+										</Transform>
+									</Transform>
+								</Transform>
+								<Transform DEF='z007' translation='-4.999999 10.000004 -5.000000' >
+									<Transform DEF='V2Xfm182' rotation='1.000000 -0.000000 -0.000000 -1.570000' >
+										<Transform DEF='pp001' rotation='-1.000000 0.000000 0.000000 -1.570000' >
+											<Transform DEF='V2Xfm183' rotation='-1.000000 -0.000000 -0.000000 -1.570000' >
+												<Transform DEF='V2Xfm184' >
+												</Transform>
+											</Transform>
+											<Transform DEF='V2Xfm185' translation='0.000000 17.000000 0.000000' >
+												<Transform DEF='z008' >
+												</Transform>
+											</Transform>
+											<Transform DEF='V2Xfm186' translation='-0.000001 15.000000 0.000000' rotation='-1.000000 -0.000000 -0.000000 -1.570000' >
+											</Transform>
+											<Transform DEF='V2Xfm187' translation='-0.000001 15.000000 0.000000' rotation='-1.000000 -0.000000 -0.000000 -1.570000' >
+											</Transform>
+											<Transform DEF='V2Xfm188' translation='-0.000001 20.500000 0.000000' >
+											</Transform>
+											<Transform DEF='V2Xfm189' translation='-6.999999 30.000000 0.000000' >
+											</Transform>
+											<Transform DEF='V2Xfm190' translation='-11.499999 28.000000 0.000000' >
+												<Transform DEF='V2Xfm191' rotation='-0.000000 -1.000000 -0.000000 -1.570000' >
+												</Transform>
+											</Transform>
+											<Transform DEF='V2Xfm192' translation='-7.000001 36.000000 0.000000' >
+											</Transform>
+											<Transform DEF='V2Xfm193' translation='0.000000 17.000000 0.000000' >
+											</Transform>
+											<Transform DEF='V2Xfm194' translation='5.000000 17.000000 0.000000' >
+											</Transform>
+											<Transform DEF='V2Xfm195' translation='-5.000001 17.000002 0.000000' >
+											</Transform>
+											<Transform DEF='V2Xfm196' translation='9.500000 28.000000 0.000000' >
+												<Transform DEF='V2Xfm197' translation='11.000000 0.000000 -3.000000' >
+													<Transform DEF='V2Xfm198' rotation='-1.000000 -0.000000 -0.000000 -1.570000' >
+													</Transform>
+												</Transform>
+												<Transform DEF='V2Xfm199' translation='6.500000 0.000000 2.500000' >
+													<Transform DEF='V2Xfm200' translation='0.000000 -0.000001 -9.500000' >
+													</Transform>
+													<Transform DEF='V2Xfm201' translation='0.000000 0.000000 -12.500000' >
+													</Transform>
+													<Transform DEF='V2Xfm202' translation='0.000000 -0.000001 14.000000' >
+													</Transform>
+													<Transform DEF='V2Xfm203' translation='0.000000 0.000000 19.500000' rotation='-1.000000 -0.000000 -0.000000 -1.570000' >
+													</Transform>
+												</Transform>
+											</Transform>
+										</Transform>
+									</Transform>
+								</Transform>
+							</Transform>
+						</Transform>
+					</Transform>
+				</Transform>
+			</Transform>
+		</Transform>
+	</Scene>
+</X3D>

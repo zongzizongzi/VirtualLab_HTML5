@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>robot</title>
+    <script src="js/math/math.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script>
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<3;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+            if(i!=3)document.getElementById("exm_video").pause();
+            else document.getElementById("exm_video").play();
+        }
+    </script>
+</head>
+<body>
+<div class="main-div" style="width: 1500px">
+    <div class="title"><b>机器人操作实验</b></div>
+    <div class="back" ><a href="index.html">←返回目录</a></div>
+    <div id="index_div">
+        <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn"  onclick="show(3)">实验操作视频</button>
+    </div>
+    <div id="index_0" style="width: 1500px;    margin-left: -750px;"> <embed id="instructTxt" src="pdf/ABB机器人虚拟实验指导书.htm" ></embed></div>
+    <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
+    <div id="index_3"><video id="exm_video" src="" controls></video></div>
+    <div id="index_1" style="height: 800px" >
+        <div style="width: 80%;height:100%;display: inline;float: left">
+            <canvas id="mainCanvas"></canvas>
+            <canvas id="noCanvas" style="display: none"></canvas>
+        </div>
+        <div style="width:20%;height: 100%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;">
+            <div class="message_div">
+                <p>关节转角：</p><br>
+                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt()">
+                    <input id="angInput0" type="range" max="165" min="-165" value="0" step="5" onchange="changeAng()">
+                </p>
+                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt()">
+                    <input  id="angInput1" type="range" max="110" min="-110" value="0" step="5" onchange="changeAng()">
+                </p>
+                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt()">
+                    <!--<input id="angInput3" type="range" max="70" min="-90" value="0" step="5" onchange="changeAng()">-->
+                    <input id="angInput2" type="range" max="70" min="-70" value="0" step="5" onchange="changeAng()">
+                </p>
+                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt()">
+                    <input id="angInput3" type="range" max="160" min="-160" value="0" step="5" onchange="changeAng()">
+                </p>
+                <p>Ang_5：<input id="angTxt4"  type="text"value="0" style="width: 50px" onchange="changeAngTxt()">
+                    <input id="angInput4" type="range" max="120" min="-120" value="0" step="5" onchange="changeAng()">
+                </p>
+                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt()">
+                    <input id="angInput5" type="range" max="400" min="-400" value="0" step="5" onchange="changeAng()">
+                </p>
+            </div>
+            <div class="message_div" >
+                <div style="width: 50%;display: inline;float: left">
+                    <p>末端坐标：</p><br>
+                    <p>P_X：<input id="posX" type="text" value="374" class="robotPA"></p>
+                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
+                    <p>P_Z：<input id="posZ" type="text" value="630" class="robotPA"></p>
+                </div>
+                <div style="width: 50%;display: inline;">
+                    <p>末端姿态：</p><br>
+                    <p>E_X：<input id="eulerX" type="text" value="0°" class="robotPA"></p>
+                    <p>E_Y：<input id="eulerY" type="text" value="90°" class="robotPA"></p>
+                    <p>E_Z：<input id="eulerZ" type="text" value="0°" class="robotPA"></p>
+                </div>
+            </div>
+            <div class="message_div" style="height: 22%;">
+                <p>设置示教点</p>
+                <textarea id="points" style="width: 90%;height: 60%;margin: 10px">
+                </textarea>
+                <div class="rowFlex-div">
+                <button id="add" onclick="points(1)">添加</button>
+                <button id="delete" onclick="points(2)">删除</button>
+                <button id="clear" onclick="points(0)">清空</button>
+                </div>
+            </div>
+            <div class="message_div" style="height: 22%;">
+                <p>控制指令</p>
+                <textarea id="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <div class="rowFlex-div">
+                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+    <div  style="font: normal 15px Calibri;width:20%;">
+
+    </div>
+    <script src="js/VILibrary.js"></script>
+    <!--js简写方法-->
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <!--弹出框-->
+    <script src="js/layui/lay/dest/layui.all.js"></script>
+
+    <!--三维显示库-->
+    <script src="js/three/three.js"></script>
+    <script src="js/three/MTLLoader.js"></script>
+    <script src="js/three/OBJLoader.js"></script>
+    <script src="js/three/controls/OrbitControls.js"></script>
+    <script src="js/three/ObjectControls.js"></script>
+    <script>
+        'use strict';
+        let robotVI = new VILibrary.VI.RobotVI($('#mainCanvas'), true);
+        let instructionCompiling= new VILibrary.VI.InstructionVI($('#noCanvas'), true);
+        VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robotVI.id, 1, 1);
+        let val=[0],ang;
+        let s=[],
+            pAngle=[],
+            indexI=0;
+        function changeAng() {
+
+            for(let i=0;i<=5;i++){
+                ang=document.getElementById("angInput"+i).value;
+                val[i]=ang/180*Math.PI;
+                document.getElementById("angTxt"+i).value=ang;
+            }
+            val[1]=-val[1];
+            val[2]=-val[2];
+            val[4]=-val[4];
+            robotVI.jointsControl(val);
+        }
+        function changeAngTxt() {
+            for(let i=0;i<=5;i++){
+                ang=document.getElementById("angTxt"+i).value;
+                val[i]=ang/180*Math.PI;
+                document.getElementById("angInput"+i).value=ang;
+            }
+            val[1]=-val[1];
+            val[2]=-val[2];
+            val[4]=-val[4];
+            robotVI.jointsControl(val);
+        }
+        function Instructions() {
+            instructionCompiling.toggleObserver(true);
+        }
+        function points(type) {
+            switch (type){
+                case 0:/*清空*/
+                    s=[];pAngle=[];indexI=0;break;
+                case 1:/*增加示教点*/
+                    let si="p"+indexI+": "+document.getElementById("posX").value+" "+document.getElementById("posY").value+" "
+                    +document.getElementById("posZ").value+" "+document.getElementById("eulerX").value+" "
+                    +document.getElementById("eulerY").value+" "+document.getElementById("eulerZ").value+";\n";
+                    s.push(si);
+                    let piAngle=[];
+                    for(let j=0;j<6;j++){
+                        piAngle[j]= Number(document.getElementById("angInput"+(j)).value)/180*Math.PI;
+                    }
+                    piAngle[1]=-piAngle[1];
+                    piAngle[2]=-piAngle[2];
+                    piAngle[4]=-piAngle[4];
+                    pAngle.push(piAngle);
+                    indexI++;
+                    break;
+                case 2:/*删除示教点*/
+                    s.pop();
+                    pAngle.pop();
+                    indexI--;
+                    break;
+                case -1:
+                    s=["p0: 340 0 302 0 0 0;\n","p1: -146.3 -39.2 75.7 0.0 -0.2 0.3;\n","p2: 136.5 36.6 93.3 0.0 0.9 0.3;\n"],
+                        pAngle=[[0, 0, 0, 0, 0, 0],[-2.8797932657906435, -1.0471975511965976, 1.2217304763960306, 0, 0, 0],[-2.8797932657906435, 1.0471975511965976, 1.2217304763960306, 0, 0, 0]];
+                    document.getElementById("instrInput").value="moveJ p0;\nmoveJ p1;\nmoveJ p2;\nmoveJ p1;\nmoveJ p2;\nmoveJ p0;";
+                    indexI=3;
+            }
+            let str="";
+            for(let m=0;m<indexI;m++){
+                str= str + s[m] ;
+            }
+            document.getElementById("points").value=str;
+        }
+    </script>
+
+</body>
+</html>

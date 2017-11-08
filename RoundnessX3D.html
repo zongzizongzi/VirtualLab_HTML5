@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script type='text/javascript' src='x3dom/x3dom.js'> </script>
+    <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+</head>
+<body>
+<x3d style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.3921,0.5843,0.9294)" skyColor='(0.3921,0.5843,0.9294)'></Background>
+        <Viewpoint position="47.96688 79.29383 1405.52200" orientation="-0.80979 0.47664 -0.34214 0.07007"></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+        <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+
+        <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+        <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+
+        <inline url="assets/roundnessX3D/base.x3d"> </inline>
+        <inline url="assets/roundnessX3D/rotator.x3d"> </inline>
+        <inline url="assets/roundnessX3D/slider.x3d"> </inline>
+        <inline url="assets/roundnessX3D/tester.x3d"> </inline>
+        <inline url="assets/roundnessX3D/switchOff.x3d"></inline>
+        <inline url="assets/roundnessX3D/switchOn.x3d"> </inline>
+
+
+
+    </scene>
+</x3d>
+</body>
+</html>
