@@ -9766,6 +9766,7 @@ VILibrary.VI = {
                                 return
                             }
                         }
+
                         else{
                             for(let i=0;i<=5;i++){
                                 document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
