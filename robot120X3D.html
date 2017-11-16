@@ -124,12 +124,14 @@
 //    let kinematicsEquationVI= new VILibrary.VI.KinematicsEquationVI($('#resultDiv'), true);
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 2);
     VILibrary.InnerObjects.bindDataLine(robot120VI.id, instructionCompiling.id, 1, 2);
+
 //    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, kinematicsEquationVI.id, 5, 5);
     let val=[0],ang;
     let s=[],
         pAngle=[],
         pPos=[],
         indexI=0;
+    let currentPOS=[374,0,630,0,Math.PI/2,0];
     function changeTransparency() {
         if(document.getElementById('BASE__MA_Base_0').getAttribute('transparency')== '0'){
             for(let i=0;i<10;i++){
@@ -193,9 +195,12 @@
         instructionCompiling.toggleObserver(true);
     }
     function points(type) {
+        let turnPoints;
         switch (type){
             case 0:/*清空*/
-                s=[];pAngle=[];indexI=0;pPos=[];break;
+                s=[];pAngle=[];indexI=0;pPos=[];
+                document.getElementById("PointSet_points").setAttribute('point','');
+                break;
             case 1:/*增加示教点*/
                 let x=parseFloat(document.getElementById("posX").value),
                     y=parseFloat(document.getElementById("posY").value),
@@ -205,23 +210,32 @@
                     alpha=parseFloat(document.getElementById("eulerZ").value);
                 let si="p"+indexI+": x"+x+" y"+y+" z"+z+" "+gamma+"° "
                     +beta+"° "+alpha+"°;\n";
-                let piPos=[x,y,z,gamma/180*Math.PI,beta/180*Math.PI,alpha/180*Math.PI]
+//                let piPos=[x,y,z,gamma/180*Math.PI,beta/180*Math.PI,alpha/180*Math.PI]
+                let piPos=currentPOS.concat();
                 s.push(si);
                 let piAngle=[];
                 for(let j=0;j<6;j++){
                     piAngle[j]= Number(document.getElementById("angInput"+(j)).value)/180*Math.PI;
                 }
-
-
                 pAngle.push(piAngle);
                 pPos.push(piPos);
-//                pAngle.push(currentAng);
+                /*----------------点集增加点的坐标-------------------*/
+                turnPoints=document.getElementById("PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
+                document.getElementById("PointSet_points").setAttribute('point',turnPoints);
+                /*-----------------------------------*/
                 indexI++;
                 break;
             case 2:/*删除示教点*/
                 s.pop();
                 pAngle.pop();
                 pPos.pop();
+                /*----------------点集删除最后一点的坐标-------------------*/
+                turnPoints=document.getElementById("PointSet_points").getAttribute('point');
+                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
+                turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
+                document.getElementById("PointSet_points").setAttribute('point',turnPoints);
+                /*-----------------------------------*/
                 indexI--;
                 break;
             case -1:
