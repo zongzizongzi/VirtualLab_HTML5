@@ -10238,8 +10238,9 @@ VILibrary.VI = {
                     ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
                     nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
                 let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                let u1,u2,v1,v2,resultAng;
+                let u1,u2,v1,v2,resultAng=[];
                 let k=(Math.pow((T[0][3]),2)+Math.pow((T[1][3]),2)+Math.pow((T[2][3]),2)-Math.pow(a[2],2)-Math.pow(a[3],2)-Math.pow(d[4],2))/(2*a[2]);
+                let j=0;
                 for(let i=0;i<=7;i++){
                     if(i<4)theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
                     else   theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
@@ -10249,7 +10250,8 @@ VILibrary.VI = {
                     else       theta[i][1]=Math.atan2(-pz,-Math.sqrt(Math.pow(u1,2)+Math.pow(u2,2)-Math.pow(pz,2)))-Math.atan2(u2,u1);
                     v1=Math.cos(theta[i][1])*u1-Math.sin(theta[i][1])*u2,
                         v2=-Math.sin(theta[i][1])*u1-Math.cos(theta[i][1])*u2;
-                    if(v1>0) theta[i][0]=Math.atan2(py,px);
+                    if(px==0&&py==0){theta[i][0]=currentANG[0];}
+                    else if(v1>0) theta[i][0]=Math.atan2(py,px);
                     else if(v1<0) theta[i][0]=Math.atan2(-py,-px);
                     else theta[i][0]=Number.NaN;
                     let c4=-ax*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-ay*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-az*Math.cos(theta[i][1]+theta[i][2]);
@@ -10267,36 +10269,36 @@ VILibrary.VI = {
                         theta[i][5]=Math.atan2(ox*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+oy*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+oz*Math.cos(theta[i][1]+theta[i][2]),-nx*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-ny*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-nz*Math.cos(theta[i][1]+theta[i][2]));
                     }
                     if(Math.abs(theta[i][0])< Math.PI*11/12&&theta[i][1]>-3.49066&&theta[i][1]<0.439066&&theta[i][2]>-1.570796&&theta[i][2]<1.22173&&Math.abs(theta[i][3])<Math.PI*8/9&&Math.abs(theta[i][4])<2*Math.PI/3&&Math.abs(theta[i][5])<Math.PI*20/9){
-                        resultAng=theta[i];
-                        break;
+                        resultAng[j]=theta[i].concat();
+                        j++;
+                        // break;
                     }
                     else {
                         continue;
                     }
                 }
-                if(resultAng==undefined){return 0}
+                if(resultAng==0&&resultAng[0]==undefined){return 0}
+                else {
+					let omega=[250,250,350,320,320,420]
+					let runTime=[];
+					for(let m=0;m<=resultAng.length-1;m++){
+                        resultAng[m][1]+=Math.PI/2;
+                        let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
+                        runTime[m]=0;
+						for(let n=0;n<6;n++){
+                            runTime[m]+=Math.abs(math.multiply(resultDiff[n],1/omega[n]));
+						}
+					}
+                    let minTime=Math.min.apply(Math,runTime);
+					let minAng=resultAng[runTime.indexOf(minTime)];
+                    return minAng;
+				}
+                /*if(resultAng==undefined){return 0}
                 else {
                     resultAng[1]+=Math.PI/2;
                     let anixAngle=math.multiply(resultAng,180/Math.PI);
                     return resultAng;
-                }
-
-				/*theta[4]=Math.atan2(Math.sqrt(1-Math.pow(c4,2)),c4);
-				 if(theta[4]>2*Math.PI/3||theta[4]<(-2*Math.PI/3)){
-				 theta[4]=Math.atan2(-Math.sqrt(1-Math.pow(c4,2)),c4);
-				 }
-				 let s4=Math.sin(theta[4]);
-				 if(s4>0){
-				 theta[3]=Math.atan2(-T[0][2]*Math.sin(theta[0])+T[1][2]*Math.cos(theta[0]),-T[0][2]*Math.cos(theta[0])*Math.cos(theta[1]+theta[2])-T[1][2]*Math.sin(theta[0])*Math.cos(theta[1]+theta[2])+T[2][2]*Math.sin(theta[1]+theta[2]));
-				 theta[5]=Math.atan2(T[0][1]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])+T[1][1]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])+T[2][1]*Math.cos(theta[1]+theta[2]),-T[0][0]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])-T[1][0]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])-T[2][0]*Math.cos(theta[1]+theta[2]));
-				 }
-				 else if(s4<0){
-				 theta[3]=Math.atan2(T[0][2]*Math.sin(theta[0])-T[1][2]*Math.cos(theta[0]),T[0][2]*Math.cos(theta[0])*Math.cos(theta[1]-theta[2])+T[1][2]*Math.sin(theta[0])*Math.cos(theta[1]+theta[2])-T[2][2]*Math.sin(theta[1]+theta[2]));
-				 theta[5]=Math.atan2(-T[0][1]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])-T[1][1]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])-T[2][1]*Math.cos(theta[1]+theta[2]),T[0][0]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])+T[1][0]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])+T[2][0]*Math.cos(theta[1]+theta[2]));
-				 }
-				 else {
-				 alert("靠近奇异点！")
-				 }*/
+                }*/
             }
         }
         static get cnName() {
@@ -10846,14 +10848,14 @@ VILibrary.VI = {
                     ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
                     nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
                 let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                let u1,u2,v1,v2,resultAng;
-                let k;
+                let u1,u2,v1,v2,resultAng=[];
+                let j=0;
                 for(let i=0;i<=7;i++){
                     if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
                     else    theta[i][0]=Math.atan2(py,px)-Math.atan2(0,-Math.sqrt(px*px+py*py));
                     let h=px*px+py*py+pz*pz+a[1]*a[1];
                     let g=2*a[1]*Math.cos(theta[i][0])*px+2*a[1]*Math.sin(theta[i][0])*py+a[3]*a[3]+d[4]*d[4]+a[2]*a[2];
-                    k=(h-g)/(2*a[2]);
+                    let k=(h-g)/(2*a[2]);
 					if(i<2||i>5) theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
                     else        theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
                    let s23=((-a[3]-a[2]*Math.cos(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.sin(theta[i][2])-d[4]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
@@ -10868,36 +10870,29 @@ VILibrary.VI = {
                    let c6=-ox*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-oy*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+oz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
                     theta[i][5]=Math.atan2(s6,c6);
                     if(Math.abs(theta[i][0])< Math.PI*185/180&&theta[i][1]>-135/180*Math.PI&&theta[i][1]<35/180*Math.PI&&theta[i][2]>-120/180*Math.PI&&theta[i][2]<158/180*Math.PI&&Math.abs(theta[i][3])<350/180*Math.PI&&Math.abs(theta[i][4])<119/180*Math.PI&&Math.abs(theta[i][5])<350/180*Math.PI){
-                        resultAng=theta[i];
-                        break;
+                        resultAng[j]=theta[i].concat();
+                        j++;
                     }
                     else {
                         continue;
                     }
                 }
-                if(resultAng==undefined){return 0}
+                if(resultAng==0&&resultAng[0]==undefined){return 0}
                 else {
-                    resultAng[1]+=Math.PI/2;
-                    let anixAngle=math.multiply(resultAng,180/Math.PI);
-                    return resultAng;
+                    let omega=[250,250,350,320,320,420]
+                    let runTime=[];
+                    for(let m=0;m<=resultAng.length-1;m++){
+                        resultAng[m][1]+=Math.PI/2;
+                        let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
+                        runTime[m]=0;
+                        for(let n=0;n<6;n++){
+                            runTime[m]+=Math.abs(math.multiply(resultDiff[n],1/omega[n]));
+                        }
+                    }
+                    let minTime=Math.min.apply(Math,runTime);
+                    let minAng=resultAng[runTime.indexOf(minTime)];
+                    return minAng;
                 }
-
-				/*theta[4]=Math.atan2(Math.sqrt(1-Math.pow(c4,2)),c4);
-				 if(theta[4]>2*Math.PI/3||theta[4]<(-2*Math.PI/3)){
-				 theta[4]=Math.atan2(-Math.sqrt(1-Math.pow(c4,2)),c4);
-				 }
-				 let s4=Math.sin(theta[4]);
-				 if(s4>0){
-				 theta[3]=Math.atan2(-T[0][2]*Math.sin(theta[0])+T[1][2]*Math.cos(theta[0]),-T[0][2]*Math.cos(theta[0])*Math.cos(theta[1]+theta[2])-T[1][2]*Math.sin(theta[0])*Math.cos(theta[1]+theta[2])+T[2][2]*Math.sin(theta[1]+theta[2]));
-				 theta[5]=Math.atan2(T[0][1]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])+T[1][1]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])+T[2][1]*Math.cos(theta[1]+theta[2]),-T[0][0]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])-T[1][0]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])-T[2][0]*Math.cos(theta[1]+theta[2]));
-				 }
-				 else if(s4<0){
-				 theta[3]=Math.atan2(T[0][2]*Math.sin(theta[0])-T[1][2]*Math.cos(theta[0]),T[0][2]*Math.cos(theta[0])*Math.cos(theta[1]-theta[2])+T[1][2]*Math.sin(theta[0])*Math.cos(theta[1]+theta[2])-T[2][2]*Math.sin(theta[1]+theta[2]));
-				 theta[5]=Math.atan2(-T[0][1]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])-T[1][1]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])-T[2][1]*Math.cos(theta[1]+theta[2]),T[0][0]*Math.cos(theta[0])*Math.sin(theta[1]+theta[2])+T[1][0]*Math.sin(theta[0])*Math.sin(theta[1]+theta[2])+T[2][0]*Math.cos(theta[1]+theta[2]));
-				 }
-				 else {
-				 alert("靠近奇异点！")
-				 }*/
             }
         }
         static get cnName() {
