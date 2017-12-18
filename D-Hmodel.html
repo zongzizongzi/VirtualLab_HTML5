@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/math/math.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script type='text/javascript' src='x3dom/x3dom.js'> </script>
+    <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+</head>
+<body>
+<div class="main-div" style="width: 1500px;">
+    <div class="title"><b>机器人操作实验(型号：ABB_IRB120)</b></div>
+    <div class="back" ><a href="index.html">←返回目录</a></div>
+    <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
+    <div id="index_1" style="height: 800px">
+        <div style="width: 80%;height: 100%;display: inline;float: left">
+            <div id="robotX3d" style="width: 100%;height: 100%;">
+            </div>
+            <div id="tools" >
+                <input type="checkbox" checked="true" onclick="lightSwitch('point')">
+                <label>point light</label>
+                <input type="checkbox" checked="true" onclick="lightSwitch('spot')">
+                <label>spot light</label>
+                <input type="checkbox" checked="true" onclick="lightSwitch('directional')">
+                <label>directional light</label>
+                <input type="checkbox" checked="true" onclick="headlight()">
+                <label>headlight</label>
+            </div>
+        </div>
+
+        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+            <div class="message_div" >
+                <p>各连杆尺寸</p><br>
+                <!--<p >Base_Y：
+                    <input id="L-1" type="range" max="227" min="147" value="187" step="1" onchange="changeLen(-1)">
+                </p>
+                <p>Link1_Y：
+                    <input  id="L0" type="range" max="123" min="83" value="103" step="1" onchange="changeLen(0)">
+                </p>
+                <p>Link2_Y：
+                    <input id="L1" type="range" max="320" min="220" value="270" step="1" onchange="changeLen(1)">
+                </p>
+                <p>Link3_Y：
+                    <input id="L2" type="range" max="80" min="60" value="70" step="1" onchange="changeLen(2)">
+                </p>
+                <p>Link3_X：
+                    <input id="L2.5" type="range" max="164" min="104" value="134" step="1" onchange="changeLen(2.5)">
+                </p>
+                <p>Link4_X：
+                    <input id="L3" type="range" max="198" min="138" value="168" step="1" onchange="changeLen(3)">
+                </p>
+                <p>Link5_X：
+                    <input id="L4" type="range" max="69" min="49" value="59" step="1" onchange="changeLen(4)">
+                </p>
+                <p>Link6_X：
+                    <input id="L5" type="range" max="16" min="10" value="13" step="1" onchange="changeLen(5)">
+                </p>-->
+                <table id="linkTable">
+                    <tr>
+                        <td>Base_Y</td>
+                        <td><input id="L-1" class="linkInput"  type="number" max="227" min="147" value="187" step="1" onchange="changeLen(-1)">
+                        <td>Link1_Y</td>
+                        <td><input  id="L0" class="linkInput"  type="number" max="123" min="83" value="103" step="1" onchange="changeLen(0)"></td>
+                    </tr>
+                    <tr>
+                        <td>Link2_Y</td>
+                        <td><input id="L1" class="linkInput"  type="number" max="320" min="220" value="270" step="1" onchange="changeLen(1)"></td>
+                        <td>Link3_Y</td>
+                        <td><input id="L2" class="linkInput"  type="number" max="80" min="60" value="70" step="1" onchange="changeLen(2)"></td>
+                    </tr>
+                    <tr>
+                        <td>Link3_X</td>
+                        <td><input id="L2.5" class="linkInput"  type="number" max="164" min="104" value="134" step="1" onchange="changeLen(2.5)"></td>
+                        <td>Link4_X</td>
+                        <td> <input id="L3" class="linkInput"  type="number" max="198" min="138" value="168" step="1" onchange="changeLen(3)"></td>
+                    </tr>
+                    <tr>
+                        <td>Link5_X</td>
+                        <td><input id="L4" class="linkInput" type="number" max="69" min="49" value="59" step="1" onchange="changeLen(4)"></td>
+                        <td>Link6_X</td>
+                        <td> <input id="L5" class="linkInput" type="number" max="16" min="10" value="13" step="1" onchange="changeLen(5)"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="message_div" >
+                <p>D-H参数</p><br>
+                <table id="d-hTable" >
+                    <tr>
+                        <th>i</th>
+                        <th>a<sub>i-1</sub></th>
+                        <th>α<sub>i-1</sub></th>
+                        <th>d<sub>i</sub></th>
+                        <th>θ<sub>i</sub></th>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>0</td>
+                        <td>0°</td>
+                        <td>290</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0°</td>
+                        <td>0</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>-90°</td>
+                        <td>0</td>
+                        <td>θ-90°</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>270</td>
+                        <td>0°</td>
+                        <td>0</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>70</td>
+                        <td>-90°</td>
+                        <td>302</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>0</td>
+                        <td>90°</td>
+                        <td>0</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>0</td>
+                        <td>-90°</td>
+                        <td>0</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>T</td>
+                        <td>0</td>
+                        <td>0°</td>
+                        <td>72</td>
+                        <td>θ+180°</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="message_div" id="messageDiv">
+                <p>关节转角：</p><br>
+                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
+                    <input id="angInput0" type="range" max="165" min="-165" value="0" step="5" onchange="changeAng(0)">
+                </p>
+                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
+                    <input  id="angInput1" type="range" max="110" min="-110" value="0" step="5" onchange="changeAng(1)">
+                </p>
+                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
+                    <input id="angInput2" type="range" max="70" min="-70" value="0" step="5" onchange="changeAng(2)">
+                </p>
+                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
+                    <input id="angInput3" type="range" max="160" min="-160" value="0" step="5" onchange="changeAng(3)">
+                </p>
+                <p>Ang_5：<input id="angTxt4"  type="text"value="0" style="width: 50px" onchange="changeAngTxt(4)">
+                    <input id="angInput4" type="range" max="120" min="-120" value="0" step="5" onchange="changeAng(4)">
+                </p>
+                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
+                    <input id="angInput5" type="range" max="400" min="-400" value="0" step="5" onchange="changeAng(5)">
+                </p>
+            </div>
+            <div class="message_div" id="resultDiv" onchange="changePos()">
+                <div style="width: 50%;display: inline;float: left">
+                    <p>末端坐标：</p><br>
+                    <p>P_X：<input id="posX" type="text" value="374" class="robotPA"></p>
+                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
+                    <p>P_Z：<input id="posZ" type="text" value="630" class="robotPA"></p>
+                </div>
+                <div style="width: 50%;display: inline;">
+                    <p>末端姿态：</p><br>
+                    <p>E_X：<input id="eulerX" type="text" value="0" class="robotPA">°</p>
+                    <p>E_Y：<input id="eulerY" type="text" value="90" class="robotPA">°</p>
+                    <p>E_Z：<input id="eulerZ" type="text" value="0" class="robotPA">°</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="js/VILibrary.js"></script>
+<!--js简写方法-->
+<script src="js/jquery-3.1.1.min.js"></script>
+<!--弹出框-->
+<script src="js/layui/lay/dest/layui.all.js"></script>
+<script>
+    let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
+    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true);
+    //    let kinematicsEquationVI= new VILibrary.VI.KinematicsEquationVI($('#resultDiv'), true);
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 2);
+    VILibrary.InnerObjects.bindDataLine(robot120VI.id, instructionCompiling.id, 1, 2);
+
+    let val=[0],ang;
+    let s=[],
+        pAngle=[],
+        pPos=[],
+        indexI=0;
+    let currentPOS=[374,0,630,0,Math.PI/2,0];
+    let currentLen=[290,270,70,302,72];
+    let currentScal=[1,1,1,1,1];
+    /*function changeLen(lenNum) {
+        let initLen=[290,270,70,302,72];
+        currentLen[lenNum]=parseFloat(document.getElementById("len"+lenNum).value);
+        if(isNaN(currentLen[lenNum])||currentLen[lenNum]<=0){
+            alert("请输入正确的数字");
+        }
+        else {
+            currentScal[lenNum]=currentLen[lenNum]/initLen[lenNum];
+            let linkScale="1,1,1",linkTransform;
+            switch (lenNum){
+                case 0:
+                    linkScale="1,"+currentScal[lenNum]+",1";
+                    linkTransform="0,"+currentLen[lenNum]+",0";
+                    document.getElementById("Robot__link0Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__baseScale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link1").setAttribute('translation',linkTransform);
+                    break;
+                case 1:
+                    linkScale="1,"+currentScal[lenNum]+",1";
+                    linkTransform="0,"+currentLen[lenNum]+",0";
+                    document.getElementById("Robot__link2").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link1Scale").setAttribute('scale',linkScale);
+                    break;
+                case 2:
+                    linkScale=currentScal[3]+","+currentScal[2]+",1";
+                    linkTransform=currentLen[3]+","+currentLen[2]+",0";
+                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
+                    break;
+                case 3:
+                    linkScale=currentScal[3]+","+currentScal[2]+",1";
+                    let linkScale3=currentScal[3]+",1,1";
+                    linkTransform=currentLen[3]+","+currentLen[2]+",0";
+                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link3Scale").setAttribute('scale',linkScale3);
+                    break;
+                case 4:
+                    linkScale=currentScal[lenNum]+",1,1";
+                    linkTransform=(59*currentScal[lenNum])+",0,0";
+                    document.getElementById("Robot__link5").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link4Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link5Scale").setAttribute('scale',linkScale);
+                    break;
+                default:alert("lenNUM error");
+                    return;
+            }
+        }
+
+    }*/
+    function changeLen(lenNum) {
+        let initLen=[290,270,70,302,72];
+        currentLen[lenNum]=parseFloat(document.getElementById("len"+lenNum).value);
+        if(isNaN(currentLen[lenNum])||currentLen[lenNum]<=0){
+            alert("请输入正确的数字");
+        }
+        else {
+            currentScal[lenNum]=currentLen[lenNum]/initLen[lenNum];
+            let linkScale="1,1,1",linkTransform;
+            switch (lenNum){
+                case 0:
+                    linkScale="1,"+currentScal[lenNum]+",1";
+                    linkTransform="0,"+currentLen[lenNum]+",0";
+                    document.getElementById("Robot__link0Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__baseScale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link1").setAttribute('translation',linkTransform);
+                    break;
+                case 1:
+                    linkScale="1,"+currentScal[lenNum]+",1";
+                    linkTransform="0,"+currentLen[lenNum]+",0";
+                    document.getElementById("Robot__link2").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link1Scale").setAttribute('scale',linkScale);
+                    break;
+                case 2:
+                    linkScale=currentScal[3]+","+currentScal[2]+",1";
+                    linkTransform=currentLen[3]+","+currentLen[2]+",0";
+                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
+                    break;
+                case 3:
+                    linkScale=currentScal[3]+","+currentScal[2]+",1";
+                    let linkScale3=currentScal[3]+",1,1";
+                    linkTransform=currentLen[3]+","+currentLen[2]+",0";
+                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link3Scale").setAttribute('scale',linkScale3);
+                    break;
+                case 4:
+                    linkScale=currentScal[lenNum]+",1,1";
+                    linkTransform=(59*currentScal[lenNum])+",0,0";
+                    document.getElementById("Robot__link5").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link4Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link5Scale").setAttribute('scale',linkScale);
+                    break;
+                default:alert("lenNUM error");
+                    return;
+            }
+        }
+
+    }
+    function changeAng(input) {
+        let currentAng=[0,0,0,0,0,0];
+        document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
+        for(let i=0;i<=5;i++){
+            currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
+        }
+        instructionCompiling.moveJ(currentAng);
+    }
+    function changeAngTxt(input) {
+        document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
+        changeAng(input);
+    }
+    function changePos() {
+//        kinematicsEquationVI.setData([0,0,0,0,0,0],3)
+        let x=parseFloat(document.getElementById("posX").value),
+            y=parseFloat(document.getElementById("posY").value),
+            z=parseFloat(document.getElementById("posZ").value),
+            gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
+            beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
+            alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
+        /*ca=Math.cos(alpha),sa=Math.sin(alpha),
+         cb=Math.cos(beta),sb=Math.sin(beta),
+         cy=Math.cos(gamma),sy=Math.sin(gamma);
+         let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
+         instructionCompiling.inverseKinematics(R);*/
+        let pos=[x,y,z,gamma,beta,alpha];
+        instructionCompiling.moveL(pos,100);
+
+    }
+</script>
+</body>
+</html>

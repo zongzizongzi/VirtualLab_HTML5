@@ -132,7 +132,7 @@
         pPos=[],
         indexI=0;
     let currentPOS=[374,0,630,0,Math.PI/2,0];
-    function changeTransparency() {
+    /*function changeTransparency() {
         if(document.getElementById('BASE__MA_Base_0').getAttribute('transparency')== '0'){
             for(let i=0;i<10;i++){
                 document.getElementById('BASE__MA_Base_'+i).setAttribute('transparency', '0.1');
@@ -142,7 +142,7 @@
             for(let i=0;i<10;i++){
                 document.getElementById('BASE__MA_Base_'+i).setAttribute('transparency', '0');
             }
-    }
+    }*/
     function changeAng(input) {
         let currentAng=[0,0,0,0,0,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -201,9 +201,9 @@
                 pAngle.push(piAngle);
                 pPos.push(piPos);
                 /*----------------点集增加点的坐标-------------------*/
-                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('coord');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                document.getElementById("Robot__PointSet_points").setAttribute('coord',turnPoints);
                 /*-----------------------------------*/
                 indexI++;
                 break;

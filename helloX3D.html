@@ -48,14 +48,14 @@
 <p>
     This is my first html page with some 3d objects.
 </p>
-<x3d width='600px' height='400px' >
+<!--<x3d width='600px' height='400px' >
     <scene onclick="changeColor();">
         <transform DEF="center">
             <cylinderSensor DEF="rotate1"  enabled='true' ></cylinderSensor>
             <transform>
                 <shape >
                     <appearance>
-                        <!--<material id="color" diffuseColor='1 0 0'></material>-->
+                        &lt;!&ndash;<material id="color" diffuseColor='1 0 0'></material>&ndash;&gt;
                         <ImageTexture  url="img/mic.png"></ImageTexture>
                     </appearance>
                     <box></box>
@@ -90,18 +90,34 @@
         <PositionInterpolator DEF="move" key="0 0.5 1" keyValue="-2 -2.5 0  -2 2.5 0  -2 -2.5 0" onoutputchange="snapBall(event)"></PositionInterpolator>
 
 
-        <!--<Route fromNode="time" fromField ="fraction_changed" toNode="move" toField="set_fraction"> </Route>-->
-        <!--<Route fromNode="move" fromField ="value_changed" toNode="ball" toField="translation"> </Route>-->
+        &lt;!&ndash;<Route fromNode="time" fromField ="fraction_changed" toNode="move" toField="set_fraction"> </Route>&ndash;&gt;
+        &lt;!&ndash;<Route fromNode="move" fromField ="value_changed" toNode="ball" toField="translation"> </Route>&ndash;&gt;
         <Route fromNode="rotate1" fromField ="rotation_changed" toNode="center" toField="rotation"> </Route>
         <Route fromNode="rotate2" fromField ="rotation_changed" toNode="ball" toField="rotation"> </Route>
     </scene>
 
+</x3d>-->
+<x3d id="120X3d" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Viewpoint position="47.96688 79.29383 1405.52200" orientation="-0.80979 0.47664 -0.34214 0.07007"></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+
+        <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+        <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+
+        <transform  translation="200,-300,500">
+            <inline url="assets/irb120_x3d/link6.x3d"> </inline>
+        </transform>
+    </scene>
 </x3d>
 <script>
     function changeColor()
     {
-        if(document.getElementById("color").getAttribute('diffuseColor')=="1 0 0")
-            document.getElementById("color").setAttribute('diffuseColor', '0 0 1');
+        if(document.getElementById("color").getAttribute('diffuseColor')=="1 0 0") ;
+        document.getElementById("color").setAttribute('diffuseColor', '0 0 1');
         else
             document.getElementById("color").setAttribute('diffuseColor', '1 0 0');
     }

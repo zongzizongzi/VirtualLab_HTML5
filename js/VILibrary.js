@@ -572,9 +572,9 @@ class RobotTemplateVI extends TemplateVI {
 				 </scene>
 				 </x3d>*!/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
 				 document.getElementById("x3d120").innerHTML=my_html;*/
-                document.getElementById("robotX3d").innerHTML='<x3d style="width: 100%;height: 100%;"><scene><transform>'+
+                document.getElementById("robotX3d").innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
                     '<inline nameSpaceName="Robot" mapDEFToID="true" url='+this.robotURL+'></inline>'+
-                    '</transform></scene></x3d>';
+                    '</scene></x3d>';
             }
             else {
 
@@ -9911,9 +9911,9 @@ VILibrary.VI = {
 				let diffPos=math.add(instructPos,math.multiply(-1,lastPos));
                 let t=Math.sqrt(Math.pow(diffPos[0],2)+Math.pow(diffPos[1],2)+Math.pow(diffPos[2],2))/v;
                 if(t==0){
-                	t=Math.max.apply(Math,math.abs(diffPos))/(240*Math.PI/180);
+                	t=Math.max.apply(Math,math.abs(diffPos))/(240*Math.PI/180);//距离为0 ，按最大转速计算时间
 				}
-                let N=t/INTERVAL;
+                let N=parseInt(t/INTERVAL)+1;
 				let step=math.multiply(diffPos,1/N);
                 let maxStep=Math.max.apply(Math,math.abs(step));
 				/*for(let i=0;i<6;i++){
@@ -9925,16 +9925,35 @@ VILibrary.VI = {
                     let diff=math.add(instructPos, current);
                     let maxDiff=Math.max.apply(Math,math.abs(diff));
                     let x,y,z,alpha,beta,gamma,tPos;
-                	if(maxDiff==0){
+                    if(k+1==N){
+                        window.clearInterval(_this.timer);
+                        _this.timer=0;
+                        if(executiveFlag){
+                            // targetANG=instrAng.concat();
+							targetANG=inverseKinematics(instructPos);
+                        }
+                        else {
+                            tPos=instructPos.concat();
+                            let tANG=inverseKinematics(tPos);
+                            if(tANG==0){
+                                window.clearInterval(_this.timer);
+                                _this.timer=0;
+                                alert("超出工作空间或靠近奇异点！");
+                                return;}
+                            else {targetANG=tANG.concat();
+                            }
+                        }
+					}
+                	/*if(maxDiff==0){
                         window.clearInterval(_this.timer);
                         _this.timer=0;
                         // return;
-                        /*if(((instrSplit)!=undefined)&&(instrIndex<(instrSplit.length-1))){
+                        /!*if(((instrSplit)!=undefined)&&(instrIndex<(instrSplit.length-1))){
                             instrIndex++;
                             setTimeout(function () {
                                 instrCompiling();
                             },500);
-                            }*/
+                            }*!/
                         if(executiveFlag){
                             instrIndex++;
                             if(instrIndex<instrSplit.length){
@@ -9948,7 +9967,6 @@ VILibrary.VI = {
                                 return
                             }
                         }
-
                         else{
                             for(let i=0;i<=5;i++){
                                 document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
@@ -9972,7 +9990,7 @@ VILibrary.VI = {
                             else {targetANG=tANG.concat();
                             }
 						}
-					}
+					}*/
 					else {
                             x=currentPOS[0]+step[0],
                             y=currentPOS[1]+step[1],
@@ -10002,6 +10020,28 @@ VILibrary.VI = {
 					if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                         }
+					if(k+1==N){
+                        if(executiveFlag){
+                            instrIndex++;
+                            if(instrIndex<instrSplit.length){
+                                setTimeout(function () {
+                                    instrCompiling();
+                                },500);
+                                // instrCompiling();
+                            }
+                            else {
+                                executiveFlag=false;
+                                return
+                            }
+                        }
+                        else{
+                            for(let i=0;i<=5;i++){
+                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI);
+                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI);
+                            }
+                            return;
+                        }
+					}
 					k++;
 				},INTERVAL*1000)
 
@@ -11042,8 +11082,6 @@ VILibrary.VI = {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas,draw3DFlag);
             const _this = this;
-            // RobotTemplateVI.prototype.robotURL='assets/kuka_KR60HA_x3d/kuka_kr60.x3d';
-            // RobotTemplateVI.prototype.draw(draw3DFlag);
             this.robotURL='assets/irb120_x3d/robot120.x3d';
             this.draw(draw3DFlag);
             this.name = 'ABB_irb20';
@@ -11063,7 +11101,7 @@ VILibrary.VI = {
             return '300px';
         }
     },
-	Robotkr60VI:class Robotkr60VI extends RobotTemplateVI {
+	Roboctkr60VI:class Robotkr60VI extends RobotTemplateVI {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas,draw3DFlag);
             const _this = this;

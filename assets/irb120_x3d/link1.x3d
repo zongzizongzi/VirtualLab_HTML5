@@ -3,7 +3,7 @@
 <X3D xmlns:xsd='http://www.w3.org/2001/XMLSchema-instance' profile='Full' version='3.0' xsd:noNamespaceSchemaLocation='http://www.web3d.org/specifications/x3d-3.0.xsd'>
 	<Scene DEF='scene'>
 		<Background skyColor='0.000 0.000 0.000'/>
-		<Transform DEF='ASTA1CE6836' rotation='-1.000 -0.000 -0.000 -1.571' >
+		<Transform DEF='aaa' rotation='-1.000 -0.000 -0.000 -1.571' >
 			<Transform DEF='ASTA1CE6836_1' >
 				<Transform DEF='ASTA1CE6836_2' >
 					<Transform DEF='_3HAC031109-003-1-solid1' >
