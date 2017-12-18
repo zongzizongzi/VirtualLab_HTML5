@@ -512,6 +512,7 @@ html {
    /* margin-left: auto;
     margin-right: auto;*/
     margin: 10px;
+    margin-top: 0px;
     padding: 10px;
 }
 .robotPA{
@@ -526,7 +527,7 @@ html {
     font-family:"Times New Roman";
 }
 #d-hTable tr{
-    height: 25px;
+    height: 20px;
 }
 #d-hTable th{
     border-left: 1px solid;
@@ -539,7 +540,7 @@ html {
     border-bottom: 1px solid;
     width: 20%;
 }
-.d-hInput{
+.linkInput{
     background-color: inherit;
     width: 90%;
     height:90%;
@@ -558,6 +559,7 @@ html {
     border-left: 1px solid;
     border-bottom: 1px solid;
     width: 25%;
+    height: 25px;
 }
 
 

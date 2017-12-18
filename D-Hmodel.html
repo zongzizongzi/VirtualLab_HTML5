@@ -12,7 +12,6 @@
 <div class="main-div" style="width: 1500px;">
     <div class="title"><b>机器人操作实验(型号：ABB_IRB120)</b></div>
     <div class="back" ><a href="index.html">←返回目录</a></div>
-    <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_1" style="height: 800px">
         <div style="width: 80%;height: 100%;display: inline;float: left">
             <div id="robotX3d" style="width: 100%;height: 100%;">
@@ -59,27 +58,27 @@
                 <table id="linkTable">
                     <tr>
                         <td>Base_Y</td>
-                        <td><input id="L-1" class="linkInput"  type="number" max="227" min="147" value="187" step="1" onchange="changeLen(-1)">
+                        <td><input id="L0" class="linkInput"  type="number" max="196" min="136" value="166" step="1" onchange="changeLen(0)">
                         <td>Link1_Y</td>
-                        <td><input  id="L0" class="linkInput"  type="number" max="123" min="83" value="103" step="1" onchange="changeLen(0)"></td>
+                        <td><input  id="L1" class="linkInput"  type="number" max="144" min="104" value="124" step="1" onchange="changeLen(1)"></td>
                     </tr>
                     <tr>
                         <td>Link2_Y</td>
-                        <td><input id="L1" class="linkInput"  type="number" max="320" min="220" value="270" step="1" onchange="changeLen(1)"></td>
+                        <td><input id="L2" class="linkInput"  type="number" max="320" min="220" value="270" step="1" onchange="changeLen(2)"></td>
                         <td>Link3_Y</td>
-                        <td><input id="L2" class="linkInput"  type="number" max="80" min="60" value="70" step="1" onchange="changeLen(2)"></td>
+                        <td><input id="L3" class="linkInput"  type="number" max="80" min="60" value="70" step="1" onchange="changeLen(3)"></td>
                     </tr>
                     <tr>
                         <td>Link3_X</td>
-                        <td><input id="L2.5" class="linkInput"  type="number" max="164" min="104" value="134" step="1" onchange="changeLen(2.5)"></td>
+                        <td><input id="L4" class="linkInput"  type="number" max="164" min="104" value="150" step="1" onchange="changeLen(4)"></td>
                         <td>Link4_X</td>
-                        <td> <input id="L3" class="linkInput"  type="number" max="198" min="138" value="168" step="1" onchange="changeLen(3)"></td>
+                        <td> <input id="L5" class="linkInput"  type="number" max="198" min="138" value="152" step="1" onchange="changeLen(5)"></td>
                     </tr>
                     <tr>
                         <td>Link5_X</td>
-                        <td><input id="L4" class="linkInput" type="number" max="69" min="49" value="59" step="1" onchange="changeLen(4)"></td>
+                        <td><input id="L6" class="linkInput" type="number" max="69" min="49" value="59" step="1" onchange="changeLen(6)"></td>
                         <td>Link6_X</td>
-                        <td> <input id="L5" class="linkInput" type="number" max="16" min="10" value="13" step="1" onchange="changeLen(5)"></td>
+                        <td> <input id="L7" class="linkInput" type="number" max="16" min="10" value="13" step="1" onchange="changeLen(7)"></td>
                     </tr>
                 </table>
             </div>
@@ -97,7 +96,7 @@
                         <td>B</td>
                         <td>0</td>
                         <td>0°</td>
-                        <td>290</td>
+                        <td id="d0">290</td>
                         <td>θ</td>
                     </tr>
                     <tr>
@@ -116,16 +115,16 @@
                     </tr>
                     <tr>
                         <td>3</td>
-                        <td>270</td>
+                        <td  id="a2">270</td>
                         <td>0°</td>
                         <td>0</td>
                         <td>θ</td>
                     </tr>
                     <tr>
                         <td>4</td>
-                        <td>70</td>
+                        <td  id="a3">70</td>
                         <td>-90°</td>
-                        <td>302</td>
+                        <td  id="d4">302</td>
                         <td>θ</td>
                     </tr>
                     <tr>
@@ -146,7 +145,7 @@
                         <td>T</td>
                         <td>0</td>
                         <td>0°</td>
-                        <td>72</td>
+                        <td  id="d7">72</td>
                         <td>θ+180°</td>
                     </tr>
                 </table>
@@ -208,8 +207,10 @@
         pPos=[],
         indexI=0;
     let currentPOS=[374,0,630,0,Math.PI/2,0];
-    let currentLen=[290,270,70,302,72];
-    let currentScal=[1,1,1,1,1];
+    let currentLen=[166,124,270,70,150,152,59,13];
+    let currentScal=[1,1,1,1,1,1,1,1];
+    let a=[0,0,0,270,70,0,0,0],
+        d=[290,0,0,0,302,0,0,72];
     /*function changeLen(lenNum) {
         let initLen=[290,270,70,302,72];
         currentLen[lenNum]=parseFloat(document.getElementById("len"+lenNum).value);
@@ -261,8 +262,8 @@
 
     }*/
     function changeLen(lenNum) {
-        let initLen=[290,270,70,302,72];
-        currentLen[lenNum]=parseFloat(document.getElementById("len"+lenNum).value);
+        let initLen=[166,124,270,70,150,152,59,13];
+        currentLen[lenNum]=parseInt(document.getElementById("L"+lenNum).value);
         if(isNaN(currentLen[lenNum])||currentLen[lenNum]<=0){
             alert("请输入正确的数字");
         }
@@ -270,39 +271,46 @@
             currentScal[lenNum]=currentLen[lenNum]/initLen[lenNum];
             let linkScale="1,1,1",linkTransform;
             switch (lenNum){
-                case 0:
+                case 0:case 1:case 2:
                     linkScale="1,"+currentScal[lenNum]+",1";
                     linkTransform="0,"+currentLen[lenNum]+",0";
-                    document.getElementById("Robot__link0Scale").setAttribute('scale',linkScale);
-                    document.getElementById("Robot__baseScale").setAttribute('scale',linkScale);
-                    document.getElementById("Robot__link1").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link"+(lenNum-1)+"Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link"+lenNum).setAttribute('translation',linkTransform);
+                    if(lenNum<2){
+                        d[0]=currentLen[0]+currentLen[1];
+                        document.getElementById("d0").innerHTML=d[0];
+                    }
+                    else {
+                        a[2]=currentLen[2];
+                        document.getElementById("a2").innerHTML=a[2];
+                    }
                     break;
-                case 1:
-                    linkScale="1,"+currentScal[lenNum]+",1";
-                    linkTransform="0,"+currentLen[lenNum]+",0";
-                    document.getElementById("Robot__link2").setAttribute('translation',linkTransform);
-                    document.getElementById("Robot__link1Scale").setAttribute('scale',linkScale);
-                    break;
-                case 2:
-                    linkScale=currentScal[3]+","+currentScal[2]+",1";
-                    linkTransform=currentLen[3]+","+currentLen[2]+",0";
+                case 3:case 4:
+                    linkScale=currentScal[4]+","+currentScal[3]+",1";
+                    linkTransform=currentLen[4]+","+currentLen[3]+",0";
                     document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
                     document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
+                    if(lenNum==3){
+                        a[3]=currentLen[3];
+                        document.getElementById("a3").innerHTML=a[3];
+                    }
+                    else {
+                        d[4]=currentLen[4]+currentLen[5];
+                        document.getElementById("d4").innerHTML=d[4];
+                    }
                     break;
-                case 3:
-                    linkScale=currentScal[3]+","+currentScal[2]+",1";
-                    let linkScale3=currentScal[3]+",1,1";
-                    linkTransform=currentLen[3]+","+currentLen[2]+",0";
-                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
-                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
-                    document.getElementById("Robot__link3Scale").setAttribute('scale',linkScale3);
-                    break;
-                case 4:
+                case 5:
+                    d[4]=currentLen[4]+currentLen[5];
+                    document.getElementById("d4").innerHTML=d[4];
+                case 6:case 7:
                     linkScale=currentScal[lenNum]+",1,1";
-                    linkTransform=(59*currentScal[lenNum])+",0,0";
-                    document.getElementById("Robot__link5").setAttribute('translation',linkTransform);
-                    document.getElementById("Robot__link4Scale").setAttribute('scale',linkScale);
-                    document.getElementById("Robot__link5Scale").setAttribute('scale',linkScale);
+                    if(lenNum!=7){
+                        linkTransform=(currentLen[lenNum])+",0,0";
+                        document.getElementById("Robot__link"+(lenNum-1)).setAttribute('translation',linkTransform);
+                    }
+                    document.getElementById("Robot__link"+(lenNum-2)+"Scale").setAttribute('scale',linkScale);
+                    d[7]=currentLen[6]+currentLen[7];
+                    document.getElementById("d7").innerHTML=d[7];
                     break;
                 default:alert("lenNUM error");
                     return;

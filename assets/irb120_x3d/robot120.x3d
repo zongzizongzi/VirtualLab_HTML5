@@ -32,39 +32,40 @@
                                  </PointSet>
                      	    </Shape>
                          </Transform>
-                         <transform DEF="baseScale">
-                            <inline url="base.x3d" DEF="BASE" nameSpaceName="BASE" mapDEFToID="true" onclick="changeTransparency()"> </inline>
-                         </transform>
-                         <transform DEF="link0" rotation="0,1,0,0">
-                             <transform DEF="link0Scale">
-                                <inline url="link1.x3d"> </inline>
+                         <transform def="base">
+                             <transform DEF="link-1Scale">
+                                <inline url="base.x3d" DEF="BASE" nameSpaceName="BASE" mapDEFToID="true" onclick="changeTransparency()"> </inline>
                              </transform>
-                             <transform DEF="link1" translation="0,290,0" mapDEFToID="true" rotation="0,0,1,0">
-                                    <transform DEF="link1Scale">
-                                        <inline url="link2.x3d"> </inline>
-                                    </transform>
-                                    <transform translation="0,270,0" DEF="link2"  mapDEFToID="true" rotation="0,0,1,0">
-                                         <transform DEF="link2Scale">
-                                            <inline url="link3.x3d"> </inline>
-                                         </transform>
-                                         <transform translation="302,70,0" DEF="link3" mapDEFToID="true" rotation="1,0,0,0">
-                                             <transform DEF="link3Scale">
-                                                <inline url="link4.x3d"> </inline>
+                             <transform DEF="link0" rotation="0,1,0,0" translation="0,166,0" >
+                                 <transform DEF="link0Scale">
+                                    <inline url="link1.x3d"> </inline>
+                                 </transform>
+                                 <transform DEF="link1" translation="0,124,0" mapDEFToID="true" rotation="0,0,1,0">
+                                        <transform DEF="link1Scale">
+                                            <inline url="link2.x3d"> </inline>
+                                        </transform>
+                                        <transform translation="0,270,0" DEF="link2"  mapDEFToID="true" rotation="0,0,1,0">
+                                             <transform DEF="link2Scale">
+                                                <inline url="link3.x3d"> </inline>
                                              </transform>
-                                             <transform translation="0,0,0" DEF="link4" mapDEFToID="true" rotation="0,0,1,0">
-                                                 <transform DEF="link4Scale">
-                                                    <inline url="link5.x3d"> </inline>
+                                             <transform translation="150,70,0" DEF="link3" mapDEFToID="true" rotation="1,0,0,0">
+                                                 <transform DEF="link3Scale">
+                                                    <inline url="link4.x3d"> </inline>
                                                  </transform>
-                                                 <transform translation="59,0,0" DEF="link5" mapDEFToID="true" rotation="1,0,0,0">
-                                                    <transform DEF="link5Scale">
-                                                        <inline url="link6.x3d"> </inline>
-                                                    </transform>
+                                                 <transform translation="152,0,0" DEF="link4" mapDEFToID="true" rotation="0,0,1,0">
+                                                     <transform DEF="link4Scale">
+                                                        <inline url="link5.x3d"> </inline>
+                                                     </transform>
+                                                     <transform translation="59,0,0" DEF="link5" mapDEFToID="true" rotation="1,0,0,0">
+                                                        <transform DEF="link5Scale">
+                                                            <inline url="link6.x3d"> </inline>
+                                                        </transform>
+                                                     </transform>
                                                  </transform>
                                              </transform>
-                                         </transform>
-                                    </transform>
+                                        </transform>
+                                 </transform>
                              </transform>
-
                          </transform>
                      </transform>
                  </scene>
