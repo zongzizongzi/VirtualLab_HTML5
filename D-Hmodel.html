@@ -207,10 +207,6 @@
         pPos=[],
         indexI=0;
     let currentPOS=[374,0,630,0,Math.PI/2,0];
-    let currentLen=[166,124,270,70,150,152,59,13];
-    let currentScal=[1,1,1,1,1,1,1,1];
-    let a=[0,0,0,270,70,0,0,0],
-        d=[290,0,0,0,302,0,0,72];
     /*function changeLen(lenNum) {
         let initLen=[290,270,70,302,72];
         currentLen[lenNum]=parseFloat(document.getElementById("len"+lenNum).value);
@@ -262,61 +258,7 @@
 
     }*/
     function changeLen(lenNum) {
-        let initLen=[166,124,270,70,150,152,59,13];
-        currentLen[lenNum]=parseInt(document.getElementById("L"+lenNum).value);
-        if(isNaN(currentLen[lenNum])||currentLen[lenNum]<=0){
-            alert("请输入正确的数字");
-        }
-        else {
-            currentScal[lenNum]=currentLen[lenNum]/initLen[lenNum];
-            let linkScale="1,1,1",linkTransform;
-            switch (lenNum){
-                case 0:case 1:case 2:
-                    linkScale="1,"+currentScal[lenNum]+",1";
-                    linkTransform="0,"+currentLen[lenNum]+",0";
-                    document.getElementById("Robot__link"+(lenNum-1)+"Scale").setAttribute('scale',linkScale);
-                    document.getElementById("Robot__link"+lenNum).setAttribute('translation',linkTransform);
-                    if(lenNum<2){
-                        d[0]=currentLen[0]+currentLen[1];
-                        document.getElementById("d0").innerHTML=d[0];
-                    }
-                    else {
-                        a[2]=currentLen[2];
-                        document.getElementById("a2").innerHTML=a[2];
-                    }
-                    break;
-                case 3:case 4:
-                    linkScale=currentScal[4]+","+currentScal[3]+",1";
-                    linkTransform=currentLen[4]+","+currentLen[3]+",0";
-                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
-                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
-                    if(lenNum==3){
-                        a[3]=currentLen[3];
-                        document.getElementById("a3").innerHTML=a[3];
-                    }
-                    else {
-                        d[4]=currentLen[4]+currentLen[5];
-                        document.getElementById("d4").innerHTML=d[4];
-                    }
-                    break;
-                case 5:
-                    d[4]=currentLen[4]+currentLen[5];
-                    document.getElementById("d4").innerHTML=d[4];
-                case 6:case 7:
-                    linkScale=currentScal[lenNum]+",1,1";
-                    if(lenNum!=7){
-                        linkTransform=(currentLen[lenNum])+",0,0";
-                        document.getElementById("Robot__link"+(lenNum-1)).setAttribute('translation',linkTransform);
-                    }
-                    document.getElementById("Robot__link"+(lenNum-2)+"Scale").setAttribute('scale',linkScale);
-                    d[7]=currentLen[6]+currentLen[7];
-                    document.getElementById("d7").innerHTML=d[7];
-                    break;
-                default:alert("lenNUM error");
-                    return;
-            }
-        }
-
+        robot120VI.changeLength(lenNum);
     }
     function changeAng(input) {
         let currentAng=[0,0,0,0,0,0];
@@ -338,13 +280,13 @@
             gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
             beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
             alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
-        /*ca=Math.cos(alpha),sa=Math.sin(alpha),
-         cb=Math.cos(beta),sb=Math.sin(beta),
-         cy=Math.cos(gamma),sy=Math.sin(gamma);
-         let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-         instructionCompiling.inverseKinematics(R);*/
-        let pos=[x,y,z,gamma,beta,alpha];
-        instructionCompiling.moveL(pos,100);
+            /*ca=Math.cos(alpha),sa=Math.sin(alpha),
+             cb=Math.cos(beta),sb=Math.sin(beta),
+             cy=Math.cos(gamma),sy=Math.sin(gamma);
+             let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
+             instructionCompiling.inverseKinematics(R);*/
+            let pos=[x,y,z,gamma,beta,alpha];
+            instructionCompiling.moveL(pos,100);
 
     }
 </script>

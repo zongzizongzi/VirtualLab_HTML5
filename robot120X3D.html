@@ -34,7 +34,7 @@
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_1" style="height: 800px">
         <div style="width: 80%;height: 100%;display: inline;float: left">
-            <div id="robotX3d" style="width: 100%;height: 100%;">
+            <div id="mainCanvas" style="width: 100%;height: 100%;">
                 <!--<x3d style="width: 100%;height: 100%;">
                     <scene>
                         <transform>
@@ -119,7 +119,7 @@
 <script src="js/layui/lay/dest/layui.all.js"></script>
 <script>
     'use strict';
-    let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
+    let robot120VI = new VILibrary.VI.Robot120VI($('#mainCanvas'), true);
     let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true);
 //    let kinematicsEquationVI= new VILibrary.VI.KinematicsEquationVI($('#resultDiv'), true);
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 2);

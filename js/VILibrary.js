@@ -525,8 +525,12 @@ class RobotTemplateVI extends TemplateVI {
         this.name = 'RobotTemplateVI';
         let CurrentANG=[],TargetANG=[];
         // this.robotURL;
+        this.currentLen=[0,0,0,0,0,0,0,0];
+        this.currentScal=[1,1,1,1,1,1,1,1];
+        this.initLen=[0,0,0,0,0,0,0,0];
+        this.a_d=[0,0,0,0,0];
         this.getData=function (dataType) {
-            return CurrentANG;
+            return this.a_d.concat();
         }
         this.setData = function (input){
             if(Array.isArray(input)) {TargetANG=input; jiontsControl()}
@@ -552,14 +556,7 @@ class RobotTemplateVI extends TemplateVI {
                 }
                 document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
             }
-            CurrentANG=TargetANG;
-            if (_this.dataLine){
-                for (let targetInfo of _this.targetInfoArray) {
-
-                    let targetVI = VILibrary.InnerObjects.getVIById(targetInfo[0]);
-                    targetVI.updater();
-                }
-            }
+            // CurrentANG=TargetANG;
         }
         this.draw=function () {
             if (draw3DFlag) {
@@ -585,7 +582,65 @@ class RobotTemplateVI extends TemplateVI {
                     _this.ctx.drawImage(img, 0, 0, _this.container.width, _this.container.height);
                 };
             }
-        };
+        }
+        this.changeLength=function(lenNum){
+			this.currentLen[lenNum]=parseInt(document.getElementById("L"+lenNum).value);
+            if(isNaN(this.currentLen[lenNum])||this.currentLen[lenNum]<=0){
+                alert("请输入正确的数字");
+            }
+            else {
+                this.currentScal[lenNum]=this.currentLen[lenNum]/this.initLen[lenNum];
+                let linkScale="1,1,1",linkTransform;
+                switch (lenNum){
+                    case 0:case 1:case 2:
+                    linkScale="1,"+this.currentScal[lenNum]+",1";
+                    linkTransform="0,"+this.currentLen[lenNum]+",0";
+                    document.getElementById("Robot__link"+(lenNum-1)+"Scale").setAttribute('scale',linkScale);
+                    document.getElementById("Robot__link"+lenNum).setAttribute('translation',linkTransform);
+                    if(lenNum<2){
+                        this.a_d[0]=this.currentLen[0]+this.currentLen[1];
+                        document.getElementById("d0").innerHTML=this.a_d[0];
+                    }
+                    else {
+                        this.a_d[1]=this.currentLen[2];
+                        document.getElementById("a2").innerHTML=this.a_d[1];
+                    }
+                    break;
+                    case 3:case 4:
+                    linkScale=this.currentScal[4]+","+this.currentScal[3]+",1";
+                    linkTransform=this.currentLen[4]+","+this.currentLen[3]+",0";
+                    document.getElementById("Robot__link3").setAttribute('translation',linkTransform);
+                    document.getElementById("Robot__link2Scale").setAttribute('scale',linkScale);
+                    if(lenNum==3){
+                        this.a_d[2]=this.currentLen[3];
+                        document.getElementById("a3").innerHTML=this.a_d[2];
+                    }
+                    else {
+                        this.a_d[3]=this.currentLen[4]+this.currentLen[5];
+                        document.getElementById("d4").innerHTML=this.a_d[3];
+                    }
+                    break;
+                    case 5:
+                        this.a_d[3]=this.currentLen[4]+this.currentLen[5];
+                        document.getElementById("d4").innerHTML=this.a_d[3];
+                    case 6:case 7:
+                    linkScale=this.currentScal[lenNum]+",1,1";
+                    if(lenNum!=7){
+                        linkTransform=(this.currentLen[lenNum])+",0,0";
+                        document.getElementById("Robot__link"+(lenNum-1)).setAttribute('translation',linkTransform);
+                    }
+                    document.getElementById("Robot__link"+(lenNum-2)+"Scale").setAttribute('scale',linkScale);
+                    this.a_d[4]=this.currentLen[6]+this.currentLen[7];
+                    document.getElementById("d7").innerHTML=this.a_d[4];
+                    break;
+                    default:alert("lenNUM error");
+                        return;
+                }
+                if (_this.dataLine){
+                    VILibrary.InnerObjects.dataUpdater(_this.dataLine);
+                }
+            }
+        }
     }
     static get cnName() {
 
@@ -9715,11 +9770,19 @@ VILibrary.VI = {
                 instrSplit,//指令划分后
 				moveType;//当前执行的运动类型
 			let executiveFlag=false;
+			let A=[0,0,0,270,70,0,0,0];
+			let D=[290,0,0,0,302,0,0,72];
             this.getData=function (dataType) {
                 return targetANG;
             }
             this.setData=function (input) {
-                currentANG=input.concat();
+                let a_D=input.concat();
+                D[0]=a_D[0];
+                A[3]=a_D[1];
+                A[4]=a_D[2];
+                D[4]=a_D[3];
+                D[7]=a_D[4];
+                kinematicsEquation(currentANG);
             }
             this.toggleObserver = function (flag) {
                 if (flag) {
@@ -10075,9 +10138,7 @@ VILibrary.VI = {
                 let xc = -(b1*c2*d3 - b1*c3*d2 - b2*c1*d3 + b2*c3*d1 + b3*c1*d2 - b3*c2*d1)/(a1*b2*c3 - a1*b3*c2 - a2*b1*c3 + a2*b3*c1 + a3*b1*c2 - a3*b2*c1);
                 let yc =  (a1*c2*d3 - a1*c3*d2 - a2*c1*d3 + a2*c3*d1 + a3*c1*d2 - a3*c2*d1)/(a1*b2*c3 - a1*b3*c2 - a2*b1*c3 + a2*b3*c1 + a3*b1*c2 - a3*b2*c1);
                 let zc = -(a1*b2*d3 - a1*b3*d2 - a2*b1*d3 + a2*b3*d1 + a3*b1*d2 - a3*b2*d1)/(a1*b2*c3 - a1*b3*c2 - a2*b1*c3 + a2*b3*c1 + a3*b1*c2 - a3*b2*c1);
-
                 let R=Math.sqrt(Math.pow(x1-xc,2)+Math.pow(y1-yc,2)+Math.pow(z1-zc,2));
-
 
                 //插补算法
                 let u,v,w,u1,v1,w1;
@@ -10168,8 +10229,10 @@ VILibrary.VI = {
             function kinematicsEquation(input) {
                 let theta = input.concat();
                 let alpha=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
-                let a=[0,0,0,270,70,0,0,0],
-                    d=[290,0,0,0,302,0,0,72];
+                let a=A.concat();
+                let d=D.concat();
+                /*let a=[0,0,0,270,70,0,0,0],
+                    d=[290,0,0,0,302,0,0,72];*/
                 theta.push(Math.PI);
                 theta.unshift(0);
                 theta[2]-=Math.PI/2;
@@ -10238,8 +10301,8 @@ VILibrary.VI = {
                 document.getElementById("eulerY").value=(EulerY*180/Math.PI).toFixed(2);
                 document.getElementById("eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
                 currentPOS=[T[0][3],T[1][3],T[2][3],EulerX,EulerY,EulerZ];
-
-                if(executiveFlag){
+                currentANG=targetANG.concat();
+                if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
                     let point=document.getElementById("Robot__LineSet_points").getAttribute('point');
                     point=point+" "+T[0][3]+" "+T[2][3]+" "+(-T[1][3]);
                     document.getElementById("Robot__LineSet_points").setAttribute('point',point);
@@ -10252,12 +10315,10 @@ VILibrary.VI = {
                         document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
                     }
 				}
-
-
-
-
             }
             function inverseKinematics(input){
+                let a=A.concat();a.shift();//a[i-1]
+                let d=D.concat();//d[i]
             	let
                 x=input[0],
                 y=input[1],
@@ -10269,8 +10330,9 @@ VILibrary.VI = {
                     cb=Math.cos(beta),sb=Math.sin(beta),
                     cy=Math.cos(gamma),sy=Math.sin(gamma);
                 let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-                let a=[0,0,270,70,0,0],
-                    d=[290,0,0,0,302,0,0,72];
+                /*let a=[0,0,270,70,0,0],
+				 d=[290,0,0,0,302,0,0,72];*/
+
                 let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-290],[0,0,0,1]];
                 let Tt_6=[[-1,0,0,0],[0,-1,0,0],[0,0,1,-72],[0,0,0,1]];
                 let T=math.multiply(math.multiply(T0_s,R),Tt_6);
@@ -10362,8 +10424,8 @@ VILibrary.VI = {
             const _this = this;
             this.name = 'Instruction_1VI';
             let currentANG=[0,0,0,0,0,0],targetANG=[0,0,0,0,0,0];
-            let a=[0,0,350,850,145,0,0,0],
-                d=[815,0,0,0,820,0,0,170];
+            let A=[0,0,350,850,145,0,0,0],
+                D=[815,0,0,0,820,0,0,170];
             let instrAng;
             let instrIndex,
                 targetPOS,
@@ -10375,7 +10437,13 @@ VILibrary.VI = {
                 return targetANG;
             }
             this.setData=function (input) {
-                currentANG=input.concat();
+                let a_D=input.concat();
+                D[0]=a_D[0];
+                A[3]=a_D[1];
+                A[4]=a_D[2];
+                D[4]=a_D[3];
+                D[7]=a_D[4];
+                A[2]=a_D[5]
             }
             this.toggleObserver = function (flag) {
                 if (flag) {
@@ -10783,6 +10851,8 @@ VILibrary.VI = {
             }
 
             function kinematicsEquation(input) {
+                let a=A.concat();
+                let d=D.concat();
                 let theta = input.concat();
                 let alpha=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                 theta.push(Math.PI);
@@ -10853,7 +10923,7 @@ VILibrary.VI = {
                 document.getElementById("eulerY").value=(EulerY*180/Math.PI).toFixed(2);
                 document.getElementById("eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
                 currentPOS=[T[0][3],T[1][3],T[2][3],EulerX,EulerY,EulerZ];
-
+                currentANG=targetANG.concat();
                 if(executiveFlag){
                     let point=document.getElementById("Robot__LineSet_points").getAttribute('point');
                     point=point+" "+T[0][3]+" "+T[2][3]+" "+(-T[1][3]);
@@ -10869,8 +10939,9 @@ VILibrary.VI = {
                 }
             }
             function inverseKinematics(input){
-                let
-                    x=input[0],
+                let a=A.concat();a.shift();//a[i-1]
+                let d=D.concat();//d[i]
+            	let x=input[0],
                     y=input[1],
                     z=input[2],
                     gamma=input[3],
@@ -10880,7 +10951,6 @@ VILibrary.VI = {
                     cb=Math.cos(beta),sb=Math.sin(beta),
                     cy=Math.cos(gamma),sy=Math.sin(gamma);
                 let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-                let a=[0,350,850,145,0,0,0];
                 let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
                 let Tt_6=[[-1,0,0,0],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
                 let T=math.multiply(math.multiply(T0_s,R),Tt_6);
@@ -11085,6 +11155,10 @@ VILibrary.VI = {
             this.robotURL='assets/irb120_x3d/robot120.x3d';
             this.draw(draw3DFlag);
             this.name = 'ABB_irb20';
+            this.currentLen=[166,124,270,70,150,152,59,13];
+            this.currentScal=[1,1,1,1,1,1,1,1];
+            this.initLen=[166,124,270,70,150,152,59,13];
+            this.a_d=[290,270,70,302,72];
         }
         static get cnName() {
 
@@ -11101,7 +11175,7 @@ VILibrary.VI = {
             return '300px';
         }
     },
-	Roboctkr60VI:class Robotkr60VI extends RobotTemplateVI {
+	Robotkr60VI:class Robotkr60VI extends RobotTemplateVI {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas,draw3DFlag);
             const _this = this;
@@ -11110,6 +11184,11 @@ VILibrary.VI = {
 			this.robotURL='assets/kuka_KR60HA_x3d/kuka_kr60.x3d';
             this.draw(draw3DFlag);
             this.name = 'KUKA_kr60';
+
+            /*this.currentLen=[166,124,270,70,150,152,59,13];
+            this.currentScal=[1,1,1,1,1,1,1,1];
+            this.initLen=[166,124,270,70,150,152,59,13];*/
+            this.a_d=[815,850,145,820,170,350];
         }
         static get cnName() {
 
