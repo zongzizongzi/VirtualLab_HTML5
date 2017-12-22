@@ -523,22 +523,26 @@ html {
     text-align: center;
     width: 100%;
     border:2px solid;
-    font-size: 14px;
-    font-family:"Times New Roman";
+
+    /*font: normal 17px Calibri*/
 }
 #d-hTable tr{
-    height: 20px;
+    height: 30px;
 }
 #d-hTable th{
     border-left: 1px solid;
     border-bottom: 1px solid;
     width: 20%;
     font-style: italic;
+    font-size: 17px;
+    font-family:"Times New Roman";
 }
 #d-hTable td{
     border-left: 1px solid;
     border-bottom: 1px solid;
     width: 20%;
+    font-size: 17px;
+    font-family:"Times New Roman";
 }
 .linkInput{
     background-color: inherit;
@@ -546,20 +550,23 @@ html {
     height:90%;
     text-align: center;
     font-family:"Times New Roman";
-    font-size: 14px;
+    font-size: 16px;
 }
 #linkTable{
     text-align: center;
     width: 100%;
     border:2px solid;
-    font-size: 14px;
-    font-family:"Times New Roman";
+
+}
+#linkTable tr{
+    height: 30px;
 }
 #linkTable td{
     border-left: 1px solid;
     border-bottom: 1px solid;
     width: 25%;
-    height: 25px;
+    font-size: 17px;
+    font-family:"Times New Roman";
 }
 
 

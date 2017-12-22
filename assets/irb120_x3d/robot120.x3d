@@ -52,7 +52,7 @@
                                                  <transform DEF="link3Scale">
                                                     <inline url="link4.x3d"> </inline>
                                                  </transform>
-                                                 <transform translation="152,0,0" DEF="link4" mapDEFToID="true" rotation="0,0,1,0">
+                                                 <transform translation="152,0,0" DEF="link4" mapDEFToID="true" rotation="0,0,-1,0.5235987755982988">
                                                      <transform DEF="link4Scale">
                                                         <inline url="link5.x3d"> </inline>
                                                      </transform>

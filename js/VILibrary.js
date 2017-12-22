@@ -569,7 +569,7 @@ class RobotTemplateVI extends TemplateVI {
 				 </scene>
 				 </x3d>*!/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
 				 document.getElementById("x3d120").innerHTML=my_html;*/
-                document.getElementById("robotX3d").innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
+                this.container.innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
                     '<inline nameSpaceName="Robot" mapDEFToID="true" url='+this.robotURL+'></inline>'+
                     '</scene></x3d>';
             }
@@ -9423,8 +9423,8 @@ VILibrary.VI = {
                                 document.getElementById("angTxt"+(i)).value=-ang[i]*180/Math.PI;
                             }
                             else {
-                                document.getElementById("angInput"+(i)).value=ang[i]*180/Math.PI;
-                                document.getElementById("angTxt"+(i)).value=ang[i]*180/Math.PI;
+                                document.getElementById("angInput"+(i)).value=(ang[i]*180/Math.PI).toFixed(1);
+                                document.getElementById("angTxt"+(i)).value=(ang[i]*180/Math.PI).toFixed(4);
                             }
 
                         }
@@ -9762,7 +9762,7 @@ VILibrary.VI = {
             super(VICanvas);
             const _this = this;
             this.name = 'Instruction_1VI';
-            let currentANG=[0,0,0,0,0,0],targetANG=[0,0,0,0,0,0];
+            let currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
             let instrAng;
             let instrIndex,
 				targetPOS,
@@ -9905,7 +9905,7 @@ VILibrary.VI = {
                         else{
                             for(let i=0;i<=5;i++){
                                 document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
+                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
                             }
                             return;
 						}
@@ -10099,8 +10099,8 @@ VILibrary.VI = {
                         }
                         else{
                             for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI);
+                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
+                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
                             }
                             return;
                         }
@@ -10312,7 +10312,7 @@ VILibrary.VI = {
                     document.getElementById("Robot__LineSet_index").setAttribute('coordIndex',point_Index);
                     for(let i=0;i<=5;i++){
                         document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                        document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
+                        document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
                     }
 				}
             }
@@ -10395,12 +10395,6 @@ VILibrary.VI = {
 					let minAng=resultAng[runTime.indexOf(minTime)];
                     return minAng;
 				}
-                /*if(resultAng==undefined){return 0}
-                else {
-                    resultAng[1]+=Math.PI/2;
-                    let anixAngle=math.multiply(resultAng,180/Math.PI);
-                    return resultAng;
-                }*/
             }
         }
         static get cnName() {
@@ -10566,7 +10560,7 @@ VILibrary.VI = {
                         else{
                             for(let i=0;i<=5;i++){
                                 document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
+                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
                             }
                             return;
                         }
@@ -10676,7 +10670,7 @@ VILibrary.VI = {
                         else{
                             for(let i=0;i<=5;i++){
                                 document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
+                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
                             }
                             return;
                         }
@@ -10934,7 +10928,7 @@ VILibrary.VI = {
                     document.getElementById("Robot__LineSet_index").setAttribute('coordIndex',point_Index);
                     for(let i=0;i<=5;i++){
                         document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                        document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
+                        document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
                     }
                 }
             }
