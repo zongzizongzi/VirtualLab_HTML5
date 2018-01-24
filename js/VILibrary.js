@@ -9880,7 +9880,7 @@ VILibrary.VI = {
             this.moveJ=function(input,v){
             	let STEP=5/180*Math.PI,
 					instructAng=input.concat(),
-					tAng=[0,0,0,0,0,0];
+					tAng=[0,0,0,0,0.5235987755982988,0];
 
                 _this.timer = window.setInterval(function () {
                 	let current=math.multiply(-1,currentANG);
@@ -9911,22 +9911,22 @@ VILibrary.VI = {
 						}
                     }
                     else if(maxDiff<=STEP){
-                        tAng=instructAng;
+                        targetANG=instructAng.concat();
                     }
                     else {
                     	for(let i=0;i<=5;i++){
-                    		if(Math.abs(diff[i])<=STEP){tAng[i]=instructAng[i]}
-                            else if(diff[i]>0)tAng[i]=currentANG[i]+STEP;
-                            else  tAng[i]=currentANG[i]-STEP;
+                    		if(Math.abs(diff[i])<=STEP){targetANG[i]=instructAng[i]}
+                            else if(diff[i]>0)targetANG[i]=currentANG[i]+STEP;
+                            else  targetANG[i]=currentANG[i]-STEP;
                             	// targetANG[i]=diff[i]>0?(currentANG[i]+STEP):(currentANG[i]-STEP);
 						}
-                        // console.log(pAngle);
                     }
-                    targetANG=tAng;
-                    kinematicsEquation(targetANG);
-                    if (_this.dataLine){
-                        VILibrary.InnerObjects.dataUpdater(_this.dataLine);
-                    }
+                    if(maxDiff){
+                        kinematicsEquation(targetANG);
+                        if (_this.dataLine){
+                            VILibrary.InnerObjects.dataUpdater(_this.dataLine);
+                        }
+					}
 				},50);
 
             }
@@ -10281,7 +10281,7 @@ VILibrary.VI = {
 				 EulerX*=180/Math.PI;
 				 EulerY*=180/Math.PI;
 				 EulerZ*=180/Math.PI;*/
-                //X-Y-Z顺序
+                //X-Y-Z顺序==ZYX顺序
                 let cosBeta=Math.sqrt(Math.pow((T[0][0]),2)+Math.pow(T[1][0],2));
                 if(cosBeta!=0){//计算三个欧拉角
                     EulerY=Math.atan2(-T[2][0],cosBeta);

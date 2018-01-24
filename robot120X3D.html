@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -90,23 +90,25 @@
                     <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
                 </div>
             </div>
-            <div class="message_div" style="height: 25%;">
-                <p>设置示教点</p>
-                <textarea id="points" style="width: 90%;height: 68%;margin: 10px">
-                </textarea>
-                <div class="rowFlex-div">
-                    <button id="add" onclick="points(1)">添加</button>
-                    <button id="delete" onclick="points(2)">删除</button>
-                    <button id="clear" onclick="points(0)">清空</button>
+            <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
+                <div class="message_div" style="height: 25%;">
+                    <p>设置示教点</p>
+                    <textarea id="points" name="points" style="width: 90%;height: 68%;margin: 10px">
+                    </textarea>
+                    <div class="rowFlex-div">
+                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
+                        <button type="button" id="delete" onclick="changePoints(2)">删除</button>
+                        <button type="button" id="clear" onclick="changePoints(0)">清空</button>
+                    </div>
                 </div>
-            </div>
-            <div class="message_div" style="height: 22%;">
-                <p>控制指令</p>
-                <textarea id="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
-                <div class="rowFlex-div">
-                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
+                <div class="message_div" style="height: 22%;">
+                    <p>控制指令</p>
+                    <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                    <div class="rowFlex-div">
+                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button><input type="submit" value="上传">
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -132,6 +134,17 @@
         pPos=[],
         indexI=0;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
+    function PostData() {
+        $.ajax({
+            type: "POST",
+            url: "/",
+            data :$('#myform').serialize(),
+            success: function(msg) {
+            }
+        });
+        Instructions();
+        return false;
+    }
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -158,12 +171,14 @@
     function Instructions() {
         instructionCompiling.toggleObserver(true);
     }
-    function points(type) {
+    function changePoints(type) {
         let turnPoints;
         switch (type){
             case 0:/*清空*/
                 s=[];pAngle=[];indexI=0;pPos=[];
+                /*----------------点集清空-------------------*/
                 document.getElementById("Robot__PointSet_points").setAttribute('point','');
+                /*-----------------------------------*/
                 break;
             case 1:/*增加示教点*/
                 let x=parseFloat(document.getElementById("posX").value),
@@ -172,8 +187,8 @@
                     gamma=parseFloat(document.getElementById("eulerX").value),
                     beta=parseFloat(document.getElementById("eulerY").value),
                     alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+indexI+": x"+x+" y"+y+" z"+z+" "+gamma+"° "
-                    +beta+"° "+alpha+"°;\n";
+                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
+                    +beta+"°,"+alpha+"°];\n";
 //                let piPos=[x,y,z,gamma/180*Math.PI,beta/180*Math.PI,alpha/180*Math.PI]
                 let piPos=currentPOS.concat();
                 s.push(si);
@@ -203,10 +218,15 @@
                 indexI--;
                 break;
             case -1:
-                s=["p0: 340 0 302 0 0 0;\n","p1: -146.3 -39.2 75.7 0.0 -0.2 0.3;\n","p2: 136.5 36.6 93.3 0.0 0.9 0.3;\n"],
-                    pAngle=[[0, 0, 0, 0, 0, 0],[-2.8797932657906435, -1.0471975511965976, 1.2217304763960306, 0, 0, 0],[-2.8797932657906435, 1.0471975511965976, 1.2217304763960306, 0, 0, 0]];
-                document.getElementById("instrInput").value="moveJ p0;\nmoveJ p1;\nmoveJ p2;\nmoveJ p1;\nmoveJ p2;\nmoveJ p0;";
-                indexI=3;
+                s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
+                    pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0, 0.40282199136029123, -0.4750786223928564, -0, 0.5958554066308641, -0],[0, 0.5235987755982988, 0, 0, 0.5235987755982988, 0],[0, 0.5235987755982988, 0.5235987755982988, 0, 0.5235987755982988, 0]];
+                pPos=[[364.35, 0, 594, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[464.35, 0, 594, -3.141592653589793, 1.0471848490249271, -3.141592653589793],[467.5397, 0, 371.0948, 3.141592653589793, 0.5236114777699694, -3.141592653589793],[346.6218, 0, 225.2872, 3.141592653589793, 0, -3.141592653589793]];
+                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
+                /*------------------点集-------------------------*/
+                turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                /*---------------------------------------------*/
+                indexI=4;
         }
         let str="";
         for(let m=0;m<indexI;m++){
