@@ -9846,7 +9846,7 @@ VILibrary.VI = {
                             switch(moveType){
                                 case "J":
                                 	instrAng=pAngle[n1].concat();
-                                	_this.moveJ(instrAng);
+                                	_this.moveJ(instrAng,m);
                                 	break;
                                 case "L":
                                     let LPos=pPos[n1].concat();
@@ -9877,8 +9877,8 @@ VILibrary.VI = {
                     }
                 }
             }
-            this.moveJ=function(input,v){
-            	let STEP=5/180*Math.PI,
+            /*this.moveJ=function(input,v){
+            	let STEP=2.5/180*Math.PI,
 					instructAng=input.concat(),
 					tAng=[0,0,0,0,0.5235987755982988,0];
 
@@ -9929,43 +9929,109 @@ VILibrary.VI = {
 					}
 				},50);
 
-            }
-            /*this.moveL=function(input,v){
-            	let instructAng=input;
-            	let distanceL=Math.sqrt(Math.pow(targetPOS[0]-LastPOS[0],2)+Math.pow(targetPOS[1]-LastPOS[1],2)+Math.pow(targetPOS[2]-LastPOS[2],2));
-                let t=distanceL/v;
+            }*/
+            this.moveJ=function(input,v){
+            	if(v==0){
+            		alert("参数设置错误！");
+            		return;
+				}
+                // let distanceL=Math.sqrt(Math.pow(targetPOS[0]-LastPOS[0],2)+Math.pow(targetPOS[1]-LastPOS[1],2)+Math.pow(targetPOS[2]-LastPOS[2],2));
+                // let t=distanceL/v;
+            	let instructAng=input.concat();
                 let Diff=math.add(instructAng,math.multiply(-1,currentANG));
-                let Omega=math.multiply(Diff,1/t);//角速度
-            	let STEP=math.multiply(Omega,0.05);//5毫秒周期内的步进角度
-                _this.timer = window.setInterval(function () {
-                    let current=math.multiply(-1,currentANG);
-                    let diff=math.add(instructAng, current);
-                    let maxDiff=Math.max.apply(Math,math.abs(diff));
-                	if(maxDiff==0){
-                        window.clearInterval(_this.timer);
-                        _this.timer=0;
-                        if(((instrSplit)!=undefined)&&(instrIndex<instrSplit.length)){
-                            instrIndex++;
-                            instrCompiling();
+                let maxDiff=Math.max.apply(Math,math.abs(Diff));
+                if(maxDiff==0){
+                    if(executiveFlag){
+                        instrIndex++;
+                        if(instrIndex<instrSplit.length){
+                            setTimeout(function () {
+                                instrCompiling();
+                            },500);
+                            // instrCompiling();
                         }
-					}
-                    else if(maxDiff<=Math.max.apply(Math,math.abs(STEP))){
-                        targetANG=instructAng;
+                        else {
+                            executiveFlag=false;
+                            return;
+                        }
                     }
-                    else {
-                        targetANG=math.add(currentANG,STEP);
-					}
-                    for(let i=0;i<=5;i++){
-                        document.getElementById("angInput"+(i)).value=targetANG[i]*180/Math.PI;
-                        document.getElementById("angTxt"+(i)).value=targetANG[i]*180/Math.PI;
-                    }
-                    kinematicsEquation(targetANG);
-                    if (_this.dataLine){
-                        VILibrary.InnerObjects.dataUpdater(_this.dataLine);
-                    }
-                },50);
+                    else return;
+				}
+				else {
+                    let dAng=math.multiply(Diff,1/maxDiff);//单位变化量
+                    let x=parseFloat(document.getElementById("posX").value),
+                        y=parseFloat(document.getElementById("posY").value),
+                        z=parseFloat(document.getElementById("posZ").value);
+                    let ANG1=math.add(currentANG,dAng),
+						T=kinematicsEquation(ANG1,true),
+						x1=T[0],y1=T[1],z1=T[2],
+                        dL=Math.sqrt(Math.pow(x-x1,2)+Math.pow(y-y1,2)+Math.pow(z-z1,2));//计算各轴转动单位变化量后产生的末端位移；
+					//dt=dL/v=dAng/ω
+                    let Omega=math.multiply(math.multiply(dAng,v),1/dL);//角速度
+                    // let t=maxDiff/(0.1*v/180*Math.PI);
+                    // let Omega=math.multiply(Diff,1/t);//角速度
+                    let STEP=math.multiply(Omega,0.05);//5毫秒周期内的步进角度
+                    let maxStep=Math.max.apply(Math,math.abs(STEP)),
+						N=parseInt(maxDiff/maxStep)+1;//计算步进次数
+                    let i=0;
+                    _this.timer = window.setInterval(function () {
+                        let current=math.multiply(-1,currentANG);
+                        let diff=math.add(instructAng, current);
+                        // let maxDiff=Math.max.apply(Math,math.abs(diff));
 
-			}*/
+                        if(i+1>=N){
+                            window.clearInterval(_this.timer);
+                            _this.timer=0;
+                            targetANG=instructAng.concat();
+                        }
+                        else{
+                            targetANG=math.add(currentANG,STEP);
+                        }
+
+						/*if(maxDiff==0){
+						 window.clearInterval(_this.timer);
+						 _this.timer=0;
+						 if(((instrSplit)!=undefined)&&(instrIndex<instrSplit.length)){
+						 instrIndex++;
+						 instrCompiling();
+						 }
+						 }
+						 else if(maxDiff<=Math.max.apply(Math,math.abs(STEP))){
+						 targetANG=instructAng;
+						 }
+						 else {
+						 targetANG=math.add(currentANG,STEP);
+						 }*/
+                        if(executiveFlag){
+                            for(let i=0;i<=5;i++){
+                                document.getElementById("angInput"+(i)).value=targetANG[i]*180/Math.PI;
+                                document.getElementById("angTxt"+(i)).value=targetANG[i]*180/Math.PI;
+                            }}
+                        kinematicsEquation(targetANG);
+                        if (_this.dataLine){
+                            VILibrary.InnerObjects.dataUpdater(_this.dataLine);
+                        }
+                        if(i+1>=N){
+                            if(executiveFlag){
+                                instrIndex++;
+                                if(instrIndex<instrSplit.length){
+                                    setTimeout(function () {
+                                        instrCompiling();
+                                    },500);
+                                    // instrCompiling();
+                                }
+                                else {
+                                    executiveFlag=false;
+                                    return
+                                }
+                            }
+                            else return;
+                        }
+                        i++;
+                    },50);
+				}
+
+
+			}
             this.moveL=function (input1,v) {
             	const INTERVAL=0.05
             	let instructPos=input1.concat();
@@ -10226,7 +10292,7 @@ VILibrary.VI = {
                     i++;
                 },T*1000);
             }
-            function kinematicsEquation(input) {
+            function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
                 let alpha=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                 let a=A.concat();
@@ -10263,6 +10329,10 @@ VILibrary.VI = {
                 for(let i=6;i>=0;i--){
                     T=math.multiply(t[i],T)
                 }
+                if(flag){
+                    currentPOS=[T[0][3],T[1][3],T[2][3]];
+                    return currentPOS;//若仅用于计算目标点，不再执行后面代码
+				}
                 // console.log("T",T,"theta",theta);
                 document.getElementById("posX").value=(T[0][3]).toFixed(2);
                 document.getElementById("posY").value=(T[1][3]).toFixed(2);

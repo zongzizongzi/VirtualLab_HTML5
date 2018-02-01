@@ -151,7 +151,7 @@
         for(let i=0;i<=5;i++){
             currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
         }
-        instructionCompiling.moveJ(currentAng);
+        instructionCompiling.moveJ(currentAng,500);
     }
     function changeAngTxt(input) {
         document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
