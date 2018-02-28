@@ -10036,18 +10036,15 @@ VILibrary.VI = {
             	const INTERVAL=0.05
             	let instructPos=input1.concat();
             	let lastPos=currentPOS.concat();
-            	// let instructAng=input2.concat();
 				let diffPos=math.add(instructPos,math.multiply(-1,lastPos));
                 let t=Math.sqrt(Math.pow(diffPos[0],2)+Math.pow(diffPos[1],2)+Math.pow(diffPos[2],2))/v;
                 if(t==0){
                 	t=Math.max.apply(Math,math.abs(diffPos))/(240*Math.PI/180);//距离为0 ，按最大转速计算时间
 				}
                 let N=parseInt(t/INTERVAL)+1;
+                let Ept=SLERP(lastPos,instructPos,N);//四元数插补
 				let step=math.multiply(diffPos,1/N);
                 let maxStep=Math.max.apply(Math,math.abs(step));
-				/*for(let i=0;i<6;i++){
-					step[i]=diffPos[i]/t*INTERVAL;//xyz及各个欧拉角在一个循环周期内的步进量
-				}*/
 				let k=0;
                 _this.timer = window.setInterval(function () {
                     let current=math.multiply(-1,currentPOS);
@@ -10073,78 +10070,20 @@ VILibrary.VI = {
                             }
                         }
 					}
-                	/*if(maxDiff==0){
-                        window.clearInterval(_this.timer);
-                        _this.timer=0;
-                        // return;
-                        /!*if(((instrSplit)!=undefined)&&(instrIndex<(instrSplit.length-1))){
-                            instrIndex++;
-                            setTimeout(function () {
-                                instrCompiling();
-                            },500);
-                            }*!/
-                        if(executiveFlag){
-                            instrIndex++;
-                            if(instrIndex<instrSplit.length){
-                                setTimeout(function () {
-                                    instrCompiling();
-                                },500);
-                                // instrCompiling();
-                            }
-                            else {
-                                executiveFlag=false;
-                                return
-                            }
-                        }
-                        else{
-                            for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                            }
-                            return;
-						}
-					}
-                	else  if(maxDiff<=maxStep){
-                		if(executiveFlag){
-                            targetANG=instrAng.concat();
-						}
-						else {
-                            tPos=instructPos.concat();
-                            let tANG=inverseKinematics(tPos);
-                            if(tANG==0){
-                                window.clearInterval(_this.timer);
-                                _this.timer=0;
-                                alert("超出工作空间或靠近奇异点！");
-                                return;}
-                            else {targetANG=tANG.concat();
-                            }
-						}
-					}*/
 					else {
                             x=currentPOS[0]+step[0],
                             y=currentPOS[1]+step[1],
                             z=currentPOS[2]+step[2];
                         let tAng;
-						outerLoop://搜索+-N*step范围内有没有合适的姿态使得运动学反解有解
-                        for(let i=0;i<5*N;i++){
-                        	for(let j=0;j<=1;j++){
-                        		let sign=j==1?1:-1;
-                                gamma=lastPos[3]+step[3]*k+step[3]/5*i*sign;
-                                beta=lastPos[4]+step[4]*k+step[4]/5*i*sign;
-                                alpha=lastPos[5]+step[5]*k+step[5]/5*i*sign;
-                                tPos=[x,y,z,gamma,beta,alpha];
-                                 tAng=inverseKinematics(tPos);
-                                if(tAng==0)continue;
-                                else {targetANG=tAng.concat();break outerLoop}
-							}
-                        }
+                        tPos=[x,y,z,Ept[k][0],Ept[k][1],Ept[k][2]];
+                        tAng=inverseKinematics(tPos);
                         if(tAng==0){
                             window.clearInterval(_this.timer);
                             _this.timer=0;
                             alert("超出工作空间或靠近奇异点！");return;
 						}
+                        else targetANG=tAng.concat();
 					}
-                    // currentPOS=tPos.concat();
 					kinematicsEquation(targetANG);
 					if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
@@ -10175,6 +10114,46 @@ VILibrary.VI = {
 				},INTERVAL*1000)
 
             }
+            function eulerToQuaternion(Ex,Ey,Ez)
+            {
+                let cosEx = Math.cos(Ex/2),
+                    sinEx = Math.sin(Ex/2),
+
+                    cosEy = Math.cos(Ey/2),
+                    sinEy = Math.sin(Ey/2),
+
+                    cosEz = Math.cos(Ez/2),
+                    sinEz = Math.sin(Ez/2);
+
+                let q0 = cosEx * cosEy * cosEz + sinEx * sinEy * sinEz,
+                    q1 = sinEx * cosEy * cosEz - cosEx * sinEy * sinEz,
+                    q2 = cosEx * sinEy * cosEz + sinEx * cosEy * sinEz,
+                    q3 = cosEx * cosEy * sinEz - sinEx * sinEy * cosEz;
+                return [q0,q1,q2,q3];
+            }
+            function SLERP(p0,p2,N) {
+                //计算始末点四元数和旋转角度thetaQ
+				let Ept=[];
+                let Ex0=p0[3],Ey0=p0[4],Ez0=p0[5],
+                    Ex2=p2[3],Ey2=p2[4],Ez2=p2[5];
+                let q0=eulerToQuaternion(Ex0,Ey0,Ez0),
+                    q2=eulerToQuaternion(Ex2,Ey2,Ez2),
+                    q0DotQ2=q0[0]*q2[0]+q0[1]*q2[1]+q0[2]*q2[2]+q0[3]*q2[3];
+                if(q0DotQ2<0){q0DotQ2*=-1;q2=math.multiply(-1,q2);}
+                let cosTheta=q0DotQ2/(Math.sqrt(q0[0]*q0[0]+q0[1]*q0[1]+q0[2]*q0[2]+q0[3]*q0[3])*Math.sqrt(q2[0]*q2[0]+q2[1]*q2[1]+q2[2]*q2[2]+q2[3]*q2[3])),
+                    thetaQ=Math.acos(cosTheta);//初末方向绕转轴旋转的角度
+				for(let i=0;i<N-1;i++){
+                    let t=(i+1)/N,qt;
+                    if(Math.sin(thetaQ)==0){qt=math.add(math.multiply((1-t),q0),math.multiply(t,q2))}
+                    else qt=math.add(math.multiply(Math.sin((1-t)*thetaQ)/Math.sin(thetaQ),q0),math.multiply(Math.sin(t*thetaQ)/Math.sin(thetaQ),q2));//插补点四元数
+                    console.log("qt",i+1,":",qt[0],qt[1],qt[2],qt[3])
+                    let Ex = Math.atan2(2* (qt[2]*qt[3] + qt[0]*qt[1]), qt[0]*qt[0] - qt[1]*qt[1] - qt[2]*qt[2] + qt[3]*qt[3]),
+                        Ey = Math.asin(2 * (qt[0]*qt[2] - qt[1]*qt[3])),
+                        Ez = Math.atan2(2* (qt[1]*qt[2] + qt[0]*qt[3]), qt[0]*qt[0] + qt[1]*qt[1] - qt[2]*qt[2] - qt[3]*qt[3]);
+                    Ept[i]=[Ex,Ey,Ez];
+				}
+				return Ept;
+            }
             this.moveC=function (input1,input2,input3) {
             	let F=input3;
                 const T=0.05;
@@ -10182,6 +10161,7 @@ VILibrary.VI = {
                 let p2=input2.concat();
                 let p0=currentPOS.concat();
                 let diffPos=math.add(p2,math.multiply(-1,p0));
+
               //计算半径和圆心坐标
                 let a1, b1, c1, d1;
                 let a2, b2, c2, d2;
@@ -10225,21 +10205,16 @@ VILibrary.VI = {
 				else theta=2*Math.PI-2*Math.asin(Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R));
                 let N=parseInt(theta/delta)+1;//插补次数
 				let step=math.multiply(1/N,diffPos);
+                console.log("p0:",p0,"\np1:",p1,"\np2:",p2,"\nstep:",step,"\nN:",N,);
 				let m=[],n=[],l=[],X=[x0],Y=[y0],Z=[z0];
 				let i=0;
+				let Ept=SLERP(p0,p2,N);//四元数插补
                 _this.timer = window.setInterval(function () {
                     let tPos,tAng,gamma,alpha,beta;
                     if(i+1==N){
                         window.clearInterval(_this.timer);
                         _this.timer=0;
                         targetANG=instrAng.concat();
-                        /*tPos=p2.concat();
-                        tAng=inverseKinematics(tPos);
-                        if(tAng==0){
-                        	alert("超出工作空间或靠近奇异点！");
-                            return;}
-                        else {targetANG=tAng.concat();}*/
-
                     }
                     else {
                         m[i]=v*(Z[i]-zc)-w*(Y[i]-yc);
@@ -10248,7 +10223,15 @@ VILibrary.VI = {
                         X[i+1]=xc+G*(X[i]+E*m[i]-xc);
                         Y[i+1]=yc+G*(Y[i]+E*n[i]-yc);
                         Z[i+1]=zc+G*(Z[i]+E*l[i]-zc);
-                        outerLoop://搜索N*step范围内有没有合适的姿态使得运动学反解有解
+                        //
+                        tPos=[X[i+1],Y[i+1],Z[i+1],Ept[i][0],Ept[i][1],Ept[i][2]];
+                        tAng=inverseKinematics(tPos);
+                        if(tAng==0){window.clearInterval(_this.timer);
+                            _this.timer=0;
+                            alert("超出工作空间或靠近奇异点！");
+                            return;}
+                        else {targetANG=tAng.concat();}
+                        /*outerLoop://搜索N*step范围内有没有合适的姿态使得运动学反解有解
                             for(let k=0;k<5*N;k++){
                                 for(let j=0;j<=1;j++){
                                     let sign=j==1?1:-1;
@@ -10267,7 +10250,7 @@ VILibrary.VI = {
                             _this.timer=0;
                             alert("超出工作空间或靠近奇异点！");
                             return;
-                        }
+                        }*/
 					}
                     kinematicsEquation(targetANG);
                     if (_this.dataLine){
@@ -10292,6 +10275,7 @@ VILibrary.VI = {
                     i++;
                 },T*1000);
             }
+
             function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
                 let alpha=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
