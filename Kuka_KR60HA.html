@@ -33,8 +33,8 @@
                 <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
                     <input id="angInput3" type="range" max="350" min="-350" value="0" step="5" onchange="changeAng(3)">
                 </p>
-                <p>Ang_5：<input id="angTxt4"  type="text"value="0" style="width: 50px" onchange="changeAngTxt(4)">
-                    <input id="angInput4" type="range" max="119" min="-119" value="0" step="1" onchange="changeAng(4)">
+                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
+                    <input id="angInput4" type="range" max="119" min="-119" value="30" step="1" onchange="changeAng(4)">
                 </p>
                 <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
                     <input id="angInput5" type="range" max="350" min="-350" value="0" step="5" onchange="changeAng(5)">
@@ -43,15 +43,15 @@
             <div class="message_div" id="resultDiv" onchange="changePos()">
                 <div style="width: 50%;display: inline;float: left">
                     <p>末端坐标：</p><br>
-                    <p>P_X：<input id="posX" type="text" value="1340" class="robotPA"></p>
+                    <p>P_X：<input id="posX" type="text" value="1317.22" class="robotPA"></p>
                     <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
-                    <p>P_Z：<input id="posZ" type="text" value="1810" class="robotPA"></p>
+                    <p>P_Z：<input id="posZ" type="text" value="1725" class="robotPA"></p>
                 </div>
                 <div style="width: 50%;display: inline;">
                     <p>末端姿态：</p><br>
-                    <p>E_X：<input id="eulerX" type="text" value="0" class="robotPA">°</p>
-                    <p>E_Y：<input id="eulerY" type="text" value="90" class="robotPA">°</p>
-                    <p>E_Z：<input id="eulerZ" type="text" value="0" class="robotPA">°</p>
+                    <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
+                    <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
+                    <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
@@ -83,7 +83,7 @@
 <script>
     'use strict';
     let robot60haVI = new VILibrary.VI.Robotkr60VI($('#mainCanvas'), true);
-   let instructionCompiling= new VILibrary.VI.Instruction_2VI($('#messageDiv'), true);
+   let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"k60");
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot60haVI.id, 1, 2);
     VILibrary.InnerObjects.bindDataLine(robot60haVI.id, instructionCompiling.id, 1, 2);
 
@@ -92,7 +92,7 @@
         pAngle=[],
         pPos=[],
         indexI=0;
-    let currentPOS=[1340,0,1810,0,Math.PI/2,0];
+    let currentPOS=[1317.22,0,1725,-Math.PI,Math.PI/3,-Math.PI];
     function changeTransparency() {
         if(document.getElementById('BASE__MA_Base_0').getAttribute('transparency')== '0'){
             for(let i=0;i<10;i++){
@@ -105,12 +105,12 @@
             }
     }
     function changeAng(input) {
-        let currentAng=[0,0,0,0,0,0];
+        let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
         for(let i=0;i<=5;i++){
             currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
         }
-        instructionCompiling.moveJ(currentAng);
+        instructionCompiling.moveJ(currentAng,500);
     }
     function changeAngTxt(input) {
         document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
@@ -181,10 +181,13 @@
                 indexI--;
                 break;
             case -1:
-                s=["p0: 340 0 302 0 0 0;\n","p1: -146.3 -39.2 75.7 0.0 -0.2 0.3;\n","p2: 136.5 36.6 93.3 0.0 0.9 0.3;\n"],
-                    pAngle=[[0, 0, 0, 0, 0, 0],[-2.8797932657906435, -1.0471975511965976, 1.2217304763960306, 0, 0, 0],[-2.8797932657906435, 1.0471975511965976, 1.2217304763960306, 0, 0, 0]];
-                document.getElementById("instrInput").value="moveJ p0;\nmoveJ p1;\nmoveJ p2;\nmoveJ p1;\nmoveJ p2;\nmoveJ p0;";
-                indexI=3;
+                s=["p0: x1317.22 y0 z1725 -180° 60° -180°;\n","p1: x1140.75 y658.61 z1725 -180° 60° -150°;\n","p2: x634.49 y366.32 z2086.7 -30° 90° 0°;\n","p3: x757.6 y-437.4 z1358.74 180° 45° 150°;\n"],
+                    pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0.5235987755982988, 0, 0, 0, 0.5235987755982988, 0],[0.5235987755982988, -0.5235987755982988, 0, 0, 0.5235987755982988, 0],[-0.5235987755982988, -0.5235987755982988, 0.7853981633974483, 0, 0.5235987755982988, 0]];
+                pPos=[[1317.22, 0, 1725, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[1140.7497, 658.6122, 1725, -3.141592653589793, 1.0471943756012814, -2.617981175819824],[634.4856, 366.3204, 2086.6953, -0.5236114777699694, 1.5707963267948966, 0],[757.5956, -437.398, 1358.7411, 3.141592653589793, 0.7853600105770818, 2.6179562867740636]];
+                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveC p1,p2,v400;\nmoveL p3,v400;\nmoveJ p0,v400;";
+                turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                indexI=4;
         }
         let str="";
         for(let m=0;m<indexI;m++){

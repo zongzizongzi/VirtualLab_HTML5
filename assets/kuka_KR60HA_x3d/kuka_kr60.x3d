@@ -37,7 +37,7 @@
                                         <inline url="link3.x3d"> </inline>
                                         <transform translation="-350,145,0" DEF="link3" id="link3" rotation="1,0,0,0">
                                             <inline url="link4.x3d"> </inline>
-                                            <transform translation="1170,0,0" DEF="link4" id="link4" rotation="0,0,1,0">
+                                            <transform translation="1170,0,0" DEF="link4" id="link4" rotation="0,0,-1,0.5235987755982988">
                                                 <inline url="link5.x3d"> </inline>
                                                 <transform translation="-1170,0,0" DEF="link5" id="link5" rotation="1,0,0,0">
                                                     <inline url="link6.x3d"> </inline>
