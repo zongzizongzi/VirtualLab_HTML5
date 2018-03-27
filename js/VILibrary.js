@@ -379,7 +379,6 @@ class TemplateVI {
 	constructor(VICanvas) {
 		
 		if (new.target === TemplateVI) {
-			
 			throw new Error('本VI为模版，不能实例化');
 		}
 		let domElement = VILibrary.InnerObjects.getDomObject(VICanvas);
@@ -561,14 +560,13 @@ class RobotTemplateVI extends TemplateVI {
 			else if(TargetANG.length==4){
                 for(let i=0;i<=3;i++){
                     if(i==2) {
-                        let translation="0,"+TargetANG[i]+",0"
+                        let translation="250,"+TargetANG[i]+",0"
                         document.getElementById("Robot__link"+i).setAttribute('translation',translation);
                     }
                     else {
-                        rotat="0,1,0,"+TargetANG[i];
-                        let a=i;
-                        if(i==3)a--;
-                        document.getElementById("Robot__link"+a).setAttribute('rotation',rotat);
+                    	if(i==3)rotat="0,1,0,"+(-TargetANG[i]);//！！！！最后一轴正方向相反！！！！！
+                        else rotat="0,1,0,"+TargetANG[i];
+                        document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
                     }
 
                 }
@@ -588,7 +586,7 @@ class RobotTemplateVI extends TemplateVI {
 				 </x3d>*!/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
 				 document.getElementById("x3d120").innerHTML=my_html;*/
                 this.container.innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
-                    '<inline nameSpaceName="Robot" mapDEFToID="true" url='+this.robotURL+'></inline>'+
+                    '<inline nameSpaceName="Robot"="Robot" mapDEFToID="true" url='+this.robotURL+'></inline>'+
                     '</scene></x3d>';
             }
             else {
@@ -9783,11 +9781,14 @@ VILibrary.VI = {
             let currentANG,targetANG;
             let instrAng;
             let instrIndex,
-				targetPOS,
                 instrSplit,//指令划分后
 				moveType,//当前执行的运动类型
+				Range,OMEGA,
 				A,D,ALPHA,THETA;//D-H参数
-			let executiveFlag=false;
+			let ToolFlag=0,//加载工具标志
+				ToolDO=false,
+				LoadFlag=false;//是否夹持工件
+			let executiveFlag=false;//是否正在执行程序
 			//判断机器人类型，
 			switch (robNumber){
 				case "k60":
@@ -9796,24 +9797,34 @@ VILibrary.VI = {
                     ALPHA=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                     THETA=[0,0,-Math.PI/2,0,0,0,0,Math.PI];
                     currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
+                    Range=[[-185,185],[-135,35],[-120,158],[-350,350],[-119,119],[-350,350]];
+                    OMEGA=[128,102,128,260,245,322];
 					break;
-				case "a910sc":
-                    A=[0,0,200,250,0];
-                    D=[0,220,0,0,0];
-                    ALPHA=[0,0,0,0,0];
-                    THETA=[0,0,0,0,0];
+				case "a910":
+                    A=[0,0,200,250,0,0];
+                    D=[0,220,0,0,0,0];//d[3]<=0;
+                    ALPHA=[0,0,0,Math.PI,0,0];
+                    THETA=[0,0,0,0,0,0];
                     currentANG=[0,0,0,0],targetANG=[0,0,0,0];
+                    Range=[[-140,140],[-150,150],[-180*180/Math.PI,0],[-400,400]];
+                    OMEGA=[415,659,1000*180/Math.PI,2400];
                     break;
 
 				case "a120":default:
-					A=[0,0,0,270,70,0,0,0];
-					D=[290,0,0,0,302,0,0,72];
+					A=[0,0,0,270,70,0,0,0];//不加tool最后一个为0
+					D=[290,0,0,0,302,0,0,72];//加tool最后一个为72
 					ALPHA=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                 	THETA=[0,0,-Math.PI/2,0,0,0,0,Math.PI];
                 	currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
-			}
+                	Range=[[-165,165],[-110,110],[-110,70],[-160,160],[-120,120],[-400,400]];
+                	OMEGA=[250,250,250,420,590,600];
+                	let lasdjsikdj=1111;
+            }
+            const baseA=A,baseD=D;
+            Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {
-                return targetANG;
+            	if(dataType==1)return targetANG;
+            	else if(dataType==2)return [ToolFlag,ToolDO];
             }
             this.setData=function (input) {
                 let a_D=input.concat();
@@ -9822,6 +9833,8 @@ VILibrary.VI = {
                 A[4]=a_D[2];
                 D[4]=a_D[3];
                 D[7]=a_D[4];
+                if(a_D.length==6)
+				 	A[2]=a_D[5];
                 kinematicsEquation(currentANG);
             }
             this.toggleObserver = function (flag) {
@@ -9864,9 +9877,15 @@ VILibrary.VI = {
                         }
 					};
                     let lengthI=instrI.length;
-                    let moveIndex=instrI.indexOf("move");
+                    let moveIndex=instrI.indexOf('move');
                     if(moveIndex==-1){
-                        errInfo();return;
+                        if(instrI.indexOf('Reset')>=0||instrI.indexOf('reset')>=0){
+                            _this.setIO(false);
+                        }
+                        else if(instrI.indexOf('Set')>=0||instrI.indexOf('set')>=0){
+                            _this.setIO(true);
+                        }
+                        else {errInfo();return;}
                     }
                     else {
                         /*let pIndex=instrI.indexOf("p");
@@ -9880,12 +9899,12 @@ VILibrary.VI = {
                             title: '系统提示'
                             ,content: '未知示教点'
                         });return;}
-                        else {
+                        else  {
                             moveType=instrI[moveIndex+4];
                             let instrPos,lastPos;
                             switch(moveType){
                                 case "J":
-                                	instrAng=pAngle[n1].concat();
+                                	instrAng=inverseKinematics(pPos[n1]);
                                 	_this.moveJ(instrAng,m);
                                 	break;
                                 case "L":
@@ -9917,59 +9936,6 @@ VILibrary.VI = {
                     }
                 }
             }
-            /*this.moveJ=function(input,v){
-            	let STEP=2.5/180*Math.PI,
-					instructAng=input.concat(),
-					tAng=[0,0,0,0,0.5235987755982988,0];
-
-                _this.timer = window.setInterval(function () {
-                	let current=math.multiply(-1,currentANG);
-                	let diff=math.add(instructAng, current);
-                    let    maxDiff=Math.max.apply(Math,math.abs(diff));
-                    if(maxDiff==0){
-                        window.clearInterval(_this.timer);
-                        _this.timer=0;
-                        if(executiveFlag){
-                            instrIndex++;
-                            if(instrIndex<(instrSplit.length-1)){
-                                setTimeout(function () {
-                                    instrCompiling();
-                                },500);
-                                // instrCompiling();
-                            }
-                            else {
-                            	executiveFlag=false;
-                            	return
-							}
-						}
-                        else{
-                            for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
-                            }
-                            return;
-						}
-                    }
-                    else if(maxDiff<=STEP){
-                        targetANG=instructAng.concat();
-                    }
-                    else {
-                    	for(let i=0;i<=5;i++){
-                    		if(Math.abs(diff[i])<=STEP){targetANG[i]=instructAng[i]}
-                            else if(diff[i]>0)targetANG[i]=currentANG[i]+STEP;
-                            else  targetANG[i]=currentANG[i]-STEP;
-                            	// targetANG[i]=diff[i]>0?(currentANG[i]+STEP):(currentANG[i]-STEP);
-						}
-                    }
-                    if(maxDiff){
-                        kinematicsEquation(targetANG);
-                        if (_this.dataLine){
-                            VILibrary.InnerObjects.dataUpdater(_this.dataLine);
-                        }
-					}
-				},50);
-
-            }*/
             //四元数方向插补
             function SLERP(p0,p2,N) {
                 //计算始末点四元数和旋转角度thetaQ
@@ -10010,6 +9976,7 @@ VILibrary.VI = {
                 return [q0,q1,q2,q3];
             }
             this.moveJ=function(input,v){
+            	moveType="J";
             	if(v<=0){
             		alert("参数设置错误！");
             		return;
@@ -10033,7 +10000,10 @@ VILibrary.VI = {
                             return;
                         }
                     }
-                    else return;
+                    else{
+                        kinematicsEquation(instructAng);
+                        return;
+					}
 				}
 				else {
                     let dAng=math.multiply(Diff,1/maxDiff);//单位变化量
@@ -10045,9 +10015,12 @@ VILibrary.VI = {
 						x1=T[0],y1=T[1],z1=T[2],
                         dL=Math.sqrt(Math.pow(x-x1,2)+Math.pow(y-y1,2)+Math.pow(z-z1,2));//计算各轴转动单位变化量后产生的末端位移；
 					//dt=dL/v=dAng/ω
-                    let Omega=math.multiply(math.multiply(dAng,v),1/dL);//角速度
-                    // let t=maxDiff/(0.1*v/180*Math.PI);
-                    // let Omega=math.multiply(Diff,1/t);//角速度
+					let Omega;//角速度
+					if(dL<0.02){
+                        let t=maxDiff/(0.1*v/180*Math.PI);
+                        Omega=math.multiply(Diff,1/t);
+					}
+                    else Omega=math.multiply(math.multiply(dAng,v),1/dL);//角速度
                     let STEP=math.multiply(Omega,0.05);//5毫秒周期内的步进角度
                     let maxStep=Math.max.apply(Math,math.abs(STEP)),
 						N=parseInt(maxDiff/maxStep)+1;//计算步进次数
@@ -10065,26 +10038,6 @@ VILibrary.VI = {
                         else{
                             targetANG=math.add(currentANG,STEP);
                         }
-
-						/*if(maxDiff==0){
-						 window.clearInterval(_this.timer);
-						 _this.timer=0;
-						 if(((instrSplit)!=undefined)&&(instrIndex<instrSplit.length)){
-						 instrIndex++;
-						 instrCompiling();
-						 }
-						 }
-						 else if(maxDiff<=Math.max.apply(Math,math.abs(STEP))){
-						 targetANG=instructAng;
-						 }
-						 else {
-						 targetANG=math.add(currentANG,STEP);
-						 }*/
-                        if(executiveFlag){
-                            for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=targetANG[i]*180/Math.PI;
-                                document.getElementById("angTxt"+(i)).value=targetANG[i]*180/Math.PI;
-                            }}
                         kinematicsEquation(targetANG);
                         if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
@@ -10112,6 +10065,7 @@ VILibrary.VI = {
 
 			}
             this.moveL=function (input1,v) {
+                moveType="L";
             	const INTERVAL=0.05
             	let instructPos=input1.concat();
             	let lastPos=currentPOS.concat();
@@ -10130,70 +10084,59 @@ VILibrary.VI = {
                     let diff=math.add(instructPos, current);
                     let maxDiff=Math.max.apply(Math,math.abs(diff));
                     let x,y,z,alpha,beta,gamma,tPos;
-                    if(k+1==N){
+                    if(k+1==N){//最后一步
                         window.clearInterval(_this.timer);
                         _this.timer=0;
-                        if(executiveFlag){
-                            // targetANG=instrAng.concat();
-							targetANG=inverseKinematics(instructPos);
-                        }
-                        else {
-                            tPos=instructPos.concat();
-                            let tANG=inverseKinematics(tPos);
-                            if(tANG==0){
-                                window.clearInterval(_this.timer);
-                                _this.timer=0;
-                                alert("超出工作空间或靠近奇异点！");
-                                return;}
-                            else {targetANG=tANG.concat();
-                            }
-                        }
-					}
+                        tPos=instructPos.concat();
+                    }
 					else {
                             x=currentPOS[0]+step[0],
                             y=currentPOS[1]+step[1],
                             z=currentPOS[2]+step[2];
-                        let tAng;
                         tPos=[x,y,z,Ept[k][0],Ept[k][1],Ept[k][2]];
-                        tAng=inverseKinematics(tPos);
-                        if(tAng==0){
-                            window.clearInterval(_this.timer);
-                            _this.timer=0;
-                            alert("超出工作空间或靠近奇异点！");return;
-						}
-                        else targetANG=tAng.concat();
+                    }
+                    let tAng=inverseKinematics(tPos);
+					if(tAng==0){
+						window.clearInterval(_this.timer);
+						_this.timer=0;
+						alert("超出工作空间或靠近奇异点！");return;
 					}
+					else targetANG=tAng.concat();
 					kinematicsEquation(targetANG);
 					if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                         }
 					if(k+1==N){
                         if(executiveFlag){
-                            instrIndex++;
+                            instrIndex++;//指向下一行指令
                             if(instrIndex<instrSplit.length){
                                 setTimeout(function () {
-                                    instrCompiling();
+                                    instrCompiling();//延时0.5秒解析下一行指令
                                 },500);
                                 // instrCompiling();
                             }
                             else {
-                                executiveFlag=false;
+                                executiveFlag=false;//指令解析完毕
                                 return
                             }
                         }
-                        else{
-                            for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
+                        /*else{
+                            for(let i=0;i<targetANG.length;i++){
+                            	let a;
+                            	if(robNumber=="a910"&&i==2)a=(targetANG[i]).toFixed(2);
+                            	else a=(targetANG[i]*180/Math.PI).toFixed(2);
+                                document.getElementById("angInput"+(i)).value=a;
+                                document.getElementById("angTxt"+(i)).value=a;
                             }
                             return;
-                        }
+                        }*/
 					}
 					k++;
 				},INTERVAL*1000)
 
             }
             this.moveC=function (input1,input2,input3) {
+                moveType="C";
             	let F=input3;
                 const T=0.05;
                 let p1=input1.concat();
@@ -10264,12 +10207,14 @@ VILibrary.VI = {
 					E=F*T/(R*Math.sqrt(u*u+v*v+w*w));
                 let theta;
                 if(H>=0){
-                	theta=2*Math.asin(Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R));
+                	let tmp=Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R);
+                	if(tmp>1)tmp=1;
+                	else if(tmp<-1)tmp=-1;
+                	theta=2*Math.asin(tmp);
 				}
-				else theta=2*Math.PI-2*Math.asin(Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R));
+				else theta=2*Math.PI-2*Math.asin((Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R)).toFixed(4));
                 let N=parseInt(theta/delta)+1;//插补次数
 				let step=math.multiply(1/N,diffPos);
-                console.log("p0:",p0,"\np1:",p1,"\np2:",p2,"\nstep:",step,"\nN:",N,);
 				let m=[],n=[],l=[],X=[x0],Y=[y0],Z=[z0];
 				let i=0;
 				let Ept=SLERP(p0,p2,N);//四元数插补
@@ -10278,7 +10223,7 @@ VILibrary.VI = {
                     if(i+1==N){
                         window.clearInterval(_this.timer);
                         _this.timer=0;
-                        targetANG=instrAng.concat();
+                        targetANG=inverseKinematics(p2);
                     }
                     else {
                         m[i]=v*(Z[i]-zc)-w*(Y[i]-yc);
@@ -10339,6 +10284,66 @@ VILibrary.VI = {
                     i++;
                 },T*1000);
             }
+            this.changeTool=function(input){
+                ToolFlag=input;
+                if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
+                let len=baseA.length;
+                let A_add=Array(len).fill(0),D_add=Array(len).fill(0);
+                switch(input){
+                    case 1:
+                    	if(robNumber=="a910"){
+                            A_add[len-1]+=34;
+                            D_add[len-1]+=115-27.5;
+						}
+						else {
+                            A_add[len-1]+=34;
+                            D_add[len-1]+=115;
+						}
+                        $('#setDO').enabled=true;
+                        break;
+                    case 0:
+                        $('#setDO').enabled=false;
+                        break;
+                }
+                A=math.add(baseA,A_add);
+                D=math.add(baseD,D_add);
+                kinematicsEquation(currentANG);
+                    }
+            this.setIO=function (input) {
+            	ToolDO=input;
+            	if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
+            	if(input){
+                    var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                    let boxPos=[trans.x,-trans.z,trans.y];
+                    /*let boxPos=document.getElementById("Robot__box").getAttribute('translation').split(",");
+                    let tmp=boxPos[1];
+                    boxPos[1]=0-parseFloat(boxPos[2]);
+                    boxPos[2]=tmp;*/
+                    for(var i=0;i<3;i++){
+                    	if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>3)break;
+                        if(i==2)LoadFlag=true;
+					}
+					document.getElementById("setDO").innerText='1';
+				}
+				else {
+            		LoadFlag=false;
+                    document.getElementById("setDO").innerText='0';
+				}
+                if(executiveFlag){
+                    instrIndex++;
+                    if(instrIndex<instrSplit.length){
+                        setTimeout(function () {
+                            instrCompiling();
+                        },500);
+                        // instrCompiling();
+                    }
+                    else {
+                        executiveFlag=false;
+                        return
+                    }
+                }
+                else return;
+            }
             function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
                 let alpha=ALPHA.concat();
@@ -10349,10 +10354,10 @@ VILibrary.VI = {
                 theta.push(0);
                 theta.unshift(0);
                 let t=[],T;
-                if(robNumber="a120"){
-                	d[3]=theta[3];
+                if(robNumber=="a910"){
+                	d[3]=-theta[3];
                 	theta[3]=0;
-                	T=[
+                	/*T=[
                 		[
                 			Math.cos(theta[1]+theta[2]-theta[4]),
                             Math.sin(theta[1]+theta[2]-theta[4]),
@@ -10366,14 +10371,16 @@ VILibrary.VI = {
                             a[2]*Math.sin(theta[1])+a[3]*Math.sin(theta[1]+theta[2])
 						],
 						[
-							0,0,-1,d[1]-d[3]
+							0,0,-1,d[1]+d[3]//d[1]-|d[3]|
 						],
 						[0,0,0,1]
 					]
+					T=math.multiply(T,[])*/
 				}
-               else {
+               // else {
+                	let len=a.length;
                     theta=math.add(theta,THETA);
-                    for(let i=0;i<=7;i++)
+                    for(let i=0;i<len;i++)
                     {
                         t[i]=[
                             [math.cos(theta[i]),
@@ -10395,11 +10402,11 @@ VILibrary.VI = {
                             [0,0,0,1],
                         ]
                     }
-                    T=t[7];
-                    for(let i=6;i>=0;i--){
+                    T=t[len-1];
+                    for(let i=len-2;i>=0;i--){
                         T=math.multiply(t[i],T)
                     }
-				}
+				// }
 
 
                 if(flag){
@@ -10437,6 +10444,15 @@ VILibrary.VI = {
                 document.getElementById("eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
                 currentPOS=[T[0][3],T[1][3],T[2][3],EulerX,EulerY,EulerZ];
                 currentANG=targetANG.concat();
+                if(executiveFlag||(moveType!='J')){
+                    for(let i=0;i<targetANG.length;i++){
+                        let a;
+                        if(robNumber=="a910"&&i==2)a=(targetANG[i]).toFixed(2);
+                        else a=(targetANG[i]*180/Math.PI).toFixed(2);
+                        document.getElementById("angInput"+(i)).value=a;
+                        document.getElementById("angTxt"+(i)).value=a;
+                    }
+				}
                 if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
                     let point=document.getElementById("Robot__LineSet_points").getAttribute('point');
                     point=point+" "+T[0][3]+" "+T[2][3]+" "+(-T[1][3]);
@@ -10445,13 +10461,18 @@ VILibrary.VI = {
 					let last_Index=parseInt(point_Index.match(/\d+$/))+1;
                     point_Index=point_Index+' '+last_Index;
                     document.getElementById("Robot__LineSet_index").setAttribute('coordIndex',point_Index);
-                    for(let i=0;i<=5;i++){
-                        document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                        document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
-                    }
 				}
+				//若夹持工件，工件坐标与末端坐标保持一致
+				if(LoadFlag&&(!flag)){
+                    var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                    trans.x=currentPOS[0];
+                    trans.y=currentPOS[2];
+                    trans.z=-currentPOS[1];
+                    document.getElementById('Robot__box').setFieldValue('translation',trans);
+				}
+
             }
-            function inverseKinematics(input){
+            function inverseKinematics(input) {
                 let a=A.concat();a.shift();//a[i-1]
                 let d=D.concat();//d[i]
                 let x=input[0],
@@ -10463,143 +10484,107 @@ VILibrary.VI = {
                 let ca=Math.cos(alpha),sa=Math.sin(alpha),
                     cb=Math.cos(beta),sb=Math.sin(beta),
                     cy=Math.cos(gamma),sy=Math.sin(gamma);
+                let resultAng=[];
                 let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-                let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
-                let Tt_6=[[-1,0,0,0],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
-                let T=math.multiply(math.multiply(T0_s,R),Tt_6);
-                let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
-                    ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
-                    nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
-                let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                let u1,u2,v1,v2,resultAng=[];
-                let j=0;
-                for(let i=0;i<=7;i++){
-                    if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
-                    else    theta[i][0]=Math.atan2(py,px)-Math.atan2(0,-Math.sqrt(px*px+py*py));
-                    let h=px*px+py*py+pz*pz+a[1]*a[1];
-                    let g=2*a[1]*Math.cos(theta[i][0])*px+2*a[1]*Math.sin(theta[i][0])*py+a[3]*a[3]+d[4]*d[4]+a[2]*a[2];
-                    let k=(h-g)/(2*a[2]);
-                    if(i<2||i>5) theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                    else        theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                    let s23=((-a[3]-a[2]*Math.cos(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.sin(theta[i][2])-d[4]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
-                    let c23=((-d[4]+a[2]*Math.sin(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.cos(theta[i][2])+a[3]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
-                    theta[i][1]=Math.atan2(s23,c23)-theta[i][2];
-                    theta[i][3]=Math.atan2(-ax*Math.sin(theta[i][0])+ay*Math.cos(theta[i][0]),-ax*Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])-ay*Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])+az*Math.sin(theta[i][1]+theta[i][2]));
-                    if(i%2){theta[i][3]+=Math.PI;}
-                    let s5=-ax*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.cos(theta[i][3])+Math.sin(theta[i][0])*Math.sin(theta[i][3]))-ay*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.cos(theta[i][3])-Math.cos(theta[i][0])*Math.sin(theta[i][3]))+az*Math.sin(theta[i][1]+theta[i][2])*Math.cos(theta[i][3]);
-                    let c5=-(ax*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+ay*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+az*Math.cos(theta[i][1]+theta[i][2]));
-                    theta[i][4]=Math.atan2(s5,c5);
-                    let s6=-nx*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-ny*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+nz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
-                    let c6=-ox*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-oy*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+oz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
-                    theta[i][5]=Math.atan2(s6,c6);
-                    if(Math.abs(theta[i][0])< Math.PI*185/180&&theta[i][1]>-135/180*Math.PI&&theta[i][1]<35/180*Math.PI&&theta[i][2]>-120/180*Math.PI&&theta[i][2]<158/180*Math.PI&&Math.abs(theta[i][3])<350/180*Math.PI&&Math.abs(theta[i][4])<119/180*Math.PI&&Math.abs(theta[i][5])<350/180*Math.PI){
-                        resultAng[j]=theta[i].concat();
-                        j++;
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if(resultAng==0&&resultAng[0]==undefined){return 0}
-                else {
-                    let omega=[250,250,350,320,320,420]
-                    let runTime=[];
-                    for(let m=0;m<=resultAng.length-1;m++){
-                    	let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//theta的差值（8->6）
-                    	resultAng[m]=math.add(resultAng[m],diff);
-                        // resultAng[m][1]+=Math.PI/2;
-                        let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
-                        runTime[m]=0;
-                        for(let n=0;n<6;n++){
-                            runTime[m]+=Math.abs(math.multiply(resultDiff[n],1/omega[n]));
+                if(robNumber=="a910"){
+                	let Tt=[[1,0,0,-a[a.length-1]],[0,1,0,0],[0,0,1,-d[d.length-1]],[0,0,0,1]];
+                	let T=math.multiply(R,Tt);
+                    let nx=T[0][0],ny=T[1][0],nz=T[2][0],
+						px=T[0][3],py=T[1][3],pz=T[2][3];
+                    // let nx=ca*cb,ny=sa*cb,nz=-sb;
+                    let theta=[[],[]];
+                    let r=Math.sqrt(px*px+py*py),
+						AA=(px*px+py*py+a[1]*a[1]-a[2]*a[2])/(2*a[1]*r),
+						phi=Math.atan(px/py);
+                    if(AA>1)AA=1;
+                    else if(AA<-1)AA=-1;
+                    theta[0][0]=Math.atan(AA/Math.sqrt(1-AA*AA))-phi;
+                    theta[1][0]=Math.atan(AA/(-Math.sqrt(1-AA*AA)))-phi;
+                    for(let i=0;i<2;i++){
+                    	let tmp=(px*px+py*py-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]);
+                    	if(tmp>1)tmp=1;
+                    	else if(tmp<-1)tmp=-1;
+                        theta[i][1]=Math.acos(tmp);//胡杰
+                        // theta[i][1]=Math.atan((r*Math.cos(theta[i][0]+phi))/(r*Math.sin(theta[i][0]+phi)-a[1]));
+                        // let aaa0=Math.acos((r*Math.cos(theta[i][0]+phi)-a[1])/a[2]);
+                        // let aaa1=Math.acos((px*px+py*py-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]));
+                        // let aaa2=Math.atan(-(r*Math.sin(theta[i][0]+phi))/(r*Math.cos(theta[i][0]+phi)-a[1]))
+						theta[i][2]=pz-d[1];
+                        theta[i][3]=theta[i][1]-Math.asin(-nx*Math.sin(theta[i][0])+ny*Math.cos(theta[i][0]));
+                        let inRange=true;
+                        for(let j=0;j<theta[i].length;j++){
+                            if((theta[i][j]>=Range[j][0])&&(theta[i][j]<=Range[j][1]))continue;
+                            else {inRange=false;break;}
+                        }
+                        if(inRange){
+                            resultAng.push(theta[i].concat());
+                            let delt=math.multiply(resultAng,180/Math.PI);
+                        }
+                        else {
+                            continue;
                         }
                     }
-                    let minTime=Math.min.apply(Math,runTime);
-                    let minAng=resultAng[runTime.indexOf(minTime)];
-                    return minAng;
+                }
+				else {
+                    let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
+                    let Tt_6=[[-1,0,0,a[6]],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
+                    let T=math.multiply(math.multiply(T0_s,R),Tt_6);
+                    let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
+                        ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
+                        nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
+                    let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
+                    let j=0;
+                    for(let i=0;i<=7;i++){
+                        if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
+                        else    theta[i][0]=Math.atan2(py,px)-Math.atan2(0,-Math.sqrt(px*px+py*py));
+                        let h=px*px+py*py+pz*pz+a[1]*a[1];
+                        let g=2*a[1]*Math.cos(theta[i][0])*px+2*a[1]*Math.sin(theta[i][0])*py+a[3]*a[3]+d[4]*d[4]+a[2]*a[2];
+                        let k=(h-g)/(2*a[2]);
+                        if(i<2||i>5) theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
+                        else        theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
+                        let s23=((-a[3]-a[2]*Math.cos(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.sin(theta[i][2])-d[4]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
+                        let c23=((-d[4]+a[2]*Math.sin(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.cos(theta[i][2])+a[3]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
+                        theta[i][1]=Math.atan2(s23,c23)-theta[i][2];
+                        theta[i][3]=Math.atan2(-ax*Math.sin(theta[i][0])+ay*Math.cos(theta[i][0]),-ax*Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])-ay*Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])+az*Math.sin(theta[i][1]+theta[i][2]));
+                        if(i%2){theta[i][3]+=Math.PI;}
+                        let s5=-ax*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.cos(theta[i][3])+Math.sin(theta[i][0])*Math.sin(theta[i][3]))-ay*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.cos(theta[i][3])-Math.cos(theta[i][0])*Math.sin(theta[i][3]))+az*Math.sin(theta[i][1]+theta[i][2])*Math.cos(theta[i][3]);
+                        let c5=-(ax*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+ay*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+az*Math.cos(theta[i][1]+theta[i][2]));
+                        theta[i][4]=Math.atan2(s5,c5);
+                        let s6=-nx*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-ny*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+nz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
+                        let c6=-ox*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-oy*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+oz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
+                        theta[i][5]=Math.atan2(s6,c6);
+                        if(Math.abs(theta[i][0])< Math.PI*185/180&&theta[i][1]>-135/180*Math.PI&&theta[i][1]<35/180*Math.PI&&theta[i][2]>-120/180*Math.PI&&theta[i][2]<158/180*Math.PI&&Math.abs(theta[i][3])<350/180*Math.PI&&Math.abs(theta[i][4])<119/180*Math.PI&&Math.abs(theta[i][5])<350/180*Math.PI){
+                            resultAng[j]=theta[i].concat();
+                            j++;
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+				}
+                if(resultAng==0&&resultAng[0]==undefined){return 0}
+                else if (resultAng.length==1){return resultAng[0]}
+                else {
+                        let runTime=[];
+                        for(let m=0;m<resultAng.length;m++){
+                        	if(resultAng[m].length!=4){
+                                let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//theta的差值（8->6）
+                                resultAng[m]=math.add(resultAng[m],diff);
+							}
+
+                            // resultAng[m][1]+=Math.PI/2;
+                            let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
+                            runTime[m]=0;
+                            for(let n=0;n<resultAng[m].length;n++){
+                                runTime[m]+=Math.abs(math.multiply(resultDiff[n],1/OMEGA[n]));
+                            }
+                        }
+                        let minTime=Math.min.apply(Math,runTime);
+                        let minAng=resultAng[runTime.indexOf(minTime)];
+                        return minAng;
                 }
             }
 
-            /*function inverseKinematics(input){
-                let a=A.concat();a.shift();//a[i-1]
-                let d=D.concat();//d[i]
-            	let
-                x=input[0],
-                y=input[1],
-                z=input[2],
-                gamma=input[3],
-                beta=input[4],
-                alpha=input[5];
-                let ca=Math.cos(alpha),sa=Math.sin(alpha),
-                    cb=Math.cos(beta),sb=Math.sin(beta),
-                    cy=Math.cos(gamma),sy=Math.sin(gamma);
-                let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-                /!*let a=[0,0,270,70,0,0],
-				 d=[290,0,0,0,302,0,0,72];*!/
-
-                let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-290],[0,0,0,1]];
-                let Tt_6=[[-1,0,0,0],[0,-1,0,0],[0,0,1,-72],[0,0,0,1]];
-                let T=math.multiply(math.multiply(T0_s,R),Tt_6);
-                let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
-                    ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
-                    nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
-                let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                let u1,u2,v1,v2,resultAng=[];
-                let k=(Math.pow((T[0][3]),2)+Math.pow((T[1][3]),2)+Math.pow((T[2][3]),2)-Math.pow(a[2],2)-Math.pow(a[3],2)-Math.pow(d[4],2))/(2*a[2]);
-                let j=0;
-                for(let i=0;i<=7;i++){
-                    if(i<4)theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                    else   theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                    u1=a[3]*Math.cos(theta[i][2])-d[4]*Math.sin(theta[i][2])+a[2];
-                    u2=a[3]*Math.sin(theta[i][2])+d[4]*Math.cos(theta[i][2]);
-                    if(i<2||i>5)theta[i][1]=Math.atan2(-pz,Math.sqrt(Math.pow(u1,2)+Math.pow(u2,2)-Math.pow(pz,2)))-Math.atan2(u2,u1);
-                    else       theta[i][1]=Math.atan2(-pz,-Math.sqrt(Math.pow(u1,2)+Math.pow(u2,2)-Math.pow(pz,2)))-Math.atan2(u2,u1);
-                    v1=Math.cos(theta[i][1])*u1-Math.sin(theta[i][1])*u2,
-                        v2=-Math.sin(theta[i][1])*u1-Math.cos(theta[i][1])*u2;
-                    if(px==0&&py==0){theta[i][0]=currentANG[0];}
-                    else if(v1>0) theta[i][0]=Math.atan2(py,px);
-                    else if(v1<0) theta[i][0]=Math.atan2(-py,-px);
-                    else theta[i][0]=Number.NaN;
-                    let c4=-ax*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-ay*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-az*Math.cos(theta[i][1]+theta[i][2]);
-                    if((1-Math.pow(c4,2))==0){
-                        theta[i][4]=Number.NaN;//待修改
-                    }
-                    if(i%2){//s4<0
-                        theta[i][4]=Math.atan2(-Math.sqrt(1-Math.pow(c4,2)),c4);
-                        theta[i][3]=Math.atan2(ax*Math.sin(theta[i][0])-ay*Math.cos(theta[i][0]),ax*Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])+ay*Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])-az*Math.sin(theta[i][1]+theta[i][2]));
-                        theta[i][5]=Math.atan2(-ox*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-oy*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-oz*Math.cos(theta[i][1]+theta[i][2]),nx*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+ny*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+nz*Math.cos(theta[i][1]+theta[i][2]));
-                    }
-                    else {//s4>0
-                        theta[i][4]=Math.atan2(Math.sqrt(1-Math.pow(c4,2)),c4);
-                        theta[i][3]=Math.atan2(-ax*Math.sin(theta[i][0])+ay*Math.cos(theta[i][0]),-ax*Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])-ay*Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])+az*Math.sin(theta[i][1]+theta[i][2]));
-                        theta[i][5]=Math.atan2(ox*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+oy*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+oz*Math.cos(theta[i][1]+theta[i][2]),-nx*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-ny*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])-nz*Math.cos(theta[i][1]+theta[i][2]));
-                    }
-                    if(Math.abs(theta[i][0])< Math.PI*11/12&&theta[i][1]>-3.49066&&theta[i][1]<0.439066&&theta[i][2]>-1.570796&&theta[i][2]<1.22173&&Math.abs(theta[i][3])<Math.PI*8/9&&Math.abs(theta[i][4])<2*Math.PI/3&&Math.abs(theta[i][5])<Math.PI*20/9){
-                        resultAng[j]=theta[i].concat();
-                        j++;
-                        // break;
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if(resultAng==0&&resultAng[0]==undefined){return 0}
-                else {
-					let omega=[250,250,350,320,320,420]
-					let runTime=[];
-					for(let m=0;m<=resultAng.length-1;m++){
-                        resultAng[m][1]+=Math.PI/2;
-                        let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
-                        runTime[m]=0;
-						for(let n=0;n<6;n++){
-                            runTime[m]+=Math.abs(math.multiply(resultDiff[n],1/omega[n]));
-						}
-					}
-                    let minTime=Math.min.apply(Math,runTime);
-					let minAng=resultAng[runTime.indexOf(minTime)];
-                    return minAng;
-				}
-            }*/
         }
         static get cnName() {
 
@@ -10616,572 +10601,6 @@ VILibrary.VI = {
             return '300px';
         }
     },
-    /*Instruction_2VI:class Instruction_1VI extends TemplateVI {
-        constructor(VICanvas, draw3DFlag) {
-            super(VICanvas);
-            const _this = this;
-            this.name = 'Instruction_1VI';
-            let currentANG=[0,0,0,0,0,0],targetANG=[0,0,0,0,0,0];
-            let A=[0,0,350,850,145,0,0,0],
-                D=[815,0,0,0,820,0,0,170];
-            let instrAng;
-            let instrIndex,
-                targetPOS,
-                // currentPOS=[374,0,630,0,Math.PI/2,0],
-                instrSplit,//指令划分后
-                moveType;//当前执行的运动类型
-            let executiveFlag=false;
-            this.getData=function (dataType) {
-                this.setData=function (input) {
-                return targetANG;
-            }
-                let a_D=input.concat();
-                D[0]=a_D[0];
-                A[3]=a_D[1];
-                A[4]=a_D[2];
-                D[4]=a_D[3];
-                D[7]=a_D[4];
-                A[2]=a_D[5]
-            }
-            this.toggleObserver = function (flag) {
-                if (flag) {
-                    // instrParse();
-                    executiveFlag=true;
-                    instrIndex=0;
-                    let instrAll=document.getElementById("instrInput").value.toString();//输入指令,获取字符串
-                    let replacedStr=instrAll.replace(/[\n]/g,"");//去掉回车
-                    instrSplit=replacedStr.split(";");//以分号分割字符串
-                    //逐条指令解析
-                    let points="";
-                    points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
-                    document.getElementById("Robot__LineSet_points").setAttribute('point',points);
-                    document.getElementById("Robot__LineSet_index").setAttribute('coordIndex','0');
-                    instrCompiling();
-                }
-            };
-            function errInfo() {
-                layer.open({
-                    title: '系统提示'
-                    ,content: '输入指令不符合语法规则'
-                });
-            }
-            function instrCompiling() {
-                let instrLen=instrSplit.length;
-                if(instrIndex<instrLen){
-                    let instrI=instrSplit[instrIndex];
-                    if(instrI.replace(/[\s]/g,"")==""){
-                        instrIndex++;
-                        if(instrIndex<(instrSplit.length-1)){
-                            setTimeout(function () {
-                                instrCompiling();
-                            },500);
-                            // instrCompiling();
-                        }
-                        else {
-                            executiveFlag=false;
-                            return
-                        }
-                    };
-                    let lengthI=instrI.length;
-                    let moveIndex=instrI.indexOf("move");
-                    if(moveIndex==-1){
-                        errInfo();return;
-                    }
-                    else {
-						/!*let pIndex=instrI.indexOf("p");
-						 let pNum=instrI.slice(pIndex+1,lengthI);//从p到结束之间的部分*!/
-                        let pNum=instrI.match(/p\d+/g);//匹配该命令中“p数字”的部分
-                        // let strN=;
-                        let n1 = Number(pNum[0].replace(/p/,""));//p后面的数字
-                        let vNum=instrI.match(/v\d+/);
-                        let m=Number(vNum[0].replace(/v/,""))//v后面的数字
-                        if(isNaN(n1)||(n1>=pAngle.length)){layer.open({
-                            title: '系统提示'
-                            ,content: '未知示教点'
-                        });return;}
-                        else {
-                            moveType=instrI[moveIndex+4];
-                            let instrPos,lastPos;
-                            switch(moveType){
-                                case "J":
-                                    instrAng=pAngle[n1].concat();
-                                    _this.moveJ(instrAng);
-                                    break;
-                                case "L":
-                                    let LPos=pPos[n1].concat();
-                                    instrAng=pAngle[n1].concat();
-                                    _this.moveL(LPos,m);
-                                    break;
-                                case "C":
-
-                                    let n2 = Number(pNum[1].replace(/p/,""));//第二个p后面的数字
-                                    if(isNaN(n2)||(n2>=pAngle.length)){layer.open({
-                                        title: '系统提示'
-                                        ,content: '未知示教点'
-                                    });return;}
-                                    if(n2==undefined){
-                                        layer.open({
-                                            title: '系统提示'
-                                            ,content: 'moveC指令缺少关键参数'
-                                        });return;
-                                    }
-                                    instrAng=pAngle[n2].concat();
-                                    let CPos1=pPos[n1].concat();
-                                    let CPos2=pPos[n2].concat();
-                                    _this.moveC(CPos1,CPos2,m);
-                                    break;
-                                default: errInfo();return;
-                            }
-                        }
-                    }
-                }
-            }
-            this.moveJ=function(input,v){
-                let STEP=5/180*Math.PI,
-                    instructAng=input.concat(),
-                    tAng=[0,0,0,0,0,0];
-
-                _this.timer = window.setInterval(function () {
-                    let current=math.multiply(-1,currentANG);
-                    let diff=math.add(instructAng, current);
-                    let    maxDiff=Math.max.apply(Math,math.abs(diff));
-                    if(maxDiff==0){
-                        window.clearInterval(_this.timer);
-                        _this.timer=0;
-                        if(executiveFlag){
-                            instrIndex++;
-                            if(instrIndex<(instrSplit.length-1)){
-                                setTimeout(function () {
-                                    instrCompiling();
-                                },500);
-                                // instrCompiling();
-                            }
-                            else {
-                                executiveFlag=false;
-                                return
-                            }
-                        }
-                        else{
-                            for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
-                            }
-                            return;
-                        }
-                    }
-                    else if(maxDiff<=STEP){
-                        tAng=instructAng;
-                    }
-                    else {
-                        for(let i=0;i<=5;i++){
-                            if(Math.abs(diff[i])<=STEP){tAng[i]=instructAng[i]}
-                            else if(diff[i]>0)tAng[i]=currentANG[i]+STEP;
-                            else  tAng[i]=currentANG[i]-STEP;
-                            // targetANG[i]=diff[i]>0?(currentANG[i]+STEP):(currentANG[i]-STEP);
-                        }
-                        // console.log(pAngle);
-                    }
-                    targetANG=tAng;
-                    kinematicsEquation(targetANG);
-                    if (_this.dataLine){
-                        VILibrary.InnerObjects.dataUpdater(_this.dataLine);
-                    }
-                },50);
-
-            }
-            this.moveL=function (input1,v) {
-                const INTERVAL=0.05
-                let instructPos=input1.concat();
-                let lastPos=currentPOS.concat();
-                // let instructAng=input2.concat();
-                let diffPos=math.add(instructPos,math.multiply(-1,lastPos));
-                let t=Math.sqrt(Math.pow(diffPos[0],2)+Math.pow(diffPos[1],2)+Math.pow(diffPos[2],2))/v;
-                if(t==0){
-                    t=Math.max.apply(Math,math.abs(diffPos))/(240*Math.PI/180);
-                }
-                let N=t/INTERVAL;
-                let step=math.multiply(diffPos,1/N);
-                let maxStep=Math.max.apply(Math,math.abs(step));
-				/!*for(let i=0;i<6;i++){
-				 step[i]=diffPos[i]/t*INTERVAL;//xyz及各个欧拉角在一个循环周期内的步进量
-				 }*!/
-                let k=0;
-                _this.timer = window.setInterval(function () {
-                    let current=math.multiply(-1,currentPOS);
-                    let diff=math.add(instructPos, current);
-                    let maxDiff=Math.max.apply(Math,math.abs(diff));
-                    let x,y,z,alpha,beta,gamma,tPos;
-                    if(maxDiff==0){
-                        window.clearInterval(_this.timer);
-                        _this.timer=0;
-                        // return;
-						/!*if(((instrSplit)!=undefined)&&(instrIndex<(instrSplit.length-1))){
-						 instrIndex++;
-						 setTimeout(function () {
-						 instrCompiling();
-						 },500);
-						 }*!/
-                        if(executiveFlag){
-                            instrIndex++;
-                            if(instrIndex<instrSplit.length){
-                                setTimeout(function () {
-                                    instrCompiling();
-                                },500);
-                                // instrCompiling();
-                            }
-                            else {
-                                executiveFlag=false;
-                                return
-                            }
-                        }
-
-                        else{
-                            for(let i=0;i<=5;i++){
-                                document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                                document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
-                            }
-                            return;
-                        }
-                    }
-                    else  if(maxDiff<=maxStep){
-                        if(executiveFlag){
-                            targetANG=instrAng.concat();
-                        }
-                        else {
-                            tPos=instructPos.concat();
-                            let tANG=inverseKinematics(tPos);
-                            if(tANG==0){
-                                window.clearInterval(_this.timer);
-                                _this.timer=0;
-                                alert("超出工作空间或靠近奇异点！");
-                                return;}
-                            else {targetANG=tANG.concat();
-                            }
-                        }
-                    }
-                    else {
-                        x=currentPOS[0]+step[0],
-                            y=currentPOS[1]+step[1],
-                            z=currentPOS[2]+step[2];
-                        let tAng;
-                        outerLoop://搜索+-N*step范围内有没有合适的姿态使得运动学反解有解
-                            for(let i=0;i<5*N;i++){
-                                for(let j=0;j<=1;j++){
-                                    let sign=j==1?1:-1;
-                                    gamma=lastPos[3]+step[3]*k+step[3]/5*i*sign;
-                                    beta=lastPos[4]+step[4]*k+step[4]/5*i*sign;
-                                    alpha=lastPos[5]+step[5]*k+step[5]/5*i*sign;
-                                    tPos=[x,y,z,gamma,beta,alpha];
-                                    tAng=inverseKinematics(tPos);
-                                    if(tAng==0)continue;
-                                    else {targetANG=tAng.concat();break outerLoop}
-                                }
-                            }
-                        if(tAng==0){
-                            window.clearInterval(_this.timer);
-                            _this.timer=0;
-                            alert("超出工作空间或靠近奇异点！");return;
-                        }
-                    }
-                    // currentPOS=tPos.concat();
-                    kinematicsEquation(targetANG);
-                    if (_this.dataLine){
-                        VILibrary.InnerObjects.dataUpdater(_this.dataLine);
-                    }
-                    k++;
-                },INTERVAL*1000)
-
-            }
-            this.moveC=function (input1,input2,input3) {
-                let F=input3;
-                const T=0.05;
-                let p1=input1.concat();
-                let p2=input2.concat();
-                let p0=currentPOS.concat();
-                let diffPos=math.add(p2,math.multiply(-1,p0));
-                //计算半径和圆心坐标
-                let a1, b1, c1, d1;
-                let a2, b2, c2, d2;
-                let a3, b3, c3, d3;
-                let x0 = p0[0], y0 = p0[1], z0 = p0[2];
-                let x1 = p1[0], y1 = p1[1], z1 = p1[2];
-                let x2 = p2[0], y2 = p2[1], z2 = p2[2];
-                a1 = (y0*z1 - y1*z0 - y0*z2 + y2*z0 + y1*z2 - y2*z1);
-                b1 = -(x0*z1 - x1*z0 - x0*z2 + x2*z0 + x1*z2 - x2*z1);
-                c1 = (x0*y1 - x1*y0 - x0*y2 + x2*y0 + x1*y2 - x2*y1);
-                d1 = -(x0*y1*z2 - x0*y2*z1 - x1*y0*z2 + x1*y2*z0 + x2*y0*z1 - x2*y1*z0);
-                a2 = 2 * (x1 - x0);
-                b2 = 2 * (y1 - y0);
-                c2 = 2 * (z1 - z0);
-                d2 = x0 * x0 + y0 * y0 + z0 * z0 - x1 * x1 - y1 * y1 - z1 * z1;
-                a3 = 2 * (x2 - x0);
-                b3 = 2 * (y2 - y0);
-                c3 = 2 * (z2 - z0);
-                d3 = x0 * x0 + y0 * y0 + z0 * z0 - x2 * x2 - y2 * y2 - z2 * z2;
-                let xc = -(b1*c2*d3 - b1*c3*d2 - b2*c1*d3 + b2*c3*d1 + b3*c1*d2 - b3*c2*d1)/(a1*b2*c3 - a1*b3*c2 - a2*b1*c3 + a2*b3*c1 + a3*b1*c2 - a3*b2*c1);
-                let yc =  (a1*c2*d3 - a1*c3*d2 - a2*c1*d3 + a2*c3*d1 + a3*c1*d2 - a3*c2*d1)/(a1*b2*c3 - a1*b3*c2 - a2*b1*c3 + a2*b3*c1 + a3*b1*c2 - a3*b2*c1);
-                let zc = -(a1*b2*d3 - a1*b3*d2 - a2*b1*d3 + a2*b3*d1 + a3*b1*d2 - a3*b2*d1)/(a1*b2*c3 - a1*b3*c2 - a2*b1*c3 + a2*b3*c1 + a3*b1*c2 - a3*b2*c1);
-
-                let R=Math.sqrt(Math.pow(x1-xc,2)+Math.pow(y1-yc,2)+Math.pow(z1-zc,2));
-
-
-                //插补算法
-                let u,v,w,u1,v1,w1;
-                u=(y1-y0)*(z2-z1)-(z1-z0)*(y2-y1);
-                v=(z1-z0)*(x2-x1)-(x1-x0)*(z2-z1);
-                w=(x1-x0)*(y2-y1)-(y1-y0)*(x2-x1);
-                u1=(y0-yc)*(z2-z0)-(z0-zc)*(y2-y0);
-                v1=(z0-zc)*(x2-x0)-(x0-xc)*(z2-z0);
-                w1=(x0-xc)*(y2-y0)-(y0-yc)*(x2-x0);
-                let G=R/Math.sqrt(R*R+F*T*T),
-                    delta=Math.asin(F*T/R),
-                    H=u*u1+v*v1+w*w1,
-                    E=F*T/(R*Math.sqrt(u*u+v*v+w*w));
-                let theta;
-                if(H>=0){
-                    theta=2*Math.asin(Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R));
-                }
-                else theta=2*Math.PI-2*Math.asin(Math.sqrt(Math.pow(x2-x0,2)+Math.pow(y2-y0,2)+Math.pow(z2-z0,2))/(2*R));
-                let N=parseInt(theta/delta)+1;//插补次数
-                let step=math.multiply(1/N,diffPos);
-                let m=[],n=[],l=[],X=[x0],Y=[y0],Z=[z0];
-                let i=0;
-                _this.timer = window.setInterval(function () {
-                    let tPos,tAng,gamma,alpha,beta;
-                    if(i+1==N){
-                        window.clearInterval(_this.timer);
-                        _this.timer=0;
-                        targetANG=instrAng.concat();
-						/!*tPos=p2.concat();
-						 tAng=inverseKinematics(tPos);
-						 if(tAng==0){
-						 alert("超出工作空间或靠近奇异点！");
-						 return;}
-						 else {targetANG=tAng.concat();}*!/
-
-                    }
-                    else {
-                        m[i]=v*(Z[i]-zc)-w*(Y[i]-yc);
-                        n[i]=w*(X[i]-xc)-u*(Z[i]-zc);
-                        l[i]=u*(Y[i]-yc)-v*(X[i]-xc);
-                        X[i+1]=xc+G*(X[i]+E*m[i]-xc);
-                        Y[i+1]=yc+G*(Y[i]+E*n[i]-yc);
-                        Z[i+1]=zc+G*(Z[i]+E*l[i]-zc);
-                        outerLoop://搜索N*step范围内有没有合适的姿态使得运动学反解有解
-                            for(let k=0;k<5*N;k++){
-                                for(let j=0;j<=1;j++){
-                                    let sign=j==1?1:-1;
-                                    gamma=p0[3]+step[3]*(i+1)+step[3]/5*k*sign;
-                                    beta=p0[4]+step[4]*(i+1)+step[4]/5*k*sign;
-                                    alpha=p0[5]+step[5]*(i+1)+step[5]/5*k*sign;
-                                    tPos=[X[i+1],Y[i+1],Z[i+1],gamma,beta,alpha];
-                                    tAng=inverseKinematics(tPos);
-                                    if(tAng==0){}
-                                    else {targetANG=tAng.concat();break outerLoop}
-                                }
-                            }
-
-                        if(tAng==0){
-                            window.clearInterval(_this.timer);
-                            _this.timer=0;
-                            alert("超出工作空间或靠近奇异点！");
-                            return;
-                        }
-                    }
-                    kinematicsEquation(targetANG);
-                    if (_this.dataLine){
-                        VILibrary.InnerObjects.dataUpdater(_this.dataLine);
-                    }
-                    if(i+1==N){
-                        if(executiveFlag){
-                            instrIndex++;
-                            if(instrIndex<instrSplit.length){
-                                setTimeout(function () {
-                                    instrCompiling();
-                                },500);
-                                // instrCompiling();
-                            }
-                            else {
-                                executiveFlag=false;
-                                return
-                            }
-                        }
-                        else return;
-                    }
-                    i++;
-                },T*1000);
-            }
-
-            function kinematicsEquation(input) {
-                let a=A.concat();
-                let d=D.concat();
-                let theta = input.concat();
-                let alpha=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
-                theta.push(Math.PI);
-                theta.unshift(0);
-                theta[2]-=Math.PI/2;
-                let t=[],T;
-                for(let i=0;i<=7;i++)
-                {
-                    t[i]=[
-                        [math.cos(theta[i]),
-                            -math.sin(theta[i]),
-                            0,
-                            a[i]
-                        ],
-                        [math.sin(theta[i])*math.cos(alpha[i]),
-                            math.cos(theta[i])*math.cos(alpha[i]),
-                            -math.sin(alpha[i]),
-                            -d[i]*math.sin(alpha[i])
-                        ],
-                        [
-                            math.sin(theta[i])*math.sin(alpha[i]),
-                            math.cos(theta[i])*math.sin(alpha[i]),
-                            math.cos(alpha[i]),
-                            d[i]*math.cos(alpha[i])
-                        ],
-                        [0,0,0,1],
-                    ]
-                }
-                T=t[7];
-                for(let i=6;i>=0;i--){
-                    T=math.multiply(t[i],T)
-                }
-                // console.log("T",T,"theta",theta);
-                document.getElementById("posX").value=(T[0][3]).toFixed(2);
-                document.getElementById("posY").value=(T[1][3]).toFixed(2);
-                document.getElementById("posZ").value=(T[2][3]).toFixed(2);
-                for(let i=0;i<=3;i++){
-                    for(let j=0;j<=3;j++){
-                        T[i][j]= parseFloat((T[i][j]).toFixed(4));
-                    }
-                }
-                let EulerZ,EulerY,EulerX;
-				/!*
-				 //Y-Z-X顺序
-				 EulerZ=Math.atan2(T[1][0],T[0][0]);
-				 EulerY=Math.atan2(-T[2][0],(T[0][0]*Math.cos(EulerZ)+T[1][0]*Math.sin(EulerZ)));
-				 EulerX=Math.atan2((T[0][2]*Math.sin(EulerZ)-T[1][2]*Math.cos(EulerZ)),(T[1][1]*Math.cos(EulerZ)-T[0][1]*Math.sin(EulerZ)));
-				 EulerX*=180/Math.PI;
-				 EulerY*=180/Math.PI;
-				 EulerZ*=180/Math.PI;*!/
-                //X-Y-Z顺序
-                let cosBeta=Math.sqrt(Math.pow((T[0][0]),2)+Math.pow(T[1][0],2));
-                if(cosBeta!=0){//计算三个欧拉角
-                    EulerY=Math.atan2(-T[2][0],cosBeta);
-                    if(EulerY>Math.PI/2||EulerY<-Math.PI/2){cosBeta=-cosBeta;EulerY=Math.atan2(-T[2][0],cosBeta);}
-                    EulerZ=Math.atan2(T[1][0],T[0][0]);
-                    EulerX=Math.atan2(T[2][1],T[2][2]);
-                }
-                else{
-                    EulerY=Math.PI/2;
-                    EulerZ=0;
-                    EulerX=Math.atan2(T[0][1],T[1][1]);
-                }
-                // let EulerZ=alpha;
-                // let EulerY=beta;
-                // let EulerX=gamma;
-                document.getElementById("eulerX").value=(EulerX*180/Math.PI).toFixed(2);
-                document.getElementById("eulerY").value=(EulerY*180/Math.PI).toFixed(2);
-                document.getElementById("eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
-                currentPOS=[T[0][3],T[1][3],T[2][3],EulerX,EulerY,EulerZ];
-                currentANG=targetANG.concat();
-                if(executiveFlag){
-                    let point=document.getElementById("Robot__LineSet_points").getAttribute('point');
-                    point=point+" "+T[0][3]+" "+T[2][3]+" "+(-T[1][3]);
-                    document.getElementById("Robot__LineSet_points").setAttribute('point',point);
-                    let point_Index=document.getElementById("Robot__LineSet_index").getAttribute('coordIndex');
-                    let last_Index=parseInt(point_Index.match(/\d+$/))+1;
-                    point_Index=point_Index+' '+last_Index;
-                    document.getElementById("Robot__LineSet_index").setAttribute('coordIndex',point_Index);
-                    for(let i=0;i<=5;i++){
-                        document.getElementById("angInput"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(1);
-                        document.getElementById("angTxt"+(i)).value=(targetANG[i]*180/Math.PI).toFixed(2);
-                    }
-                }
-            }
-            function inverseKinematics(input){
-                let a=A.concat();a.shift();//a[i-1]
-                let d=D.concat();//d[i]
-            	let x=input[0],
-                    y=input[1],
-                    z=input[2],
-                    gamma=input[3],
-                    beta=input[4],
-                    alpha=input[5];
-                let ca=Math.cos(alpha),sa=Math.sin(alpha),
-                    cb=Math.cos(beta),sb=Math.sin(beta),
-                    cy=Math.cos(gamma),sy=Math.sin(gamma);
-                let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-                let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
-                let Tt_6=[[-1,0,0,0],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
-                let T=math.multiply(math.multiply(T0_s,R),Tt_6);
-                let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
-                    ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
-                    nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
-                let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                let u1,u2,v1,v2,resultAng=[];
-                let j=0;
-                for(let i=0;i<=7;i++){
-                    if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
-                    else    theta[i][0]=Math.atan2(py,px)-Math.atan2(0,-Math.sqrt(px*px+py*py));
-                    let h=px*px+py*py+pz*pz+a[1]*a[1];
-                    let g=2*a[1]*Math.cos(theta[i][0])*px+2*a[1]*Math.sin(theta[i][0])*py+a[3]*a[3]+d[4]*d[4]+a[2]*a[2];
-                    let k=(h-g)/(2*a[2]);
-					if(i<2||i>5) theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                    else        theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                   let s23=((-a[3]-a[2]*Math.cos(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.sin(theta[i][2])-d[4]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
-                   let c23=((-d[4]+a[2]*Math.sin(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.cos(theta[i][2])+a[3]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
-                   theta[i][1]=Math.atan2(s23,c23)-theta[i][2];
-                   theta[i][3]=Math.atan2(-ax*Math.sin(theta[i][0])+ay*Math.cos(theta[i][0]),-ax*Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])-ay*Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])+az*Math.sin(theta[i][1]+theta[i][2]));
-                   if(i%2){theta[i][3]+=Math.PI;}
-                   let s5=-ax*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.cos(theta[i][3])+Math.sin(theta[i][0])*Math.sin(theta[i][3]))-ay*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.cos(theta[i][3])-Math.cos(theta[i][0])*Math.sin(theta[i][3]))+az*Math.sin(theta[i][1]+theta[i][2])*Math.cos(theta[i][3]);
-                   let c5=-(ax*Math.cos(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+ay*Math.sin(theta[i][0])*Math.sin(theta[i][1]+theta[i][2])+az*Math.cos(theta[i][1]+theta[i][2]));
-                   theta[i][4]=Math.atan2(s5,c5);
-                   let s6=-nx*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-ny*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+nz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
-                   let c6=-ox*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-oy*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+oz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
-                    theta[i][5]=Math.atan2(s6,c6);
-                    if(Math.abs(theta[i][0])< Math.PI*185/180&&theta[i][1]>-135/180*Math.PI&&theta[i][1]<35/180*Math.PI&&theta[i][2]>-120/180*Math.PI&&theta[i][2]<158/180*Math.PI&&Math.abs(theta[i][3])<350/180*Math.PI&&Math.abs(theta[i][4])<119/180*Math.PI&&Math.abs(theta[i][5])<350/180*Math.PI){
-                        resultAng[j]=theta[i].concat();
-                        j++;
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if(resultAng==0&&resultAng[0]==undefined){return 0}
-                else {
-                    let omega=[250,250,350,320,320,420]
-                    let runTime=[];
-                    for(let m=0;m<=resultAng.length-1;m++){
-                        resultAng[m][1]+=Math.PI/2;
-                        let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
-                        runTime[m]=0;
-                        for(let n=0;n<6;n++){
-                            runTime[m]+=Math.abs(math.multiply(resultDiff[n],1/omega[n]));
-                        }
-                    }
-                    let minTime=Math.min.apply(Math,runTime);
-                    let minAng=resultAng[runTime.indexOf(minTime)];
-                    return minAng;
-                }
-            }
-        }
-        static get cnName() {
-
-            return '指令解析';
-        }
-
-        static get defaultWidth() {
-
-            return '550px';
-        }
-
-        static get defaultHeight() {
-
-            return '300px';
-        }
-    },*/
     KinematicsEquationVI:class KinematicsEquationVI extends TemplateVI {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas);
@@ -11380,7 +10799,7 @@ VILibrary.VI = {
 			/*this.currentLen=[166,124,270,70,150,152,59,13];
 			 this.currentScal=[1,1,1,1,1,1,1,1];
 			 this.initLen=[166,124,270,70,150,152,59,13];*/
-            // this.a_d=[815,850,145,820,170,350];
+            this.a_d=[815,850,145,820,170,350];
         }
         static get cnName() {
 
@@ -11396,5 +10815,63 @@ VILibrary.VI = {
 
             return '300px';
         }
-    }
+    },
+    ToolVI:class ToolVI extends TemplateVI{
+        constructor(VICanvas, draw3DFlag,robNum) {
+            super(VICanvas, draw3DFlag,robNum);
+            const _this = this;
+            let haveTool=false;
+            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0"
+            function draw() {
+            	switch(robNum){
+					case "k60":
+                        jiajuScal="2,2,2";
+                        jiajuTrans="15,0,0"
+						break;
+					case "a910":
+						jiajuRotate='0,0,1,-1.5707963';
+                        jiajuTrans="0,65,0";
+                        break;
+					case "a120":default:break;
+				}
+                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
+                    "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
+                    "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
+                    "<inline url='../tool/jiajuL.x3d' > </inline>" +
+                    "</Transform>" +
+                    "<Transform DEF='jiajuR' translation='0 0 -10' nameSpaceName id='Robot__jiajuR'>" +
+                    "<inline url='../tool/jiajuR.x3d'> </inline>" +
+                    "</Transform>" +
+                    "<inline url='../tool/jiaju.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</switch>";
+                $("#Robot__lastLink").after(toolSwitch);
+                var box="<transform DEF='box' translation='400,20,-400' nameSpaceName id='Robot__box'><shape>" +
+							"<appearance><material diffuseColor='1 0 0'></material></appearance>" +
+							"<box size='40,40,40'></box>" +
+						"</shape></transform>";
+                $("#Robot__platform").after(box);
+                haveTool=true;
+            }
+
+			this.setData=function (input) {
+            	toolSwitch(input[0]);
+            	toolDo(input[1])
+            }
+            function toolSwitch(input){
+                if(!haveTool)draw();
+                document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
+            }
+            function toolDo(input) {
+                if(input){
+                    document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,0');
+                    document.getElementById("Robot__jiajuR").setAttribute('translation','0,0,0');
+                }
+                else{
+                    document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,10');
+                    document.getElementById("Robot__jiajuR").setAttribute('translation','0,0,-10');
+                }
+            }
+        }
+	}
 };

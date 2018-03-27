@@ -7,28 +7,24 @@
     <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
     <title> </title>
     <script>
-        function lightSwitch(id){
-            var light = document.getElementById("Robot__"+id);
-            if(light.getAttribute('on')!='TRUE')
-                light.setAttribute('on','TRUE');
-            else
-                light.setAttribute('on','FALSE');
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<3;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+            if(i!=3)document.getElementById("exm_video").pause();
+            else document.getElementById("exm_video").play();
         }
-
-        function headlight()
-        {
-            var h = document.getElementById("Robot__head");
-            if(h.getAttribute('headlight')=='true')
-                h.setAttribute('headlight', 'false');
-            else
-                h.setAttribute('headlight', 'true');
-        }
-
     </script>
 </head>
 <body>
 <div class="main-div" style="width: 1500px;">
-    <div class="title"><b>机器人操作实验(型号：ABB_IRB120)</b></div>
+    <div class="title"><b>机器人操作实验(型号：ABB_IRB910sc)</b></div>
     <div class="back" ><a href="index.html">←返回目录</a></div>
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_1" style="height: 800px">
@@ -52,16 +48,23 @@
             <div class="message_div" id="messageDiv">
                 <p>关节变量：</p><br>
                 <p >Ang_1：<input id="angTxt0" type="text" max="140" min="-140" value="0" style="width: 50px" onchange="changeAngTxt(0)">
-                    <input id="angInput0" type="range" max="140" min="-140" value="0" step="5" onchange="changeAng(0)">
+                    <input id="angInput0" type="range" max="140" min="-140" value="0" step="1" onchange="changeAng(0)">
                 </p>
                 <p>Ang_2：<input id="angTxt1" type="text" max="150" min="-150" value="0" style="width: 50px" onchange="changeAngTxt(1)">
-                    <input  id="angInput1" type="range" max="150" min="-150" value="0" step="5" onchange="changeAng(1)">
+                    <input  id="angInput1" type="range" max="150" min="-150" value="0" step="1" onchange="changeAng(1)">
                 </p>
                 <p>&nbsp;&nbsp;&nbsp;H_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
-                    <input id="angInput2" type="range" max="0" min="-180" value="0" step="5" onchange="changeAng(2)">
+                    <input id="angInput2" type="range" max="0" min="-180" value="0" step="1" onchange="changeAng(2)">
                 </p>
                 <p>Ang_4：<input id="angTxt3"  type="text" max="400" min="-400" value="0" style="width: 50px" onchange="changeAngTxt(3)">
-                    <input id="angInput3" type="range" max="400" min="-400" value="0" step="5" onchange="changeAng(3)">
+                    <input id="angInput3" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(3)">
+                </p>
+                <p id="tool" style="padding-top: 4px">Tool :
+                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
+                        <option value="0">tool0</option>
+                        <option value="1">tool1</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
                 </p>
             </div>
             <div class="message_div" id="resultDiv" onchange="changePos()">
@@ -73,9 +76,9 @@
                 </div>
                 <div style="width: 50%;display: inline;">
                     <p>末端姿态：</p><br>
-                    <p>EX：<input id="eulerX" type="text" value="0" class="robotPA">°</p>
+                    <p>EX：<input id="eulerX" type="text" value="180" class="robotPA">°</p>
                     <p>EY：<input id="eulerY" type="text" value="0" class="robotPA">°</p>
-                    <p>EZ：<input id="eulerZ" type="text" value="180" class="robotPA">°</p>
+                    <p>EZ：<input id="eulerZ" type="text" value="0" class="robotPA">°</p>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
@@ -107,16 +110,19 @@
 <script>
     'use strict';
     let robot910scVI = new VILibrary.VI.Robot910scVI($('#robotX3d'), true);
-    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a910sc");
+    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a910");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"a910");
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot910scVI.id, 1, 2);
-    VILibrary.InnerObjects.bindDataLine(robot910scVI.id, instructionCompiling.id, 1, 2);
+
+//    VILibrary.InnerObjects.bindDataLine(robot910scVI.id, instructionCompiling.id, 1, 2);
 
     let val=[0],ang;
     let s=[],
         pAngle=[],
         pPos=[],
         indexI=0;
-    let currentPOS=[450,0,220,0,0,Math.PI];
+    let currentPOS=[450,0,220,Math.PI,0,0];
     function changeAng(input) {
         let currentAng=[0,0,0,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -124,6 +130,7 @@
             if(i!=2){
                 currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
             }
+            else currentAng[i]=parseFloat(document.getElementById("angInput"+i).value);
         }
         instructionCompiling.moveJ(currentAng,500);
     }
@@ -171,7 +178,7 @@
                 let piPos=currentPOS.concat();
                 s.push(si);
                 let piAngle=[];
-                for(let j=0;j<6;j++){
+                for(let j=0;j<4;j++){
                     piAngle[j]= Number(document.getElementById("angInput"+(j)).value)/180*Math.PI;
                 }
                 pAngle.push(piAngle);
@@ -196,13 +203,27 @@
                 indexI--;
                 break;
             case -1:
-                s=["p0: x1317.22 y0 z1725 -180° 60° -180°;\n","p1: x1140.75 y658.61 z1725 -180° 60° -150°;\n","p2: x634.49 y366.32 z2086.7 -30° 90° 0°;\n","p3: x757.6 y-437.4 z1358.74 180° 45° 150°;\n"],
-                    pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0.5235987755982988, 0, 0, 0, 0.5235987755982988, 0],[0.5235987755982988, -0.5235987755982988, 0, 0, 0.5235987755982988, 0],[-0.5235987755982988, -0.5235987755982988, 0.7853981633974483, 0, 0.5235987755982988, 0]];
-                pPos=[[1317.22, 0, 1725, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[1140.7497, 658.6122, 1725, -3.141592653589793, 1.0471943756012814, -2.617981175819824],[634.4856, 366.3204, 2086.6953, -0.5236114777699694, 1.5707963267948966, 0],[757.5956, -437.398, 1358.7411, 3.141592653589793, 0.7853600105770818, 2.6179562867740636]];
-                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveC p1,p2,v400;\nmoveL p3,v400;\nmoveJ p0,v400;";
-                turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
+                s=["p0: x450 y0 z130 180° 0° 0°;\n","p1: x300 y300 z130 180° 0° 0°;\n","p2: x300 y300 z50 180° 0° 0°;\n",
+                    "p3: x400 y0 z130 180° 0° 0°;\n","p4: x400 y0 z50 180° 0° 0°;\n",]
+                pAngle=[[0, 0, -1.5707963267948966, 0],[0.40142572795869574, 0.6806784082777886, -1.5707963267948966, 1.0821041362364843],
+                    [0.40142572795869574, 0.6806784082777886, -2.96705972839036, 1.0821041362364843],
+                    [-0.5410520681182421, 0.9599310885968813, -1.5707963267948966, 0.41887902047863906],
+                    [-0.5410520681182421, 0.9599310885968813, -2.96705972839036, 0.41887902047863906]];
+                pPos=[[450, -0, 130, 3.141592653589793, -0, 0],[300, 300, 130, 3.141592653589793, -0, 0],
+                    [300, 300, 50, 3.141592653589793, -0, 0],[400, 0, 130, 3.141592653589793, -0, 0],[400, 0, 50, 3.141592653589793, -0, 0]];
+                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nmoveL p3,v200;";
+                turnPoints=" 300 130 -300 300 50 -300 400 130 0 400 50 0 450 130 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                indexI=4;
+                indexI=5;
+                /*s=["p0: x450 y0 z220 180° 0° 0°;\n","p1: x318.2 y318.2 z220 180° 0° 45°;\n","p2: x318.2 y318.2 z120 180° 0° 45°;\n","p3: x318.2 y-318.2 z220 180° 0° -45°;\n","p4: x318.2 y-318.2 z120 180° 0° -45°;\n"],
+                pAngle=[[0, 0, 0, 0],[0.7853981633974483, 0, 0, 0],[0.7853981633974483, 0, -1.7453292519943295, 0],[-0.7853981633974483, 0, 0, 0],[-0.7853981633974483, 0, -1.7453292519943295, 0]];
+                pPos=[[450, 0, 220, 3.141592653589793, 0, 0],[318.1981, 318.1981, 220, 3.141592653589793, -0, 0.7853981633974483],
+                    [318.1981, 318.1981, 120, 3.141592653589793, -0, 0.7853981633974483],[318.1981, -318.1981, 220, 3.141592653589793, -0, -0.7853981633974483],
+                    [318.1981, -318.1981, 120, 3.141592653589793, -0, -0.7853981633974483]];
+                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nmoveL p1,v200;\nmoveC p0,p3,v200;\nmoveL p4,v200;\nmoveL p3,v200;";
+                turnPoints=" 450 220 0 318.2 220 -318.2 318.2 120 -318.2 318.2 220 318.2 318.2 120 318.2";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                indexI=5;*/
         }
         let str="";
         for(let m=0;m<indexI;m++){

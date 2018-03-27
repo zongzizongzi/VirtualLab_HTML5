@@ -1,72 +1,83 @@
 <x3d id="120X3d" style="width: 100%;height: 100%;">
      <scene>
-                     <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
-                     <Viewpoint position="47.96688 79.29383 1405.52200" orientation="-0.80979 0.47664 -0.34214 0.07007"></Viewpoint>
-                     <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+         <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+         <Viewpoint position="47.96688 79.29383 1405.52200" orientation="-0.80979 0.47664 -0.34214 0.07007"></Viewpoint>
+         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
 
-                     <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
-                     <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
-                     <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
-                     <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
-                     <transform  translation="0,-500,0">
-                         <inline url="platform.x3d"> </inline>
+         <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+         <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+         <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+         <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+         <transform  translation="0,-500,0" >
+             <Transform>
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='0 0 1'/>
+                    </Appearance>
+                    <IndexedLineSet id='LineSet_index' coordIndex=''>
+                        <Coordinate id='LineSet_points' point=''/>
+                    </IndexedLineSet>
+                </Shape>
+             </Transform>
+             <Transform>
+                <Shape>
+                     <Appearance>
+                        <Material emissiveColor='1 0 0'/>
+                     </Appearance>
+                     <PointSet>
+                        <Coordinate id='PointSet_points' point=''/>
+                     </PointSet>
+                </Shape>
+             </Transform>
+             <inline DEF="platform" url="../platform.x3d"> </inline>
+             <transform def="base">
+                 <transform DEF="link-1Scale">
+                    <inline url="base.x3d"> </inline>
+                 </transform>
+                 <transform DEF="link0" rotation="0,1,0,0" translation="0,166,0" >
+                     <transform DEF="link0Scale">
+                        <inline url="link1.x3d"> </inline>
                      </transform>
-                     <transform  translation="0,-500,0" >
-                         <Transform>
-                            <Shape>
-                     		    <Appearance>
-                     			    <Material emissiveColor='0 0 1'/>
-                     		    </Appearance>
-                                <IndexedLineSet id='LineSet_index' coordIndex=''>
-                                    <Coordinate id='LineSet_points' point=''/>
-                                </IndexedLineSet>
-                     	    </Shape>
-                     	 </Transform>
-                     	 <Transform>
-                     		<Shape>
-                                 <Appearance>
-                                    <Material emissiveColor='1 0 0'/>
-                                 </Appearance>
-                                 <PointSet>
-                                    <Coordinate id='PointSet_points' point=''/>
-                                 </PointSet>
-                     	    </Shape>
-                         </Transform>
-                         <transform def="base">
-                             <transform DEF="link-1Scale">
-                                <inline url="base.x3d" DEF="BASE" nameSpaceName="BASE" mapDEFToID="true" onclick="changeTransparency()"> </inline>
-                             </transform>
-                             <transform DEF="link0" rotation="0,1,0,0" translation="0,166,0" >
-                                 <transform DEF="link0Scale">
-                                    <inline url="link1.x3d"> </inline>
+                     <transform DEF="link1" translation="0,124,0" mapDEFToID="true" rotation="0,0,1,0">
+                            <transform DEF="link1Scale">
+                                <inline url="link2.x3d"> </inline>
+                            </transform>
+                            <transform translation="0,270,0" DEF="link2"  mapDEFToID="true" rotation="0,0,1,0">
+                                 <transform DEF="link2Scale">
+                                    <inline url="link3.x3d"> </inline>
                                  </transform>
-                                 <transform DEF="link1" translation="0,124,0" mapDEFToID="true" rotation="0,0,1,0">
-                                        <transform DEF="link1Scale">
-                                            <inline url="link2.x3d"> </inline>
-                                        </transform>
-                                        <transform translation="0,270,0" DEF="link2"  mapDEFToID="true" rotation="0,0,1,0">
-                                             <transform DEF="link2Scale">
-                                                <inline url="link3.x3d"> </inline>
-                                             </transform>
-                                             <transform translation="150,70,0" DEF="link3" mapDEFToID="true" rotation="1,0,0,0">
-                                                 <transform DEF="link3Scale">
-                                                    <inline url="link4.x3d"> </inline>
-                                                 </transform>
-                                                 <transform translation="152,0,0" DEF="link4" mapDEFToID="true" rotation="0,0,-1,0.5235987755982988">
-                                                     <transform DEF="link4Scale">
-                                                        <inline url="link5.x3d"> </inline>
-                                                     </transform>
-                                                     <transform translation="59,0,0" DEF="link5" mapDEFToID="true" rotation="1,0,0,0">
-                                                        <transform DEF="link5Scale">
-                                                            <inline url="link6.x3d"> </inline>
-                                                        </transform>
-                                                     </transform>
-                                                 </transform>
-                                             </transform>
-                                        </transform>
+                                 <transform translation="150,70,0" DEF="link3" mapDEFToID="true" rotation="1,0,0,0">
+                                     <transform DEF="link3Scale">
+                                        <inline url="link4.x3d"> </inline>
+                                     </transform>
+                                     <transform translation="152,0,0" DEF="link4" mapDEFToID="true" rotation="0,0,-1,0.5235987755982988">
+                                         <transform DEF="link4Scale">
+                                            <inline url="link5.x3d"> </inline>
+                                         </transform>
+                                         <transform translation="59,0,0" DEF="link5" mapDEFToID="true" rotation="1,0,0,0">
+                                            <transform DEF="link5Scale">
+                                                <inline DEF="lastLink" url="link6.x3d"> </inline>
+                                                <!--<switch whichChoice="-1" id="TOOL">
+                                                    <Transform>
+                                                        <Transform DEF='jiajuL' translation='0 0 10'>
+                                                            <inline url="jiajuL.x3d" > </inline>
+                                                        </Transform>
+                                                        <Transform DEF="jiajuR" translation='0 0 -10'>
+                                                            <inline url="jiajuR.x3d"> </inline>
+                                                        </Transform>
+                                                        <inline url="jiaju.x3d"> </inline>
+                                                    </Transform>
+                                                </switch>-->
+                                            </transform>
+
+
+                                         </transform>
+                                     </transform>
                                  </transform>
-                             </transform>
-                         </transform>
+                            </transform>
                      </transform>
-                 </scene>
+                 </transform>
+             </transform>
+         </transform>
+     </scene>
 </x3d>

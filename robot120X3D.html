@@ -7,12 +7,33 @@
     <link rel="stylesheet" href="css/main.css">
     <script type='text/javascript' src='x3dom/x3dom.js'> </script>
     <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+    <script>
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<3;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+            if(i!=3)document.getElementById("exm_video").pause();
+            else document.getElementById("exm_video").play();
+        }
+    </script>
 </head>
 <body>
 <div class="main-div" style="width: 1500px;">
     <div class="title"><b>机器人操作实验(型号：ABB_IRB120)</b></div>
     <div class="back" ><a href="index.html">←返回目录</a></div>
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
+    <div id="index_div">
+        <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn"  onclick="show(3)">实验操作视频</button>
+    </div>
+    <div id="index_0" style="width: 1500px;    margin-left: -750px;"> <embed id="instructTxt" src="pdf/ABB机器人虚拟实验指导书.htm" ></embed></div>
+    <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
+    <div id="index_3"><video id="exm_video" src="" controls></video></div>
     <div id="index_1" style="height: 800px">
         <div style="width: 80%;height: 100%;display: inline;float: left">
             <div id="robotX3d" style="width: 100%;height: 100%;">
@@ -23,16 +44,6 @@
                         </transform>
                     </scene>
                 </x3d>-->
-            </div>
-            <div id="tools" >
-                <input type="checkbox" checked="true" onclick="lightSwitch('point')">
-                <label>point light</label>
-                <input type="checkbox" checked="true" onclick="lightSwitch('spot')">
-                <label>spot light</label>
-                <input type="checkbox" checked="true" onclick="lightSwitch('directional')">
-                <label>directional light</label>
-                <input type="checkbox" checked="true" onclick="headlight()">
-                <label>headlight</label>
             </div>
         </div>
         <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
@@ -56,6 +67,13 @@
                 <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
                     <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
                 </p>
+                <p id="tool" style="padding-top: 4px">Tool :
+                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
+                    <option value="0">tool0</option>
+                    <option value="1">tool1</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
+                </p>
             </div>
             <div class="message_div" id="resultDiv" onchange="changePos()">
                 <div style="width: 50%;display: inline;float: left">
@@ -72,9 +90,9 @@
                 </div>
             </div>
             <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
-                <div class="message_div" style="height: 25%;">
+                <div class="message_div" style="height: 23%;">
                     <p>设置示教点</p>
-                    <textarea id="points" name="points" style="width: 90%;height: 68%;margin: 10px">
+                    <textarea id="points" name="points" style="width: 90%;height: 66%;margin: 10px">
                     </textarea>
                     <div class="rowFlex-div">
                         <button type="button" id="add" onclick="changePoints(1)">添加</button>
@@ -104,10 +122,11 @@
     'use strict';
     let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
     let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a120");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"a120");
 //    let kinematicsEquationVI= new VILibrary.VI.KinematicsEquationVI($('#resultDiv'), true);
-    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 2);
-    VILibrary.InnerObjects.bindDataLine(robot120VI.id, instructionCompiling.id, 1, 2);
-
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 1);
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
+//    VILibrary.InnerObjects.bindDataLine(robot120VI.id, instructionCompiling.id, 1, 2);
 //    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, kinematicsEquationVI.id, 5, 5);
     let val=[0],ang;
     let s=[],
@@ -201,15 +220,34 @@
                 break;
             case -1:
 
-                s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
-                    pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0, 0.40282199136029123, -0.4750786223928564, -0, 0.5958554066308641, -0],[0, 0.5235987755982988, 0, 0, 0.5235987755982988, 0],[0, 0.5235987755982988, 0.5235987755982988, 0, 0.5235987755982988, 0]];
-                pPos=[[364.35, 0, 594, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[464.35, 0, 594, -3.141592653589793, 1.0471848490249271, -3.141592653589793],[467.5397, 0, 371.0948, 3.141592653589793, 0.5236114777699694, -3.141592653589793],[346.6218, 0, 225.2872, 3.141592653589793, 0, -3.141592653589793]];
+               /* s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
+                pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0, 0.40282199136029123, -0.4750786223928564, -0, 0.5958554066308641, -0],[0, 0.5235987755982988, 0, 0, 0.5235987755982988, 0],[0, 0.5235987755982988, 0.5235987755982988, 0, 0.5235987755982988, 0]];
+                    pPos=[[364.35, 0, 594, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[464.35, 0, 594, -3.141592653589793, 1.0471848490249271, -3.141592653589793],[467.5397, 0, 371.0948, 3.141592653589793, 0.5236114777699694, -3.141592653589793],[346.6218, 0, 225.2872, 3.141592653589793, 0, -3.141592653589793]];
                 document.getElementById("instrInput").value="moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
-                /*------------------点集-------------------------*/
+                //------------------点集-------------------------
                 turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                /*---------------------------------------------*/
+                //---------------------------------------------
                 indexI=4;
+                */
+                s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n",
+                    "p1:[400,400,100,180°,0°,-180°];\n",
+                    "p2:[400,400,20,180°,0°,-180°];\n",
+                    "p3:[400,0,100,180°,0°,-180°];\n",
+                    "p4:[400,0,20,180°,0°,-180°];\n"];
+                pAngle=[[-0, 0, 0, 0, 0.5235987755982988, -0],
+                    [0.8297295263981043, 1.1859512267301469, -0.6150540284028018, 0, 0.999724595542352, 0.8297295263981043],
+                    [0.8297295263981043, 1.3669418701619587, -0.6791076119509936, 0, 0.8829620685839313, 0.8297295263981043],
+                    [-0, 0.6030112565640408, 0.438601241026175, 0, 0.5291838292046808, -0],
+                    [-0, 0.8422958970124633, 0.39671333897831107, 0, 0.33161255787892263, -0]];
+                pPos=[[480.9468, 0, 565.9449, -3.141592653589793, 1.0471848490249271, -3.141592653589793],
+                    [400, 400, 100, 3.141592653589793, -0, -3.141592653589793],
+                    [400, 400, 20, 3.141592653589793, 0, -3.141592653589793],
+                    [400, 0, 100, 3.141592653589793, 0, -3.141592653589793], [400, 0, 20, 3.141592653589793, 0, -3.141592653589793]];
+                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveL p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
+                turnPoints="480.95 565.94 0 400 100 -400 400 20 -400 400 100 0 400 20 0";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                indexI=5;
         }
         let str="";
         for(let m=0;m<indexI;m++){
@@ -217,6 +255,11 @@
         }
         document.getElementById("points").value=str;
     }
+    /*function changeTool() {
+        var  myselect=document.getElementById("toolSelect");
+        var toolFlag=myselect.selectedIndex ;
+        instructionCompiling.changeTool(toolFlag);
+    }*/
     function openTeachPendant() {
         layer.open({
             type: 2,
@@ -228,6 +271,16 @@
         });
 
     }
+
+   /* let rob=document.getElementById('Robot');
+    rob.onreadystatechange=function () {
+    console.log(rob.readyState);
+    }/!*document.getElementById('Robot')*!/document.body.onload=function(){
+        $("#Robot__lastLink").after(toolSwitch);
+        var tmp=$("#Robot__TOOL");
+        console.log(tmp)}
+    console.log('robot.x3d loaded')*/
+
 
 
 

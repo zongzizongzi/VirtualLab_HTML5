@@ -1,15 +1,18 @@
 <x3d id="910scX3d" style="width: 100%;height: 100%;">
     <scene>
         <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
-        <Viewpoint position="305.21113 -333.47998 1156.69868" orientation="-0.66577 0.69759 -0.26479 0.09602" zNear="547.48577" zFar="1979.03065" description=""></Viewpoint>
+        <Viewpoint position="305.21113 400 1156.69868" orientation="-0.66577 0.69759 -0.26479 0.09602" zNear="547.48577" zFar="1979.03065" description=""></Viewpoint>
 
         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
         <directionalLight id="directional" direction='0 -0.5 -0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
         <!--<directionalLight id="directional" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>-->
-        <directionalLight id="directional2"  direction='1 0 0' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
-        <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
-        <!--<SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>-->
-        <transform  translation="0,-500,0" >
+        <directionalLight id="directional2"  direction='0 0.5 0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <!--<PointLight id='point' on='TRUE' intensity='1' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='0 0 200 '  attenuation='0 0 0' radius='50.0000'> </PointLight>-->
+        <!--<SpotLight id='spot' on ="TRUE" beamWidth='1.5' color='1 1 1' cutOffAngle='1.5' location='400 200 200' radius='200' >  </SpotLight>-->
+        <transform  translation="0,0,0">
+            <inline DEF="platform" url="../platform.x3d"> </inline>
+        </transform>
+        <transform  translation="0,0,0" >
             <Transform>
                 <Shape>
                     <Appearance>
@@ -30,16 +33,20 @@
                     </PointSet>
                 </Shape>
             </Transform>
-            <inline url="base.x3d"> </inline>
-            <transform DEF="link0" id="link0" rotation="0,1,0,0">
-                <inline url="link1.x3d"> </inline>
-                <transform translation="200,0,0" DEF="link1" id="link1" rotation="0,0,1,0">
-                    <inline url="link2.x3d"> </inline>
-                    <transform translation="0,0,0" DEF="link2"  id="link2" rotation="0,0,1,0">
-                        <inline url="link3.x3d"> </inline>
+            <Transform translation="0,194,0">
+                <inline url="base.x3d"> </inline>
+                <transform DEF="link0" id="link0" rotation="0,1,0,0">
+                    <inline url="link1.x3d"> </inline>
+                    <transform translation="200,0,0" DEF="link1" id="link1" rotation="0,0,1,0">
+                        <inline url="link2.x3d"> </inline>
+                        <transform translation="250,0,0" DEF="link2"  id="link2" rotation="0,0,1,0">
+                            <transform DEF="link3">
+                                <inline DEF="lastLink" url="link3.x3d"> </inline>
+                            </transform>
+                        </transform>
                     </transform>
                 </transform>
-            </transform>
+            </Transform>
         </transform>
     </scene>
 </x3d>

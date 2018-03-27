@@ -39,6 +39,13 @@
                 <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
                     <input id="angInput5" type="range" max="350" min="-350" value="0" step="5" onchange="changeAng(5)">
                 </p>
+                <p id="tool" style="padding-top: 4px">Tool :
+                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
+                        <option value="0">tool0</option>
+                        <option value="1">tool1</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
+                </p>
             </div>
             <div class="message_div" id="resultDiv" onchange="changePos()">
                 <div style="width: 50%;display: inline;float: left">
@@ -84,8 +91,10 @@
     'use strict';
     let robot60haVI = new VILibrary.VI.Robotkr60VI($('#mainCanvas'), true);
    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"k60");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"k60");
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot60haVI.id, 1, 2);
-    VILibrary.InnerObjects.bindDataLine(robot60haVI.id, instructionCompiling.id, 1, 2);
+//    VILibrary.InnerObjects.bindDataLine(robot60haVI.id, instructionCompiling.id, 1, 2);
 
     let val=[0],ang;
     let s=[],

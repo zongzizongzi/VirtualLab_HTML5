@@ -18,7 +18,7 @@
                                     </IndexedLineSet>
                                  </Shape>
                                  </Transform>
-                                 <Transform>
+                            <Transform>
                                     <Shape>
                                                  <Appearance>
                                                  <Material emissiveColor='1 0 0'/>
@@ -28,6 +28,9 @@
                                                  </PointSet>
                                  </Shape>
                             </Transform>
+                            <transform  translation="0,0,0" scale="2,2,2">
+                                <inline DEF="platform" url="../platform.x3d"> </inline>
+                            </transform>
                             <inline url="base.x3d"> </inline>
                             <transform DEF="link0" id="link0" rotation="0,1,0,0">
                                 <inline url="link1.x3d"> </inline>
@@ -39,8 +42,8 @@
                                             <inline url="link4.x3d"> </inline>
                                             <transform translation="1170,0,0" DEF="link4" id="link4" rotation="0,0,-1,0.5235987755982988">
                                                 <inline url="link5.x3d"> </inline>
-                                                <transform translation="-1170,0,0" DEF="link5" id="link5" rotation="1,0,0,0">
-                                                    <inline url="link6.x3d"> </inline>
+                                                <transform translation="126,0,0" DEF="link5" id="link5" rotation="1,0,0,0">
+                                                    <inline DEF="lastLink" url="link6.x3d"> </inline>
                                                 </transform>
                                             </transform>
                                         </transform>
