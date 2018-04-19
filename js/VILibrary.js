@@ -522,7 +522,7 @@ class RobotTemplateVI extends TemplateVI {
         super(VICanvas);
         const _this = this;
         this.name = 'RobotTemplateVI';
-        let CurrentANG=[],TargetANG=[];
+        // let CurrentANG=[],TargetANG=[];
         // this.robotURL;
         this.currentLen=[0,0,0,0,0,0,0,0];
         this.currentScal=[1,1,1,1,1,1,1,1];
@@ -532,47 +532,29 @@ class RobotTemplateVI extends TemplateVI {
             return this.a_d.concat();
         }
         this.setData = function (input){
-            if(Array.isArray(input)) {TargetANG=input; jiontsControl()}
+            if(Array.isArray(input)) {let targetANG=input.concat(); _this.jiontsControl(targetANG)}
             else {
                 console.log('RobotVI: Input value error');
                 return;
             }
         }
-        function jiontsControl() {
+        this.jiontsControl=function(TargetANG) {
             let rotat="0,0,0,0";
-            if(TargetANG.length==6){
-                for(let i=0;i<=5;i++){
-                    switch (i){
-                        case 1:case 2:case 4:
-                        rotat="0,0,-1,"+TargetANG[i];
-                        break;
-                        case 0:
-                            rotat="0,1,0,"+TargetANG[i];
-                            break;
-                        case 3:case 5:
-                        rotat="1,0,0,"+TargetANG[i];
-                        break;
-                        default:alert("输入转角错误");return;
-                    }
-                    document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
-                }
+			for(let i=0;i<=5;i++){
+				switch (i){
+					case 1:case 2:case 4:
+					rotat="0,0,-1,"+TargetANG[i];
+					break;
+					case 0:
+						rotat="0,1,0,"+TargetANG[i];
+						break;
+					case 3:case 5:
+					rotat="1,0,0,"+TargetANG[i];
+					break;
+					default:alert("输入转角错误");return;
+				}
+				document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
 			}
-			else if(TargetANG.length==4){
-                for(let i=0;i<=3;i++){
-                    if(i==2) {
-                        let translation="250,"+TargetANG[i]+",0"
-                        document.getElementById("Robot__link"+i).setAttribute('translation',translation);
-                    }
-                    else {
-                    	if(i==3)rotat="0,1,0,"+(-TargetANG[i]);//！！！！最后一轴正方向相反！！！！！
-                        else rotat="0,1,0,"+TargetANG[i];
-                        document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
-                    }
-
-                }
-			}
-
-            // CurrentANG=TargetANG;
         }
         this.draw=function () {
             if (draw3DFlag) {
@@ -9779,6 +9761,7 @@ VILibrary.VI = {
             const _this = this;
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
+            let targetANG2;//专为IRB360提供
             let instrAng;
             let instrIndex,
                 instrSplit,//指令划分后
@@ -9809,7 +9792,14 @@ VILibrary.VI = {
                     Range=[[-140,140],[-150,150],[-180*180/Math.PI,0],[-400,400]];
                     OMEGA=[415,659,1000*180/Math.PI,2400];
                     break;
-
+				case "a360":
+                    A=[0,0,0,0,0,0];
+                    D=[0,0,0,0,0,0];//d[3]<=0;
+                    ALPHA=[0,0,0,0,0,0];
+                    THETA=[0,0,0,0,0,0];
+                    currentANG=[0,0,0],targetANG=[0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
+                    Range=[[-55,110],[-55,110],[-55,110]];
+                    OMEGA=[400,400,400];break;
 				case "a120":default:
 					A=[0,0,0,270,70,0,0,0];//不加tool最后一个为0
 					D=[290,0,0,0,302,0,0,72];//加tool最后一个为72
@@ -9823,7 +9813,7 @@ VILibrary.VI = {
             const baseA=A,baseD=D;
             Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {
-            	if(dataType==1)return targetANG;
+            	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;
             	else if(dataType==2)return [ToolFlag,ToolDO];
             }
             this.setData=function (input) {
@@ -9847,7 +9837,8 @@ VILibrary.VI = {
 					instrSplit=replacedStr.split(";");//以分号分割字符串
                     //逐条指令解析
 					let points="";
-                    points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
+					if(robNumber=="a360")points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
+                    else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
                     document.getElementById("Robot__LineSet_points").setAttribute('point',points);
                     document.getElementById("Robot__LineSet_index").setAttribute('coordIndex','0');
                     instrCompiling();
@@ -9983,10 +9974,10 @@ VILibrary.VI = {
 				}
                 // let distanceL=Math.sqrt(Math.pow(targetPOS[0]-LastPOS[0],2)+Math.pow(targetPOS[1]-LastPOS[1],2)+Math.pow(targetPOS[2]-LastPOS[2],2));
                 // let t=distanceL/v;
-            	let instructAng=input.concat();
+            	let instructAng=input.concat([]);
                 let Diff=math.add(instructAng,math.multiply(-1,currentANG));
                 let maxDiff=Math.max.apply(Math,math.abs(Diff));
-                if(maxDiff==0||maxDiff==undefined){
+                if(maxDiff==0||maxDiff==undefined){//
                     if(executiveFlag){
                         instrIndex++;
                         if(instrIndex<instrSplit.length){
@@ -10029,7 +10020,6 @@ VILibrary.VI = {
                         let current=math.multiply(-1,currentANG);
                         let diff=math.add(instructAng, current);
                         // let maxDiff=Math.max.apply(Math,math.abs(diff));
-
                         if(i+1>=N){
                             window.clearInterval(_this.timer);
                             _this.timer=0;
@@ -10039,10 +10029,11 @@ VILibrary.VI = {
                             targetANG=math.add(currentANG,STEP);
                         }
                         kinematicsEquation(targetANG);
+                        i++;
                         if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                         }
-                        if(i+1>=N){
+                        if(i+1>N){
                             if(executiveFlag){
                                 instrIndex++;
                                 if(instrIndex<instrSplit.length){
@@ -10058,7 +10049,7 @@ VILibrary.VI = {
                             }
                             else return;
                         }
-                        i++;
+
                     },50);
 				}
 
@@ -10066,7 +10057,7 @@ VILibrary.VI = {
 			}
             this.moveL=function (input1,v) {
                 moveType="L";
-            	const INTERVAL=0.05
+            	const INTERVAL=0.05;
             	let instructPos=input1.concat();
             	let lastPos=currentPOS.concat();
 				let diffPos=math.add(instructPos,math.multiply(-1,lastPos));
@@ -10314,13 +10305,13 @@ VILibrary.VI = {
             	if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
             	if(input){
                     var trans = document.getElementById('Robot__box').getFieldValue('translation');
-                    let boxPos=[trans.x,-trans.z,trans.y];
+                    let boxPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
                     /*let boxPos=document.getElementById("Robot__box").getAttribute('translation').split(",");
                     let tmp=boxPos[1];
                     boxPos[1]=0-parseFloat(boxPos[2]);
                     boxPos[2]=tmp;*/
                     for(var i=0;i<3;i++){
-                    	if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>3)break;
+                    	if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>10)break;
                         if(i==2)LoadFlag=true;
 					}
 					document.getElementById("setDO").innerText='1';
@@ -10344,41 +10335,110 @@ VILibrary.VI = {
                 }
                 else return;
             }
+            //向量模（范数）
+            function norm(input) {
+            	let a=input.concat();
+                return Math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2]);
+            }
+            //向量叉积
+            function crossProduct(a,b) {
+                let c=[
+                    a[1]*b[2]-a[2]*b[1],
+                    a[2]*b[0]-a[0]*b[2],
+                    a[0]*b[1]-a[1]*b[0]
+                ]
+                return c;
+            }
             function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
-                let alpha=ALPHA.concat();
-                let a=A.concat();
-                let d=D.concat();
-                /*let a=[0,0,0,270,70,0,0,0],
-                    d=[290,0,0,0,302,0,0,72];*/
-                theta.push(0);
                 theta.unshift(0);
-                let t=[],T;
-                if(robNumber=="a910"){
-                	d[3]=-theta[3];
-                	theta[3]=0;
-                	/*T=[
-                		[
-                			Math.cos(theta[1]+theta[2]-theta[4]),
-                            Math.sin(theta[1]+theta[2]-theta[4]),
-							0,
-							a[2]*Math.cos(theta[1])+a[3]*Math.cos(theta[1]+theta[2])
-						],
-						[
-                            Math.sin(theta[1]+theta[2]-theta[4]),
-							0-Math.cos(theta[1]+theta[2]-theta[4]),
-							0,
-                            a[2]*Math.sin(theta[1])+a[3]*Math.sin(theta[1]+theta[2])
-						],
-						[
-							0,0,-1,d[1]+d[3]//d[1]-|d[3]|
-						],
-						[0,0,0,1]
-					]
-					T=math.multiply(T,[])*/
+                theta.push(0);
+                let x,y,z,EulerZ,EulerY,EulerX;
+                //并联型
+                let theta2=[],n=[];
+				if(robNumber=='a360'){
+                    // let R=200,r=45,L1=350,L2=800;
+                    // let psi=[0,0,Math.PI/3*2,Math.PI/3*4];
+                    let R=200,r=45,L1=235,L2=800;
+                    let psi=[0,0,Math.PI/3*4,Math.PI/3*2];
+                    let E=[];
+                    for(let i=1;i<=3;i++){
+                    	E[i]=[
+							(R-r+L1*Math.cos(theta[i]))*Math.cos(psi[i]),
+                            (R-r+L1*Math.cos(theta[i]))*Math.sin(psi[i]),
+							-L1*Math.sin(theta[i])
+						]
+                    }
+					let E12=[E[2][0]-E[1][0],E[2][1]-E[1][1],E[2][2]-E[1][2]],
+						E23=[E[3][0]-E[2][0],E[3][1]-E[2][1],E[3][2]-E[2][2]],
+						E31=[E[1][0]-E[3][0],E[1][1]-E[3][1],E[1][2]-E[3][2]];
+					let D1=norm(E12),
+						D2=norm(E23),
+						D3=norm(E31);
+					let H=(D1+D2+D3)/2;
+					let S=Math.sqrt(H*(H-D1)*(H-D2)*(H-D3)),
+						D_FE=D1*D2*D3/(4*S),
+						D_GF=Math.sqrt(D_FE*D_FE-D3*D3/4),//D开头代表向量长度
+						GF_=crossProduct(crossProduct(E12,E23),E31),//叉乘结果与GF同向
+						normGF_=norm(GF_),
+						N_GF=math.multiply(GF_,1/normGF_),//N开头代表单位向量
+						FP_=crossProduct(E12,E23),
+						N_FP=math.multiply(FP_,1/norm(FP_)),
+						D_FP=Math.sqrt(L2*L2-D_FE*D_FE);
+					let OG=math.multiply(math.add(E[1],E[3]),0.5),
+						GF=math.multiply(N_GF,D_GF),
+						FP=math.multiply(N_FP,D_FP),
+						OP=math.add(OG,math.add(GF,FP));
+					x=OP[0],y=OP[1],z=OP[2];
+					z-=274;
+					EulerX=3.1415926,EulerY=0,EulerZ=0;
+					let EP=[],AC=[];
+                    for(let i=1;i<=3;i++){
+						EP[i]=math.add(OP,math.multiply(-1,E[i]));
+                        AC[i]=[
+                            L1*Math.cos(theta[i])*Math.cos(psi[i]),
+                            L1*Math.cos(theta[i])*Math.sin(psi[i]),
+                            -L1*Math.sin(theta[i])
+                        ];
+                        let N=crossProduct(AC[i],EP[i]);
+						n[i-1]=math.multiply(N,1/norm(N));
+                        theta2[i-1]=Math.acos(math.multiply(AC[i],EP[i])/L2/L1);
+                        let tmp=Math.asin(norm(N)/L2/L1),tmp2=Math.atan2(norm(N),math.multiply(AC[i],EP[i]));
+						let RR=[
+							[Math.cos(psi[i]),Math.sin(psi[i]),0],
+							[-Math.sin(psi[i]),Math.cos(psi[i]),0],
+							[0,0,1]
+						];
+						let RR2=[
+                            [Math.cos(theta[i]),0,-Math.sin(theta[i])],
+							[0,1,0],
+                            [Math.sin(theta[i]),0,Math.cos(theta[i])],
+						]
+						n[i-1]=math.multiply(RR2,math.multiply(RR,n[i-1]));//将世界坐标系下的向量转换为某一轴坐标系下的向量
+						// let aa=n[i-1][1]*n[i-1][1]+n[i-1][0]*n[i-1][0]+n[i-1][2]*n[i-1][2];
+						// console.log(norm(math.add(OP,math.multiply(-1,OP1)))<0.05);
+                    }
+                    targetANG2=targetANG.concat(theta2,n[0],n[1],n[2],[x,y,z]);
+                    if(ToolFlag){
+                        z-=115;
+                        y+=34;
+                    }
 				}
-               // else {
-                	let len=a.length;
+                //串联型
+				else{
+                    let alpha=ALPHA.concat();
+                    let a=A.concat();
+                    let d=D.concat();
+					/*let a=[0,0,0,270,70,0,0,0],
+					 d=[290,0,0,0,302,0,0,72];*/
+
+                    let t=[],T;
+                    if(robNumber=="a910"){
+                        d[3]=-theta[3];
+                        theta[3]=0;
+                    }
+                    // else {
+                    let len=a.length;
                     theta=math.add(theta,THETA);
                     for(let i=0;i<len;i++)
                     {
@@ -10406,43 +10466,41 @@ VILibrary.VI = {
                     for(let i=len-2;i>=0;i--){
                         T=math.multiply(t[i],T)
                     }
-				// }
-
-
-                if(flag){
-                    currentPOS=[T[0][3],T[1][3],T[2][3]];
-                    return currentPOS;//若仅用于计算目标点，不再执行后面代码
-				}
-                // console.log("T",T,"theta",theta);
-                document.getElementById("posX").value=(T[0][3]).toFixed(2);
-                document.getElementById("posY").value=(T[1][3]).toFixed(2);
-                document.getElementById("posZ").value=(T[2][3]).toFixed(2);
-                for(let i=0;i<=3;i++){
-                    for(let j=0;j<=3;j++){
-                        T[i][j]= parseFloat((T[i][j]).toFixed(4));
+                    // }
+                    x=T[0][3];y=T[1][3];z=T[2][3];
+                    for(let i=0;i<=3;i++){
+                        for(let j=0;j<=3;j++){
+                            T[i][j]= parseFloat((T[i][j]).toFixed(4));
+                        }
                     }
+                    //X-Y-Z顺序==ZYX顺序
+                    let cosBeta=Math.sqrt(Math.pow((T[0][0]),2)+Math.pow(T[1][0],2));
+                    //计算三个欧拉角
+                    if(cosBeta!=0){
+                        EulerY=Math.atan2(-T[2][0],cosBeta);
+                        if(EulerY>Math.PI/2||EulerY<-Math.PI/2){cosBeta=-cosBeta;EulerY=Math.atan2(-T[2][0],cosBeta);}
+                        EulerZ=Math.atan2(T[1][0],T[0][0]);
+                        EulerX=Math.atan2(T[2][1],T[2][2]);
+                    }
+                    else{
+                        EulerY=Math.PI/2;
+                        EulerZ=0;
+                        EulerX=Math.atan2(T[0][1],T[1][1]);
+                    }
+				}
+                
+                if(flag){
+                    currentPOS=[x,y,z];
+                    return currentPOS;//若仅用于计算目标点，不再执行后面代码
                 }
-                let EulerZ,EulerY,EulerX;
-                //X-Y-Z顺序==ZYX顺序
-                let cosBeta=Math.sqrt(Math.pow((T[0][0]),2)+Math.pow(T[1][0],2));
-                if(cosBeta!=0){//计算三个欧拉角
-                    EulerY=Math.atan2(-T[2][0],cosBeta);
-                    if(EulerY>Math.PI/2||EulerY<-Math.PI/2){cosBeta=-cosBeta;EulerY=Math.atan2(-T[2][0],cosBeta);}
-                    EulerZ=Math.atan2(T[1][0],T[0][0]);
-                    EulerX=Math.atan2(T[2][1],T[2][2]);
-                }
-                else{
-                    EulerY=Math.PI/2;
-                    EulerZ=0;
-                    EulerX=Math.atan2(T[0][1],T[1][1]);
-                }
-                // let EulerZ=alpha;
-                // let EulerY=beta;
-                // let EulerX=gamma;
+
+                document.getElementById("posX").value=x.toFixed(2);
+                document.getElementById("posY").value=y.toFixed(2);
+                document.getElementById("posZ").value=z.toFixed(2);
                 document.getElementById("eulerX").value=(EulerX*180/Math.PI).toFixed(2);
                 document.getElementById("eulerY").value=(EulerY*180/Math.PI).toFixed(2);
                 document.getElementById("eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
-                currentPOS=[T[0][3],T[1][3],T[2][3],EulerX,EulerY,EulerZ];
+                currentPOS=[x,y,z,EulerX,EulerY,EulerZ];
                 currentANG=targetANG.concat();
                 if(executiveFlag||(moveType!='J')){
                     for(let i=0;i<targetANG.length;i++){
@@ -10455,7 +10513,8 @@ VILibrary.VI = {
 				}
                 if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
                     let point=document.getElementById("Robot__LineSet_points").getAttribute('point');
-                    point=point+" "+T[0][3]+" "+T[2][3]+" "+(-T[1][3]);
+                    if(robNumber=="a360")point+=" "+y+" "+z+" "+x;
+                    else point+=" "+x+" "+z+" "+(-y);
                     document.getElementById("Robot__LineSet_points").setAttribute('point',point);
 					let point_Index=document.getElementById("Robot__LineSet_index").getAttribute('coordIndex');
 					let last_Index=parseInt(point_Index.match(/\d+$/))+1;
@@ -10465,9 +10524,16 @@ VILibrary.VI = {
 				//若夹持工件，工件坐标与末端坐标保持一致
 				if(LoadFlag&&(!flag)){
                     var trans = document.getElementById('Robot__box').getFieldValue('translation');
-                    trans.x=currentPOS[0];
-                    trans.y=currentPOS[2];
-                    trans.z=-currentPOS[1];
+                    if(robNumber=="a360"){
+                        trans.x=currentPOS[1];
+                        trans.y=currentPOS[2];
+                        trans.z=currentPOS[0];
+					}
+					else {
+                        trans.x=currentPOS[0];
+                        trans.y=currentPOS[2];
+                        trans.z=-currentPOS[1];
+					}
                     document.getElementById('Robot__box').setFieldValue('translation',trans);
 				}
 
@@ -10484,7 +10550,7 @@ VILibrary.VI = {
                 let ca=Math.cos(alpha),sa=Math.sin(alpha),
                     cb=Math.cos(beta),sb=Math.sin(beta),
                     cy=Math.cos(gamma),sy=Math.sin(gamma);
-                let resultAng=[];
+                let theta,resultAng=[];
                 let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
                 if(robNumber=="a910"){
                 	let Tt=[[1,0,0,-a[a.length-1]],[0,1,0,0],[0,0,1,-d[d.length-1]],[0,0,0,1]];
@@ -10492,7 +10558,7 @@ VILibrary.VI = {
                     let nx=T[0][0],ny=T[1][0],nz=T[2][0],
 						px=T[0][3],py=T[1][3],pz=T[2][3];
                     // let nx=ca*cb,ny=sa*cb,nz=-sb;
-                    let theta=[[],[]];
+                    theta=[[],[]];
                     let r=Math.sqrt(px*px+py*py),
 						AA=(px*px+py*py+a[1]*a[1]-a[2]*a[2])/(2*a[1]*r),
 						phi=Math.atan(px/py);
@@ -10518,13 +10584,58 @@ VILibrary.VI = {
                         }
                         if(inRange){
                             resultAng.push(theta[i].concat());
-                            let delt=math.multiply(resultAng,180/Math.PI);
                         }
                         else {
                             continue;
                         }
                     }
                 }
+                else if(robNumber=='a360'){
+                    if(ToolFlag){
+                        z+=115;
+                        y-=34;
+                    }
+                	z=z+274;
+                	let R=200,r=45,l=[0,235,800];
+                    theta=[[],[],[],[]]
+                    let psi=[0,0,Math.PI/3*4,Math.PI/3*2];
+					/*let psi=[0,Math.PI,-Math.PI/3,Math.PI/3];
+                	let a=[[],[],[],[]],k=[[],[],[],[]],phi=[];
+                	theta=[[],[],[],[]];
+                	let T1=0,T2=1;
+                	// let T1=Math.cos(alpha)*Math.sin(beta)*Math.sin(gamma)-Math.sin(alpha)*Math.cos(gamma),//0
+						// T2=Math.sin(alpha)*Math.sin(beta)*Math.sin(gamma)+Math.cos(alpha)*Math.cos(gamma),//-1
+						// T3=Math.cos(alpha)*Math.sin(beta)*Math.cos(gamma)+Math.sin(alpha)*Math.sin(gamma),//0
+						// T4=Math.sin(alpha)*Math.sin(beta)*Math.cos(gamma)-Math.cos(alpha)*Math.sin(gamma);//0
+					for(let i=1;i<=3;i++){
+						a[i][1]=r/2*(Math.sin(psi[i])*Math.sin(psi[i])-T1*Math.sin(2*psi[i])+2*T2*Math.cos(psi[i])*Math.cos(psi[i])-2)+y*Math.cos(psi[i])-x*Math.sin(psi[i]);
+						a[i][2]=z;
+						phi[i]=Math.acos((a[i][1]*a[i][1]+a[i][2]*a[i][2]-l[1]*l[1]-l[2]*l[2])/(2*l[1]*l[2]));
+						k[i][1]=-2*l[1]*(l[1]+l[2]*Math.cos(phi[i]));
+						k[i][2]=-2*l[1]*l[2]*Math.sin(phi[i]);
+						k[i][3]=a[i][1]*a[i][1]+a[i][2]*a[i][2]+l[1]*l[1]-l[2]*l[2];
+						theta[i][1]=Math.PI/2-2*Math.atan((-k[i][2]+Math.sqrt(k[i][1]*k[i][1]+k[i][2]*k[i][2]-k[i][3]*k[i][3]))/(k[i][3]-k[i][1]));
+                        theta[i][2]=Math.PI/2-2*Math.atan((-k[i][2]-Math.sqrt(k[i][1]*k[i][1]+k[i][2]*k[i][2]-k[i][3]*k[i][3]))/(k[i][3]-k[i][1]));
+                        //[ 4.078856157810996, 1.570796326794896]
+					}*/
+                    // let psi=[0,-Math.PI/2,-Math.PI/6*7,Math.PI/6];
+                    let I,J,K;
+                    for(let i=1;i<=3;i++) {
+                        I=2*l[1]*((x+r*Math.cos(psi[i])-R*Math.cos(psi[i]))*Math.cos(psi[i])+(y+r*Math.sin(psi[i])-R*Math.sin(psi[i]))*Math.sin(psi[i]));
+						J=2*l[1]*z;
+						K=Math.pow(x+(r-R)*Math.cos(psi[i]),2)+Math.pow(y+(r-R)*Math.sin(psi[i]),2)+z*z+l[1]*l[1]-l[2]*l[2];
+						theta[i][1]=2*Math.atan((-J-Math.sqrt(J*J+I*I-K*K))/(K+I));
+                        theta[i][2]=2*Math.atan((-J+Math.sqrt(J*J+I*I-K*K))/(K+I));
+					 }
+					for(let i=1;i<theta[1].length;i++){
+                    	if(theta[1][i]>=Range[0][0]&&theta[1][i]<=Range[0][1])for(let j=1;j<theta[2].length;j++){
+                            if(theta[2][i]>=Range[1][0]&&theta[2][i]<=Range[1][1])for(let k=1;k<theta[3].length;k++){
+                                if(theta[3][i]>=Range[2][0]&&theta[3][i]<=Range[2][1])resultAng.push([theta[1][i],theta[2][j],theta[3][k]]);
+								//100,0,-972.5->-0.2103,0.14666,0.14666
+							}
+						}
+					}
+				}
 				else {
                     let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
                     let Tt_6=[[-1,0,0,a[6]],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
@@ -10532,7 +10643,7 @@ VILibrary.VI = {
                     let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
                         ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
                         nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
-                    let theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
+                    theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
                     let j=0;
                     for(let i=0;i<=7;i++){
                         if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
@@ -10562,12 +10673,26 @@ VILibrary.VI = {
                         }
                     }
 				}
+				/*for(let i=0;i<theta.length;i++){
+                    let inRange=true;
+                    for(let j=0;j<theta[i].length;j++){
+                        if((theta[i][j]>=Range[j][0])&&(theta[i][j]<=Range[j][1]))continue;
+                        else {inRange=false;break;}
+                    }
+                    if(inRange){
+                        resultAng.push(theta[i].concat());
+                    }
+                    else {
+                        continue;
+                    }
+				}*/
+
                 if(resultAng==0&&resultAng[0]==undefined){return 0}
                 else if (resultAng.length==1){return resultAng[0]}
                 else {
                         let runTime=[];
                         for(let m=0;m<resultAng.length;m++){
-                        	if(resultAng[m].length!=4){
+                        	if(robNumber=="a120"||robNumber=="k60"){
                                 let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//theta的差值（8->6）
                                 resultAng[m]=math.add(resultAng[m],diff);
 							}
@@ -10584,7 +10709,6 @@ VILibrary.VI = {
                         return minAng;
                 }
             }
-
         }
         static get cnName() {
 
@@ -10790,16 +10914,70 @@ VILibrary.VI = {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas,draw3DFlag);
             const _this = this;
-            // RobotTemplateVI.prototype.robotURL='assets/kuka_KR60HA_x3d/kuka_kr60.x3d';
-            // RobotTemplateVI.prototype.draw(draw3DFlag);
             this.robotURL='assets/irb910sc_x3d/irb910sc.x3d';
             this.draw(draw3DFlag);
             this.name = 'ABB_IRB910sc';
-
+            this.jiontsControl=function(TargetANG){
+                let rotat="0,0,0,0";
+				for(let i=0;i<=3;i++){
+                        if(i==2) {
+                            let translation="250,"+TargetANG[i]+",0"
+                            document.getElementById("Robot__link"+i).setAttribute('translation',translation);
+                        }
+                        else {
+                            if(i==3)rotat="0,1,0,"+(-TargetANG[i]);//！！！！最后一轴正方向相反！！！！！
+                            else rotat="0,1,0,"+TargetANG[i];
+                            document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
+                        }
+                    }
+                // CurrentANG=TargetANG;
+            }
 			/*this.currentLen=[166,124,270,70,150,152,59,13];
 			 this.currentScal=[1,1,1,1,1,1,1,1];
 			 this.initLen=[166,124,270,70,150,152,59,13];*/
             this.a_d=[815,850,145,820,170,350];
+        }
+        static get cnName() {
+
+            return 'KUKA_kr60';
+        }
+
+        static get defaultWidth() {
+
+            return '550px';
+        }
+
+        static get defaultHeight() {
+
+            return '300px';
+        }
+    },
+    Robot360VI:class RobotIrb360VI extends RobotTemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas,draw3DFlag);
+            const _this = this;
+            this.robotURL='assets/irb360_x3d/irb360.x3d';
+            this.draw(draw3DFlag);
+            this.name = 'ABB_IRB360';
+            this.jiontsControl=function(TargetANG){
+                let rotat="0,0,0,0";
+                for(let i=0;i<3;i++){
+                    //主动轴转角
+                        rotat="1,0,0,"+TargetANG[i];
+                        document.getElementById("Robot__link"+i+"_1").setAttribute('rotation',rotat);
+                    //从动轴转角和旋转轴
+						rotat=""+(TargetANG[(2+i)*3+1])+","+(TargetANG[(2+i)*3+2])+","+(TargetANG[(2+i)*3+0])+","+TargetANG[i+3];
+						document.getElementById("Robot__link"+(i)+"_2r").setAttribute('rotation',rotat);
+                   		document.getElementById("Robot__link"+(i)+"_2l").setAttribute('rotation',rotat);
+                    }
+				let trans=(TargetANG[16]).toFixed(2)+","+TargetANG[17].toFixed(2)+","+(TargetANG[15]).toFixed(2);
+				document.getElementById("Robot__plate").setAttribute('translation',trans);
+                // CurrentANG=TargetANG;
+            }
+			/*this.currentLen=[166,124,270,70,150,152,59,13];
+			 this.currentScal=[1,1,1,1,1,1,1,1];
+			 this.initLen=[166,124,270,70,150,152,59,13];*/
+            // this.a_d=[815,850,145,820,170,350];
         }
         static get cnName() {
 
@@ -10821,7 +10999,7 @@ VILibrary.VI = {
             super(VICanvas, draw3DFlag,robNum);
             const _this = this;
             let haveTool=false;
-            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0"
+            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='400,20,-400';
             function draw() {
             	switch(robNum){
 					case "k60":
@@ -10831,7 +11009,13 @@ VILibrary.VI = {
 					case "a910":
 						jiajuRotate='0,0,1,-1.5707963';
                         jiajuTrans="0,65,0";
+                        boxTrans='300,40,-300';
                         break;
+                    case "a360":
+                        jiajuRotate='0,0,1,-1.5707963';
+                        jiajuTrans="0,5,0";
+                        boxTrans='250,-1180,-250';
+                    	break;
 					case "a120":default:break;
 				}
                 var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
@@ -10846,7 +11030,7 @@ VILibrary.VI = {
                     "</Transform>" +
                     "</switch>";
                 $("#Robot__lastLink").after(toolSwitch);
-                var box="<transform DEF='box' translation='400,20,-400' nameSpaceName id='Robot__box'><shape>" +
+                var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
 							"<appearance><material diffuseColor='1 0 0'></material></appearance>" +
 							"<box size='40,40,40'></box>" +
 						"</shape></transform>";
@@ -10861,6 +11045,10 @@ VILibrary.VI = {
             function toolSwitch(input){
                 if(!haveTool)draw();
                 document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
+                if(input){
+                    document.getElementById("Robot__box").setAttribute("render", 'true');
+				}
+				else document.getElementById("Robot__box").setAttribute("render", 'false');
             }
             function toolDo(input) {
                 if(input){
