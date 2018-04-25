@@ -9800,6 +9800,16 @@ VILibrary.VI = {
                     currentANG=[0,0,0],targetANG=[0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
                     Range=[[-55,110],[-55,110],[-55,110]];
                     OMEGA=[400,400,400];break;
+                case "epson":
+                    A=[0,0,0,0,0,0];
+                    D=[0,0,0,0,0,0];//d[3]<=0;
+                    ALPHA=[0,0,0,0,0,0];
+                    THETA=[0,0,0,0,0,0];
+                    THETA=[92,80,227];
+                    currentANG=[92,80,227],targetANG=[92,80,227];//theta,theta2,n0,n1,n2,x,y,z
+                    Range=[[30,470],[55,500],[0,300]];
+                    OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];break;
+                    break;
 				case "a120":default:
 					A=[0,0,0,270,70,0,0,0];//不加tool最后一个为0
 					D=[290,0,0,0,302,0,0,72];//加tool最后一个为72
@@ -9811,7 +9821,7 @@ VILibrary.VI = {
                 	let lasdjsikdj=1111;
             }
             const baseA=A,baseD=D;
-            Range=math.multiply(Range,Math.PI/180);
+			if(robNumber!="epson")Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {
             	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;
             	else if(dataType==2)return [ToolFlag,ToolDO];
@@ -10400,9 +10410,9 @@ VILibrary.VI = {
                             L1*Math.cos(theta[i])*Math.sin(psi[i]),
                             -L1*Math.sin(theta[i])
                         ];
-                        let N=crossProduct(AC[i],EP[i]);
+                        let N=crossProduct(AC[i],EP[i]);//计算转轴
 						n[i-1]=math.multiply(N,1/norm(N));
-                        theta2[i-1]=Math.acos(math.multiply(AC[i],EP[i])/L2/L1);
+                        theta2[i-1]=Math.acos(math.multiply(AC[i],EP[i])/L2/L1);//计算转角
                         let tmp=Math.asin(norm(N)/L2/L1),tmp2=Math.atan2(norm(N),math.multiply(AC[i],EP[i]));
 						let RR=[
 							[Math.cos(psi[i]),Math.sin(psi[i]),0],
@@ -10425,6 +10435,18 @@ VILibrary.VI = {
                     }
 				}
                 //串联型
+                else if (robNumber=="epson"){
+                    x=theta[1]+98.5;
+                    y=theta[2]-63.5;
+                    z=theta[3]+145;
+                    EulerZ=0;
+                    EulerY=0;
+                    EulerX=Math.PI/2;
+                    if(ToolFlag){
+                        y-=115;
+                        z-=54;
+                    }
+                }
 				else{
                     let alpha=ALPHA.concat();
                     let a=A.concat();
@@ -10505,7 +10527,7 @@ VILibrary.VI = {
                 if(executiveFlag||(moveType!='J')){
                     for(let i=0;i<targetANG.length;i++){
                         let a;
-                        if(robNumber=="a910"&&i==2)a=(targetANG[i]).toFixed(2);
+                        if(robNumber=="a910"&&i==2||robNumber=="epson")a=(targetANG[i]).toFixed(2);
                         else a=(targetANG[i]*180/Math.PI).toFixed(2);
                         document.getElementById("angInput"+(i)).value=a;
                         document.getElementById("angTxt"+(i)).value=a;
@@ -10636,6 +10658,19 @@ VILibrary.VI = {
 						}
 					}
 				}
+                else if(robNumber=="epson"){
+                    if(ToolFlag){
+                        y+=115;
+                        z+=54;
+                    }
+                    theta=[[x-98.5,y+63.5,z-145]];
+                    let inRange=true;
+                    for(let i=0;i<theta[0].length;i++){
+                    	if(theta[0][1]>=Range[i][0]&&theta[0][1]<=Range[i][1])continue;
+                    	else inRange=false;break;
+					}
+					if(inRange)resultAng=theta.concat();
+                }
 				else {
                     let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
                     let Tt_6=[[-1,0,0,a[6]],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
@@ -10696,7 +10731,6 @@ VILibrary.VI = {
                                 let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//theta的差值（8->6）
                                 resultAng[m]=math.add(resultAng[m],diff);
 							}
-
                             // resultAng[m][1]+=Math.PI/2;
                             let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
                             runTime[m]=0;
@@ -10994,12 +11028,48 @@ VILibrary.VI = {
             return '300px';
         }
     },
+    RobotEpsonVI:class RobotEpsonVI extends RobotTemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas,draw3DFlag);
+            const _this = this;
+            this.robotURL='assets/epson_hms3_x3d/epson.x3d';
+            this.draw(draw3DFlag);
+            this.name = 'EPSON_HMS-3Axis';
+            this.jiontsControl=function(TargetANG){
+                let trans="0,0,0";
+                trans="0,0,"+(-TargetANG[1]);
+                document.getElementById("Robot__link0").setAttribute('translation',trans);
+                trans=""+(TargetANG[0])+",0,0";
+                document.getElementById("Robot__link1").setAttribute('translation',trans);
+                trans="0,"+(TargetANG[2])+",0";
+                document.getElementById("Robot__link2").setAttribute('translation',trans);
+            }
+			/*this.currentLen=[166,124,270,70,150,152,59,13];
+			 this.currentScal=[1,1,1,1,1,1,1,1];
+			 this.initLen=[166,124,270,70,150,152,59,13];*/
+            // this.a_d=[815,850,145,820,170,350];
+        }
+        static get cnName() {
+
+            return 'KUKA_kr60';
+        }
+
+        static get defaultWidth() {
+
+            return '550px';
+        }
+
+        static get defaultHeight() {
+
+            return '300px';
+        }
+    },
     ToolVI:class ToolVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag,robNum) {
             super(VICanvas, draw3DFlag,robNum);
             const _this = this;
             let haveTool=false;
-            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='400,20,-400';
+            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='400,20,-400',jiajuRotate2='0,0,1,0';
             function draw() {
             	switch(robNum){
 					case "k60":
@@ -11016,10 +11086,19 @@ VILibrary.VI = {
                         jiajuTrans="0,5,0";
                         boxTrans='250,-1180,-250';
                     	break;
+					case "epson":
+                        jiajuRotate='0,1,0,-1.5707963';
+                        jiajuRotate2='1,0,0,3.1415926';
+                        // jiajuRotate="0.45749571099781405,-0.7624928516630234,-0.45749571099781405,2.2834529548131237"
+                        // jiajuRotate="0.5144957554275265,-0.6859943405700353,-0.5144957554275265,1.9390642202315367"
+                        jiajuTrans="98.5,125,58.5";
+                        boxTrans='400,20,-400'
+						break;
 					case "a120":default:break;
 				}
                 var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
                     "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
                     "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
                     "<inline url='../tool/jiajuL.x3d' > </inline>" +
                     "</Transform>" +
@@ -11027,7 +11106,7 @@ VILibrary.VI = {
                     "<inline url='../tool/jiajuR.x3d'> </inline>" +
                     "</Transform>" +
                     "<inline url='../tool/jiaju.x3d'> </inline>" +
-                    "</Transform>" +
+                    "</Transform>" +"</Transform>"
                     "</switch>";
                 $("#Robot__lastLink").after(toolSwitch);
                 var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
@@ -11036,11 +11115,31 @@ VILibrary.VI = {
 						"</shape></transform>";
                 $("#Robot__platform").after(box);
                 haveTool=true;
-            }
 
+
+            }
+//向量模（范数）
+            function norm(input) {
+                let a=input.concat();
+                return Math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2]);
+            }
+            //向量叉积
+            function crossProduct(a,b) {
+                let c=[
+                    a[1]*b[2]-a[2]*b[1],
+                    a[2]*b[0]-a[0]*b[2],
+                    a[0]*b[1]-a[1]*b[0]
+                ]
+                return c;
+            }
 			this.setData=function (input) {
             	toolSwitch(input[0]);
-            	toolDo(input[1])
+            	toolDo(input[1]);
+                let a=[4,5,3],b=[-5,-4,-3];
+                // console.log(b,theta);
+                let N=crossProduct(a,b),//计算转轴
+                    n=math.multiply(N,1/norm(N)),
+                    theta2=Math.acos(math.multiply(a,b)/norm(a)/norm(b));//计算转角
             }
             function toolSwitch(input){
                 if(!haveTool)draw();
