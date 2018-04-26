@@ -10292,13 +10292,21 @@ VILibrary.VI = {
                 let A_add=Array(len).fill(0),D_add=Array(len).fill(0);
                 switch(input){
                     case 1:
-                    	if(robNumber=="a910"){
-                            A_add[len-1]+=34;
-                            D_add[len-1]+=115-27.5;
-						}
-						else {
-                            A_add[len-1]+=34;
-                            D_add[len-1]+=115;
+                    	switch (robNumber){
+							case "a910":
+                                A_add[len-1]+=34;
+                                D_add[len-1]+=115-27.5;
+                                break;
+							case "a120":
+                                A_add[len-1]+=34;
+                                D_add[len-1]+=115;
+                                break;
+							case "k60":
+                                A_add[len-1]+=68;
+                                D_add[len-1]+=230;
+                                break;
+							default:
+								break;
 						}
                         $('#setDO').enabled=true;
                         break;
@@ -10666,7 +10674,7 @@ VILibrary.VI = {
                     theta=[[x-98.5,y+63.5,z-145]];
                     let inRange=true;
                     for(let i=0;i<theta[0].length;i++){
-                    	if(theta[0][1]>=Range[i][0]&&theta[0][1]<=Range[i][1])continue;
+                    	if(theta[0][i]>=Range[i][0]&&theta[0][i]<=Range[i][1])continue;
                     	else inRange=false;break;
 					}
 					if(inRange)resultAng=theta.concat();
@@ -10679,7 +10687,7 @@ VILibrary.VI = {
                         ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
                         nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
                     theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                    let j=0;
+                    let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//D-H模型中的theta与实际的转动惯量的差值（8->6）
                     for(let i=0;i<=7;i++){
                         if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
                         else    theta[i][0]=Math.atan2(py,px)-Math.atan2(0,-Math.sqrt(px*px+py*py));
@@ -10699,13 +10707,28 @@ VILibrary.VI = {
                         let s6=-nx*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-ny*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+nz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
                         let c6=-ox*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-oy*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+oz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
                         theta[i][5]=Math.atan2(s6,c6);
+
+                        //以上计算出的是D-H模型中的theta,与实际的转动惯量差一个theta（diff)的值
+                        theta[i]=math.add(theta[i],diff);
+                        let inRange=true;
+                        for(let j=0;j<theta[i].length;j++){
+                            if((theta[i][j]>=Range[j][0])&&(theta[i][j]<=Range[j][1]))continue;
+                            else {inRange=false;break;}
+                        }
+                        if(inRange){
+                            resultAng.push(theta[i].concat());
+                        }
+                        else {
+                            continue;
+                        }
+                        /*
                         if(Math.abs(theta[i][0])< Math.PI*185/180&&theta[i][1]>-135/180*Math.PI&&theta[i][1]<35/180*Math.PI&&theta[i][2]>-120/180*Math.PI&&theta[i][2]<158/180*Math.PI&&Math.abs(theta[i][3])<350/180*Math.PI&&Math.abs(theta[i][4])<119/180*Math.PI&&Math.abs(theta[i][5])<350/180*Math.PI){
                             resultAng[j]=theta[i].concat();
                             j++;
                         }
                         else {
                             continue;
-                        }
+                        }*/
                     }
 				}
 				/*for(let i=0;i<theta.length;i++){
@@ -10727,10 +10750,6 @@ VILibrary.VI = {
                 else {
                         let runTime=[];
                         for(let m=0;m<resultAng.length;m++){
-                        	if(robNumber=="a120"||robNumber=="k60"){
-                                let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//theta的差值（8->6）
-                                resultAng[m]=math.add(resultAng[m],diff);
-							}
                             // resultAng[m][1]+=Math.PI/2;
                             let resultDiff=math.add(resultAng[m],math.multiply(-1,currentANG));
                             runTime[m]=0;
