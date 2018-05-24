@@ -9762,7 +9762,6 @@ VILibrary.VI = {
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
             let targetANG2;//专为IRB360提供
-            let instrAng;
             let instrIndex,
                 instrSplit,//指令划分后
 				moveType,//当前执行的运动类型
@@ -9789,7 +9788,7 @@ VILibrary.VI = {
                     ALPHA=[0,0,0,Math.PI,0,0];
                     THETA=[0,0,0,0,0,0];
                     currentANG=[0,0,0,0],targetANG=[0,0,0,0];
-                    Range=[[-140,140],[-150,150],[-180*180/Math.PI,0],[-400,400]];
+                    Range=[[-140,140],[-160,150],[-180*180/Math.PI,0],[-400,400]];
                     OMEGA=[415,659,1000*180/Math.PI,2400];
                     break;
 				case "a360":
@@ -9903,14 +9902,17 @@ VILibrary.VI = {
                         else  {
                             moveType=instrI[moveIndex+4];
                             let instrPos,lastPos;
+                            let instrAng;
                             switch(moveType){
                                 case "J":
                                 	instrAng=inverseKinematics(pPos[n1]);
+                                    if(instrAng==0){
+                                        alert("超出工作空间或靠近奇异点！");return;
+                                    }
                                 	_this.moveJ(instrAng,m);
                                 	break;
                                 case "L":
                                     let LPos=pPos[n1].concat();
-                                    instrAng=pAngle[n1].concat();
                                     _this.moveL(LPos,m);
                                 	break;
                                 case "C":
@@ -9926,7 +9928,6 @@ VILibrary.VI = {
                                             ,content: 'moveC指令缺少关键参数'
                                         });return;
 									}
-                                    instrAng=pAngle[n2].concat();
                                     let CPos1=pPos[n1].concat();
                                     let CPos2=pPos[n2].concat();
                                     _this.moveC(CPos1,CPos2,m);
@@ -9984,7 +9985,7 @@ VILibrary.VI = {
 				}
                 // let distanceL=Math.sqrt(Math.pow(targetPOS[0]-LastPOS[0],2)+Math.pow(targetPOS[1]-LastPOS[1],2)+Math.pow(targetPOS[2]-LastPOS[2],2));
                 // let t=distanceL/v;
-            	let instructAng=input.concat([]);
+            	let instructAng=input.concat();
                 let Diff=math.add(instructAng,math.multiply(-1,currentANG));
                 let maxDiff=Math.max.apply(Math,math.abs(Diff));
                 if(maxDiff==0||maxDiff==undefined){//
@@ -10341,10 +10342,7 @@ VILibrary.VI = {
                 if(executiveFlag){
                     instrIndex++;
                     if(instrIndex<instrSplit.length){
-                        setTimeout(function () {
-                            instrCompiling();
-                        },500);
-                        // instrCompiling();
+                        instrCompiling();
                     }
                     else {
                         executiveFlag=false;
@@ -10421,7 +10419,6 @@ VILibrary.VI = {
                         let N=crossProduct(AC[i],EP[i]);//计算转轴
 						n[i-1]=math.multiply(N,1/norm(N));
                         theta2[i-1]=Math.acos(math.multiply(AC[i],EP[i])/L2/L1);//计算转角
-                        let tmp=Math.asin(norm(N)/L2/L1),tmp2=Math.atan2(norm(N),math.multiply(AC[i],EP[i]));
 						let RR=[
 							[Math.cos(psi[i]),Math.sin(psi[i]),0],
 							[-Math.sin(psi[i]),Math.cos(psi[i]),0],
@@ -10445,7 +10442,7 @@ VILibrary.VI = {
                 //串联型
                 else if (robNumber=="epson"){
                     x=theta[1]+98.5;
-                    y=theta[2]-63.5;
+                    y=theta[2]-75.5;
                     z=theta[3]+145;
                     EulerZ=0;
                     EulerY=0;
@@ -10671,7 +10668,7 @@ VILibrary.VI = {
                         y+=115;
                         z+=54;
                     }
-                    theta=[[x-98.5,y+63.5,z-145]];
+                    theta=[[x-98.5,y+75.5,z-145]];
                     let inRange=true;
                     for(let i=0;i<theta[0].length;i++){
                     	if(theta[0][i]>=Range[i][0]&&theta[0][i]<=Range[i][1])continue;
@@ -11088,7 +11085,7 @@ VILibrary.VI = {
             super(VICanvas, draw3DFlag,robNum);
             const _this = this;
             let haveTool=false;
-            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='400,20,-400',jiajuRotate2='0,0,1,0';
+            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0';
             function draw() {
             	switch(robNum){
 					case "k60":
@@ -11115,17 +11112,18 @@ VILibrary.VI = {
 						break;
 					case "a120":default:break;
 				}
-                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
-                    "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
-                    "<Transform rotation="+jiajuRotate2+">"+
-                    "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
-                    "<inline url='../tool/jiajuL.x3d' > </inline>" +
-                    "</Transform>" +
-                    "<Transform DEF='jiajuR' translation='0 0 -10' nameSpaceName id='Robot__jiajuR'>" +
-                    "<inline url='../tool/jiajuR.x3d'> </inline>" +
-                    "</Transform>" +
-                    "<inline url='../tool/jiaju.x3d'> </inline>" +
-                    "</Transform>" +"</Transform>"
+                var toolSwitch= "<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
+						"<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
+							"<Transform rotation="+jiajuRotate2+">"+
+								"<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
+								"<inline url='../tool/jiajuL.x3d' > </inline>" +
+								"</Transform>" +
+								"<Transform DEF='jiajuR' translation='0 0 -10' nameSpaceName id='Robot__jiajuR'>" +
+								"<inline url='../tool/jiajuR.x3d'> </inline>" +
+								"</Transform>" +
+								"<inline url='../tool/jiaju.x3d'> </inline>" +
+							"</Transform>" +
+						"</Transform>"+
                     "</switch>";
                 $("#Robot__lastLink").after(toolSwitch);
                 var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
@@ -11154,19 +11152,17 @@ VILibrary.VI = {
 			this.setData=function (input) {
             	toolSwitch(input[0]);
             	toolDo(input[1]);
-                let a=[4,5,3],b=[-5,-4,-3];
-                // console.log(b,theta);
-                let N=crossProduct(a,b),//计算转轴
-                    n=math.multiply(N,1/norm(N)),
-                    theta2=Math.acos(math.multiply(a,b)/norm(a)/norm(b));//计算转角
             }
             function toolSwitch(input){
                 if(!haveTool)draw();
                 document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
-                if(input){
-                    document.getElementById("Robot__box").setAttribute("render", 'true');
+                if(robNum!="epson"){
+                    if(input){
+                        document.getElementById("Robot__box").setAttribute("render", 'true');
+                    }
+                    else document.getElementById("Robot__box").setAttribute("render", 'false');
 				}
-				else document.getElementById("Robot__box").setAttribute("render", 'false');
+
             }
             function toolDo(input) {
                 if(input){

@@ -1,12 +1,14 @@
 /**
  * Created by bear on 2018/1/15.
  */
+//127.0.0.1:3000
 var http=require("http");
 var fs=require("fs");
 var path=require("path");
 var mime=require("mime");
 var net = require('net');
-var tcp=require('./lib/TCPclient')
+var tcp=require('./lib/TCPserver');
+var ws=require('./lib/connectWS');
 var qs=require('querystring');
 
 
@@ -58,13 +60,15 @@ var server = http.createServer(function(req, res) {
             case 'POST':
                 req.setEncoding('utf8');
                 req.on('data',function(chunk){
+                    console.log(chunk);
                     var dataString = chunk.toString();
+                    console.log(dataString);
                     //将接收到的字符串转换位为json对象
                     var dataObj = qs.parse(dataString);
+                    console.log(dataObj)
                     // var message=qs.parse(body);
                     var pos=dataObj.points;
                     var cmd=dataObj.instrInput;
-                    console.log("obj",dataObj);
                     tcp.cnct(pos,cmd);
                 });
                 /*req.on('data',function(data){
@@ -73,7 +77,7 @@ var server = http.createServer(function(req, res) {
                 });*/
                 break;
             default:
-                send404(res)
+                send404(res);
         }
 
     } else {
@@ -87,8 +91,3 @@ var server = http.createServer(function(req, res) {
 server.listen(3000, function() {
     console.log("Server listening on port 3000.");
 });
-function TCPconnect(alldata) {
-
-}
-
-

@@ -1,0 +1,11 @@
+/**
+ * Created by bear on 2018/5/24.
+ */
+// var express = require("express");
+global.tcp=require('./lib/TCPserver');
+var ws=require('./lib/connectWS');
+
+/*
+var app = express();
+app.use("/",express.static(__dirname));
+var server=app.listen(3000);*/

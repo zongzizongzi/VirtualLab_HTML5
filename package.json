@@ -1,8 +1,10 @@
 {
-  "name": "chatrooms",
+  "name": "virtualLab",
   "version": "0.0.1",
   "description": "chatserver",
+  "private": true,
   "dependencies": {
-    "mime": "~1.2.7"
+    "mime": "~1.2.7",
+    "ws": "^5.2.0"
   }
 }

@@ -31,19 +31,12 @@
     <div id="index_div">
         <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn"  onclick="show(3)">实验操作视频</button>
     </div>
-    <div id="index_0" style="width: 1500px;    margin-left: -750px;"> <embed id="instructTxt" src="pdf/ABB机器人虚拟实验指导书.htm" ></embed></div>
+    <div id="index_0" style="width: 1500px;    margin-left: -750px;"> <embed id="instructTxt" src="pdf/ABBRobot.htm" ></embed></div>
     <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
     <div id="index_3"><video id="exm_video" src="" controls></video></div>
     <div id="index_1" style="height: 800px">
         <div style="width: 80%;height: 100%;display: inline;float: left">
             <div id="robotX3d" style="width: 100%;height: 100%;">
-                <!--<x3d style="width: 100%;height: 100%;">
-                    <scene>
-                        <transform>
-                            <inline nameSpaceName="Robot" mapDEFToID="true" url="assets/irb120_x3d/robot120.x3d"></inline>
-                        </transform>
-                    </scene>
-                </x3d>-->
             </div>
         </div>
         <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
@@ -104,7 +97,7 @@
                     <p>控制指令</p>
                     <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
                     <div class="rowFlex-div">
-                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button><input type="submit" value="上传">
+                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button><button type="button" onclick="submitInstructions()">上传</button>
                     </div>
                 </div>
             </form>
@@ -118,6 +111,7 @@
 <script src="js/jquery-3.1.1.min.js"></script>
 <!--弹出框-->
 <script src="js/layui/lay/dest/layui.all.js"></script>
+<script src="js/communication.js"></script>
 <script>
     'use strict';
     let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
@@ -134,7 +128,50 @@
         pPos=[],
         indexI=0;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
-    function PostData() {
+   /* if ("WebSocket" in window)
+    {
+        // 打开一个 web socket
+        var ws = new WebSocket("ws://127.0.0.1:3002");
+
+        ws.onopen = function()
+        {
+            // Web Socket 已连接上，使用 send() 方法发送数据
+            ws.send("发送数据");
+            console.log("数据发送中...");
+        };
+
+        ws.onmessage = function (evt)
+        {
+            var received_msg = evt.data;
+            console.log("已接收数据",received_msg);
+            if(received_msg=="go"){
+                Instructions();
+            }
+            else console.log(received_msg)
+        };
+
+        ws.onclose = function()
+        {
+            // 关闭 websocket
+            console.log("连接已关闭...");
+        };
+    }
+    else
+    {
+        // 浏览器不支持 WebSocket
+        alert("您的浏览器不支持 WebSocket!");
+    }*/
+   let wsServerAddr={
+       port:'3002',
+       host:'127.0.0.1'
+   }
+   let ws=new communcication(wsServerAddr);
+   ws.connect();
+   function submitInstructions() {
+       let data=$('#myform').serialize();
+       ws.send(data);
+   }
+    /*function PostData() {
         $.ajax({
             type: "POST",
             url: "/",
@@ -142,9 +179,9 @@
             success: function(msg) {
             }
         });
-        Instructions();
+//        Instructions();
         return false;
-    }
+    }*/
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -165,9 +202,7 @@
             beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
             alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
             let pos=[x,y,z,gamma,beta,alpha];
-
         instructionCompiling.moveL(pos,100);
-
     }
     function Instructions() {
         instructionCompiling.toggleObserver(true);
@@ -219,8 +254,8 @@
                 indexI--;
                 break;
             case -1:
-
-                /*s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
+                /*
+                s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
                 pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0, 0.40282199136029123, -0.4750786223928564, -0, 0.5958554066308641, -0],[0, 0.5235987755982988, 0, 0, 0.5235987755982988, 0],[0, 0.5235987755982988, 0.5235987755982988, 0, 0.5235987755982988, 0]];
                     pPos=[[364.35, 0, 594, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[464.35, 0, 594, -3.141592653589793, 1.0471848490249271, -3.141592653589793],[467.5397, 0, 371.0948, 3.141592653589793, 0.5236114777699694, -3.141592653589793],[346.6218, 0, 225.2872, 3.141592653589793, 0, -3.141592653589793]];
                 document.getElementById("instrInput").value="moveJ p0,v500;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v500;";
@@ -228,23 +263,21 @@
                 turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 //---------------------------------------------
-                indexI=4;*/
-                s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n",
-                    "p1:[400,400,100,180°,0°,-180°];\n",
-                    "p2:[400,400,20,180°,0°,-180°];\n",
-                    "p3:[400,0,100,180°,0°,-180°];\n",
-                    "p4:[400,0,20,180°,0°,-180°];\n"];
-                pAngle=[[-0, 0, 0, 0, 0.5235987755982988, -0],
-                    [0.8297295263981043, 1.1859512267301469, -0.6150540284028018, 0, 0.999724595542352, 0.8297295263981043],
-                    [0.8297295263981043, 1.3669418701619587, -0.6791076119509936, 0, 0.8829620685839313, 0.8297295263981043],
+                indexI=4;
+                */
+                s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
+                pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],
+                    [0.8454374896660531, 0.6958627727701391, 0.2769837522915001, 0, 0.5979498017332573, 0.8454374896660531],
+                    [0.8454374896660531, 0.9161233243718235, 0.23596851486963336, 0, 0.41887902047863906, 0.8454374896660531],
                     [-0, 0.6030112565640408, 0.438601241026175, 0, 0.5291838292046808, -0],
                     [-0, 0.8422958970124633, 0.39671333897831107, 0, 0.33161255787892263, -0]];
-                pPos=[[480.9468, 0, 565.9449, -3.141592653589793, 1.0471848490249271, -3.141592653589793],
-                    [400, 400, 100, 3.141592653589793, -0, -3.141592653589793],
-                    [400, 400, 20, 3.141592653589793, 0, -3.141592653589793],
-                    [400, 0, 100, 3.141592653589793, 0, -3.141592653589793], [400, 0, 20, 3.141592653589793, 0, -3.141592653589793]];
-                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveL p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
-                turnPoints="480.95 565.94 0 400 100 -400 400 20 -400 400 100 0 400 20 0";
+                pPos=[[480.94675050769, 1.3045864533829317e-14, 565.944863728671, -3.141592653589793, 1.0471848490249271, -3.141592653589793],
+                    [299.99999999999994, 300.00000000000006, 99.99999999999994, 3.141592653589793, -0, -3.141592653589793],
+                    [300, 300.00000000000006, 20, 3.141592653589793, -0, -3.141592653589793],
+                    [400.00000000000006, 4.157675883105265e-14, 99.99999999999994, 3.141592653589793, 0, -3.141592653589793],
+                    [400, 4.6475346027642046e-14, 19.999999999999943, 3.141592653589793, 0, -3.141592653589793]];
+                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
+                turnPoints="480.95 565.94 0 300 100 -300 300 20 -300 400 100 0 400 20 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 indexI=5;
         }
@@ -268,7 +301,6 @@
             area : ['800px' , '520px'],
             content: 'teachPendant.html'
         });
-
     }
 
    /* let rob=document.getElementById('Robot');
