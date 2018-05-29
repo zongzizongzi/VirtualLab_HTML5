@@ -568,7 +568,7 @@ class RobotTemplateVI extends TemplateVI {
 				 </x3d>*!/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
 				 document.getElementById("x3d120").innerHTML=my_html;*/
                 this.container.innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
-                    '<inline nameSpaceName="Robot"="Robot" mapDEFToID="true" url='+this.robotURL+'></inline>'+
+                    '<inline nameSpaceName="Robot"  mapDEFToID="true" url='+this.robotURL+'></inline>'+
                     '</scene></x3d>';
             }
             else {
@@ -9703,7 +9703,7 @@ VILibrary.VI = {
                             let pIndex=instrI.indexOf("p");
                             let pNum=instrI.slice(pIndex+1,lengthI);//从p到结束之间的部分
                             let n = Number(pNum);//p后面的数字
-                            if(isNaN(n)||(n>=pAngle.length)){layer.open({
+                            if(isNaN(n)||(n>=pPos.length)){layer.open({
                                 title: '系统提示'
                                 ,content: '未知示教点'
                             });;return;}
@@ -9762,11 +9762,13 @@ VILibrary.VI = {
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
             let targetANG2;//专为IRB360提供
+            let pPos=[];
             let instrIndex,
                 instrSplit,//指令划分后
 				moveType,//当前执行的运动类型
 				Range,OMEGA,
 				A,D,ALPHA,THETA;//D-H参数
+
 			let ToolFlag=0,//加载工具标志
 				ToolDO=false,
 				LoadFlag=false;//是否夹持工件
@@ -9836,21 +9838,41 @@ VILibrary.VI = {
 				 	A[2]=a_D[5];
                 kinematicsEquation(currentANG);
             }
+            function Split(idName) {
+                let str= document.getElementById(idName).value.toString();
+                let arr=(str.replace(/\r|\n|\s|°/g,'')).split(";");//剔除所有换行回车和空格，并以分号分割
+                let newArr=[];//用于存储不为''的元素
+                for(let value of arr){
+                    if(''!= value) {newArr.push(value);}
+                }
+                return newArr;
+            }
             this.toggleObserver = function (flag) {
                 if (flag) {
                     // instrParse();
+					let pPoints=Split('points');
+					pPos=[];
+					for(let p of pPoints){
+						p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');
+						for(let i=0;i<p.length;i++){
+							if(p[i]!=''){
+								p[i]=i<3?parseFloat(p[i]):(parseFloat(p[i])/180*Math.PI);
+							}
+						}
+						pPos.push(p)
+						console.log(pPos)
+					}
                     executiveFlag=true;
                     instrIndex=0;
                     let instrAll=document.getElementById("instrInput").value.toString();//输入指令,获取字符串
                     let replacedStr=instrAll.replace(/[\n]/g,"");//去掉回车
 					instrSplit=replacedStr.split(";");//以分号分割字符串
-                    //逐条指令解析
 					let points="";
 					if(robNumber=="a360")points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
                     else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
                     document.getElementById("Robot__LineSet_points").setAttribute('point',points);
                     document.getElementById("Robot__LineSet_index").setAttribute('coordIndex','0');
-                    instrCompiling();
+                    instrCompiling(); //逐条指令解析
                 }
             };
             function errInfo() {
@@ -9895,7 +9917,7 @@ VILibrary.VI = {
                         let n1 = Number(pNum[0].replace(/p/,""));//p后面的数字
 						let vNum=instrI.match(/v\d+/);
 						let m=Number(vNum[0].replace(/v/,""))//v后面的数字
-                        if(isNaN(n1)||(n1>=pAngle.length)){layer.open({
+                        if(isNaN(n1)||(n1>=pPos.length)){layer.open({
                             title: '系统提示'
                             ,content: '未知示教点'
                         });return;}
@@ -9918,7 +9940,7 @@ VILibrary.VI = {
                                 case "C":
 
                                     let n2 = Number(pNum[1].replace(/p/,""));//第二个p后面的数字
-                                    if(isNaN(n2)||(n2>=pAngle.length)){layer.open({
+                                    if(isNaN(n2)||(n2>=pPos.length)){layer.open({
                                         title: '系统提示'
                                         ,content: '未知示教点'
                                     });return;}
@@ -11175,5 +11197,7 @@ VILibrary.VI = {
                 }
             }
         }
-	}
+	},
+
+	CoordTransVI:class CoordTransVI extends TemplateVI{}
 };

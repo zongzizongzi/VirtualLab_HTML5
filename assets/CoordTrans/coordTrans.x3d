@@ -1,0 +1,17 @@
+<x3d id="coordTrans" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Viewpoint position="70 90 120" orientation="-0.54111 0.83041 0.13275 0.66909"></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+        <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+        <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+        <transform def="fixed">
+           <inline url="base.x3d"></inline>
+            <transform def="">
+                <inline url="axis.x3d"></inline>
+            </transform>
+        </transform>
+    </scene>
+</x3d>

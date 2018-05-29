@@ -98,8 +98,6 @@
 
     let val=[0],ang;
     let s=[],
-        pAngle=[],
-        pPos=[],
         indexI=0;
     let currentPOS=[1317.22,0,1725,-Math.PI,Math.PI/3,-Math.PI];
     function changeTransparency() {
@@ -161,15 +159,7 @@
                     alpha=parseFloat(document.getElementById("eulerZ").value);
                 let si="p"+indexI+": x"+x+" y"+y+" z"+z+" "+gamma+"° "
                     +beta+"° "+alpha+"°;\n";
-//                let piPos=[x,y,z,gamma/180*Math.PI,beta/180*Math.PI,alpha/180*Math.PI]
-                let piPos=currentPOS.concat();
                 s.push(si);
-                let piAngle=[];
-                for(let j=0;j<6;j++){
-                    piAngle[j]= Number(document.getElementById("angInput"+(j)).value)/180*Math.PI;
-                }
-                pAngle.push(piAngle);
-                pPos.push(piPos);
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
@@ -179,8 +169,6 @@
                 break;
             case 2:/*删除示教点*/
                 s.pop();
-                pAngle.pop();
-                pPos.pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
@@ -190,9 +178,7 @@
                 indexI--;
                 break;
             case -1:
-                s=["p0: x1317.22 y0 z1725 -180° 60° -180°;\n","p1: x1140.75 y658.61 z1725 -180° 60° -150°;\n","p2: x634.49 y366.32 z2086.7 -30° 90° 0°;\n","p3: x757.6 y-437.4 z1358.74 180° 45° 150°;\n"],
-                    pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],[0.5235987755982988, 0, 0, 0, 0.5235987755982988, 0],[0.5235987755982988, -0.5235987755982988, 0, 0, 0.5235987755982988, 0],[-0.5235987755982988, -0.5235987755982988, 0.7853981633974483, 0, 0.5235987755982988, 0]];
-                pPos=[[1317.22, 0, 1725, -3.141592653589793, 1.0471975511965976, -3.141592653589793],[1140.7497, 658.6122, 1725, -3.141592653589793, 1.0471943756012814, -2.617981175819824],[634.4856, 366.3204, 2086.6953, -0.5236114777699694, 1.5707963267948966, 0],[757.5956, -437.398, 1358.7411, 3.141592653589793, 0.7853600105770818, 2.6179562867740636]];
+                s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],
                 document.getElementById("instrInput").value="moveJ p0,v400;\nmoveC p1,p2,v400;\nmoveL p3,v400;\nmoveJ p0,v400;";
                 turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);

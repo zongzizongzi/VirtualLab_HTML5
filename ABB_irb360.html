@@ -112,8 +112,6 @@
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
     let val=[0],ang;
     let s=[],
-        pAngle=[],
-        pPos=[],
         indexI=0;
     let currentPOS=[0,0,-972.5,0,0,Math.PI];
     function changeAng(input) {
@@ -146,7 +144,7 @@
         let turnPoints;
         switch (type){
             case 0:/*清空*/
-                s=[];pAngle=[];indexI=0;pPos=[];
+                s=[];indexI=0;
                 /*----------------点集清空-------------------*/
                 document.getElementById("Robot__PointSet_points").setAttribute('point','');
                 /*-----------------------------------*/
@@ -160,14 +158,8 @@
                     alpha=parseFloat(document.getElementById("eulerZ").value);
                 let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
-                let piPos=currentPOS.concat();
                 s.push(si);
-                let piAngle=[];
-                for(let j=0;j<3;j++){
-                    piAngle[j]= Number(document.getElementById("angTxt"+(j)).value)/180*Math.PI;
-                }
-                pAngle.push(piAngle);
-                pPos.push(piPos);
+
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+y+" "+z+" "+x;
@@ -177,8 +169,6 @@
                 break;
             case 2:/*删除示教点*/
                 s.pop();
-                pAngle.pop();
-                pPos.pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
 //                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
@@ -192,14 +182,6 @@
                     "p1:[-250,250,-1000,180°,0°,0°];\n",
                     "p2:[-250,250,-1180,180°,0°,0°];\n",
                     "p3:[0,0,-1180,180°,0°,0°];\n"];
-                pAngle=[[0.11362093430483085, 0.11362093430483085, 0.11362093430483085],
-                    [0.9557422983920949, 0.6658431096358367, -0.29269171555944906],
-                    [1.8627899106535482, 1.4793410739903938, 0.49445177708999355],
-                    [0.8154178265317507,0.8154178265317507,0.8154178265317507]];
-                pPos=[[0, 0, -1000, 3.1415926, 0, 0],
-                    [-250, 250, -1000, 3.1415926, 0, 0],
-                    [-250, 250, -1180, 3.1415926, 0, 0],
-                    [0, 0, -1180, 3.1415926, 0, 0]];
                 document.getElementById("instrInput").value="moveJ p0,v200;\nmoveL p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveL p0,v200;\nmoveL p3,v200;\nreset do1;\nmoveL p0,v200;";
                 turnPoints=" 0 -1000 0 250 -1000 -250 250 -1180 -250 0 -1180 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);

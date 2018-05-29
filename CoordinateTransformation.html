@@ -25,7 +25,7 @@
 </head>
 <body>
 <div class="main-div" style="width: 1500px;">
-    <div class="title"><b>机器人操作实验(型号：ABB_IRB120)</b></div>
+    <div class="title"><b>坐标变换实验</b></div>
     <div class="back" ><a href="index.html">←返回目录</a></div>
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_div">
@@ -37,6 +37,11 @@
     <div id="index_1" style="height: 800px">
         <div style="width: 80%;height: 100%;display: inline;float: left">
             <div id="robotX3d" style="width: 100%;height: 100%;">
+                <x3d style="width: 100%;height: 100%;">
+                    <scene>
+                        <inline nameSpaceName="axis" mapDEFToID="true" url='assets/CoordTrans/coordTrans.x3d'></inline>
+                    </scene>
+                </x3d>
             </div>
         </div>
         <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
@@ -112,7 +117,7 @@
 <!--弹出框-->
 <script src="js/layui/lay/dest/layui.all.js"></script>
 <script src="js/communication.js"></script>
-<script>
+<!--<script>
     'use strict';
     let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
     let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a120");
@@ -211,9 +216,9 @@
             case 0:/*清空*/
                 s=[];
                 indexI=0;
-                /*----------------点集清空-------------------*/
+                /*&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集清空-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
                 document.getElementById("Robot__PointSet_points").setAttribute('point','');
-                /*-----------------------------------*/
+                /*-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
                 break;
             case 1:/*增加示教点*/
                 let x=parseFloat(document.getElementById("posX").value),
@@ -224,27 +229,27 @@
                     alpha=parseFloat(document.getElementById("eulerZ").value);
                 let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
-                /*----------------点集增加点的坐标-------------------*/
+                /*&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集增加点的坐标-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                /*-----------------------------------*/
+                /*-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
                 indexI++;
                 break;
             case 2:/*删除示教点*/
                 s.pop();
-                /*----------------点集删除最后一点的坐标-------------------*/
+                /*&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集删除最后一点的坐标-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
 //                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                /*-----------------------------------*/
-                indexI--;
+                /*-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
+                indexI&#45;&#45;;
                 break;
             case -1:
                 s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
                 document.getElementById("instrInput").value="moveJ p0,v500;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v500;";
-                //------------------点集-------------------------
+                //&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
                 turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                /* s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
@@ -289,6 +294,6 @@
 
 
 
-</script>
+</script>-->
 </body>
 </html>
