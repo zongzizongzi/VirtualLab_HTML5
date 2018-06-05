@@ -11157,20 +11157,6 @@ VILibrary.VI = {
 
 
             }
-//向量模（范数）
-            function norm(input) {
-                let a=input.concat();
-                return Math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2]);
-            }
-            //向量叉积
-            function crossProduct(a,b) {
-                let c=[
-                    a[1]*b[2]-a[2]*b[1],
-                    a[2]*b[0]-a[0]*b[2],
-                    a[0]*b[1]-a[1]*b[0]
-                ]
-                return c;
-            }
 			this.setData=function (input) {
             	toolSwitch(input[0]);
             	toolDo(input[1]);
@@ -11199,5 +11185,207 @@ VILibrary.VI = {
         }
 	},
 
-	CoordTransVI:class CoordTransVI extends TemplateVI{}
+	CoordSystemVI:class CoordSystemVI extends TemplateVI{
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas, draw3DFlag);
+            const _this = this;
+            this.name = 'CoordSystem';
+            let floatAxis,rotAxis;
+
+            this.draw=function() {
+                if (draw3DFlag) {
+                    //此处向网页插入HTML代码
+                    this.container.innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
+                        '<inline nameSpaceName="axis" mapDEFToID="true" url="assets/CoordTrans/coordTrans.x3d"></inline>'+
+                        '</scene></x3d>';
+                }
+                else {
+
+                    this.ctx = this.container.getContext("2d");
+                    let img = new Image();
+                    img.src = '';
+                    img.onload = function () {
+                        _this.ctx.drawImage(img, 0, 0, _this.container.width, _this.container.height);
+                    };
+                }
+			}
+            this.draw();
+            this.setData=function (input,method) {
+                let R=[],rot=[];
+                let pos=[input[0],input[1],input[2]];
+                let trans=''+input[0]+","+input[2]+","+(-input[1]);
+                if(!floatAxis) floatAxis=document.getElementById('axis__floating');
+                floatAxis.setAttribute("translation",trans);
+                switch (method){
+					case "Euler":
+                        rot=[input[3]/180*Math.PI,input[4]/180*Math.PI,input[5]/180*Math.PI];
+						R=Euler(rot,pos);
+						break;
+                    case "RPY":
+                        rot=[input[3]/180*Math.PI,input[4]/180*Math.PI,input[5]/180*Math.PI];
+                        R=RPY(rot,pos);
+                        break;
+                    case "Axis_Ang":
+                    	if(Math.abs(input[3]*input[3]+input[4]*input[4]+input[5]*input[5]-1)>0.1&&input[6]!=0){
+                            alert("请先归一化旋转轴！")
+                            return;
+						}
+                        rot=[input[3],input[4],input[5],input[6]/180*Math.PI];
+                        R=Axis_Ang(rot,pos);
+                        let rott=''+rot[0]+","+rot[2]+","+(-rot[1])+","+rot[3];
+                        floatAxis.setAttribute("rotation",rott);
+                        break;
+				}
+				if(method!='Axis_Ang') R_to_AA(R);
+               /* R=[
+                	[R[0][0],R[0][1],R[0][2],input[0]],
+					[R[1][0],R[1][1],R[1][2],input[1]],
+                    [R[2][0],R[2][1],R[2][2],input[2]],
+					[0,0,0,1]
+				]*/
+                R_to_Martrix(R);
+                R_to_Quternion(R);
+            }
+            this.setAxis=function(rot){
+                if(!rotAxis) rotAxis=document.getElementById('axis__LineSet_points');
+                rotAxis.setAttribute('point','0 0 0 '+rot[0]*20+' '+rot[2]*20+' '+(-rot[1]*20))
+			}
+            this.reset=function() {
+                if(rotAxis)rotAxis.setAttribute('point','0 0 0 0 0 0');
+                if(floatAxis) {
+                	floatAxis.setAttribute("rotation",'1,0,0,0');
+                	floatAxis.setAttribute("translation",'0,0,0');
+                }
+                let R_0=[
+                    [1,0,0,0],
+                    [0,1,0,0],
+                    [0,0,1,0],
+                    [0,0,0,1]
+                ]
+				R_to_Martrix(R_0);
+                R_to_Quternion(R_0)
+            }
+            function Euler(rot,pos) {
+                let alpha=rot[0],belta=rot[1],gamma=rot[2];
+                let ca=Math.cos(alpha), sa=Math.sin(alpha),
+                    cb=Math.cos(belta), sb=Math.sin(belta),
+                    cy=Math.cos(gamma), sy=Math.sin(gamma);
+                let R=[
+                	[ca*cb*cy-sa*sy,-ca*cb*sy-sa*cy,ca*sb,pos[0]],
+					[sa*cb*cy+ca*sy,-sa*cb*sy+ca*cy,sa*sb,pos[1]],
+					[-sb*cy,sb*sy,cb,pos[2]],
+                    [0,0,0,1]
+				];
+                return R
+            }
+            function RPY(rot,pos) {
+            	//计算alpha，belta,gamma的正余弦
+                let alpha=rot[2],belta=rot[1],gamma=rot[0];
+                let ca=Math.cos(alpha), sa=Math.sin(alpha),
+                    cb=Math.cos(belta), sb=Math.sin(belta),
+                    cy=Math.cos(gamma), sy=Math.sin(gamma);
+                let R=[
+                	[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,pos[0]],
+					[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,pos[1]],
+					[-sb,cb*sy,cb*cy,pos[2]],
+					[0,0,0,1]
+				];
+                return R
+            }
+            function Axis_Ang(rot,pos) {
+            	let kx=rot[0],ky=rot[1],kz=rot[2],theta=rot[3];
+            	let s0=Math.sin(theta),c0=Math.cos(theta),vers0=1-c0;
+            	let R=[
+            		[kx*kx*vers0+c0,ky*kx*vers0-kz*s0,kz*kx*vers0+ky*s0,pos[0]],
+					[ky*kx*vers0+kz*s0,ky*ky*vers0+c0,kz*ky*vers0-kx*s0,pos[1]],
+                    [kx*kz*vers0-ky*s0,ky*kz*vers0+kx*s0,kz*kz*vers0+c0,pos[2]],
+                    [0,0,0,1]
+				]
+                return R
+            }
+            function R_to_AA(R) {
+            	let nx=R[0][0],ox=R[0][1],ax=R[0][2],
+					ny=R[1][0],oy=R[1][1],ay=R[1][2],
+                    nz=R[2][0],oz=R[2][1],az=R[2][2];
+            	let theta=Math.acos(0.5*(nx+oy+az-1));
+            	let kx=(oz-ay)/(2*Math.sin(theta)),
+                    ky=(ax-nz)/(2*Math.sin(theta)),
+                    kz=(ny-ox)/(2*Math.sin(theta));
+                let rot=''+kx+","+kz+","+(-ky)+","+theta;
+                floatAxis.setAttribute("rotation",rot);
+            }
+            function R_to_Quternion(R) {
+            	let q0,q1,q2,q3;
+            	let r11=R[0][0],r12=R[0][1],r13=R[0][2],
+                    r21=R[1][0],r22=R[1][1],r23=R[1][2],
+                    r31=R[2][0],r32=R[2][1],r33=R[2][2];
+				q0=Math.sqrt(1+r11+r22+r33)/2;
+				if(Math.abs(q0)>=0.01){
+					q1=(r32-r23)/4/q0;
+					q2=(r13-r31)/(4*q0);
+					q3=(r21-r12)/(4*q0);
+				}
+				else if(r11>r22&&r11>r33){
+					let t=Math.sqrt(1+r11-r22-r33);
+					q0=(r32-r23)/t;
+					q1=t/4;
+                    q2=(r13+r31)/t;
+                    q3=(r21+r12)/t;
+				}
+				else if(r22>r11&&r22>r33){
+                    let t=Math.sqrt(1-r11+r22-r33);
+                    q0=(r13+r31)/t;
+                    q1=(r21+r12)/t;
+                    q2=t/4;
+                    q3=(r32+r23)/t;
+				}
+                else{
+                    let t=Math.sqrt(1-r11-r22+r33);
+                    q0=(r21-r12)/t;
+                    q1=(r13+r31)/t;
+                    q2=(r23-r32)/t;
+                    q3=t/4;
+                }
+                let q=[q0,q1,q2,q3];
+				if(!quterSpans)global.quterSpans=$('.quaternion');
+				for(let i=0;i<quterSpans.length;i++){
+                    quterSpans[i].innerText=(q[i]).toFixed(3);
+				}
+
+            }
+            let r_trs=document.getElementById("result_table").getElementsByTagName("tr");
+            function R_to_Martrix(R) {
+            	for(let i=0;i<r_trs.length;i++){
+            		let tds=(r_trs[i]).getElementsByTagName('td');
+					for(let j=0;j<4;j++){
+            			tds[j+1].innerText=R[i][j].toFixed(3);
+					}
+				}
+
+            }
+
+
+        }
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 };

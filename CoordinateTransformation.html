@@ -35,77 +35,156 @@
     <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
     <div id="index_3"><video id="exm_video" src="" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div style="width: 80%;height: 100%;display: inline;float: left">
-            <div id="robotX3d" style="width: 100%;height: 100%;">
-                <x3d style="width: 100%;height: 100%;">
-                    <scene>
-                        <inline nameSpaceName="axis" mapDEFToID="true" url='assets/CoordTrans/coordTrans.x3d'></inline>
-                    </scene>
-                </x3d>
+        <div class="left_column" style="width: 70%">
+            <div id="X3d" style="width: 100%;height: 100%;">
+
             </div>
         </div>
-        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
-            <div class="message_div" id="messageDiv">
-                <p>关节转角：</p><br>
-                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
-                    <input id="angInput0" type="range" max="165" min="-165" value="0" step="1" onchange="changeAng(0)">
-                </p>
-                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
-                    <input  id="angInput1" type="range" max="110" min="-110" value="0" step="1" onchange="changeAng(1)">
-                </p>
-                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
-                    <input id="angInput2" type="range" max="70" min="-70" value="0" step="1" onchange="changeAng(2)">
-                </p>
-                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
-                    <input id="angInput3" type="range" max="160" min="-160" value="0" step="1" onchange="changeAng(3)">
-                </p>
-                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
-                    <input id="angInput4" type="range" max="120" min="-120" value="30" step="1" onchange="changeAng(4)">
-                </p>
-                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
-                    <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
-                </p>
-                <p id="tool" style="padding-top: 4px">Tool :
-                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
-                    <option value="0">tool0</option>
-                    <option value="1">tool1</option>
-                    </select>&nbsp;&nbsp;&nbsp;
-                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
-                </p>
+        <div class="right_column columnFlex-div " style="width: 30%">
+            <div class="message_div " id="examType">
+                <h4>转换方式</h4>
+                <div class="rowFlex-div">
+                    <input type="radio" name="typeRadio" value="RPY" checked="checked">RPY角
+                    <input type="radio" name="typeRadio" value="Euler">欧拉角
+                    <input type="radio" name="typeRadio" value="Axis_Ang">轴角
+                </div>
+
             </div>
-            <div class="message_div" id="resultDiv" onchange="changePos()">
-                <div style="width: 50%;display: inline;float: left">
-                    <p>末端坐标：</p><br>
-                    <p>P_X：<input id="posX" type="text" value="364.35" class="robotPA"></p>
-                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
-                    <p>P_Z：<input id="posZ" type="text" value="594" class="robotPA"></p>
-                </div>
-                <div style="width: 50%;display: inline;">
-                    <p>末端姿态：</p><br>
-                    <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
-                    <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
-                    <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
-                </div>
+            <div class="message_div transform_div" id="tyransform_RPY" style="display: block">
+                <h4>转换过程</h4>
+                <form class="rotateDiv" id="rotate_RPY" style="display: block">
+                    <p>绕固定轴X转动：<input type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                    <p>绕固定轴Y转动：<input  type="text"value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                    <p>绕固定轴Z转动：<input   type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                </form>
+                <form class="rotateDiv" id="rotate_Euler" style="display: none">
+                    <span>绕浮动轴Z转动：<input type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </span>
+                    <p>绕浮动轴Y转动：<input  type="text"value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                    <p>绕浮动轴Z转动：<input   type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                </form>
+                <form class="rotateDiv" id="rotate_Axis_Ang" style="display: none">
+                    <p>旋转轴k的x分量：<input id="" type="text" value="1" style="width: 50px"  onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="1" min="0" value="1" step="0.01" onchange="changeTrans(this)">
+                    </p>
+                    <p>旋转轴k的y分量：<input  type="text"value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="1" min="0" value="0" step="0.01" onchange="changeTrans(this)">
+                    </p>
+                    <p>旋转轴k的z分量：<input   type="text" value="0" style="width: 50px"  onchange="changeTransTxt(this)">
+                        <input class="rotInput" type="range" max="1" min="0" value="0" step="0.01" onchange="changeTrans(this)">
+                    </p>
+                    <button class="button" onclick="axis();return false">归一化旋转轴</button>
+                    <p>绕k轴旋转角度θ：<input  type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input  id="a_Ang" class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                </form>
+                <form  id="transDiv">
+                    <p >沿固定轴X移动：<input class="transTxt" type="text"  value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input class="transInput" type="range" max="100" min="-100" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                    <p>沿固定轴Y移动：<input type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                        <input  class="transInput" type="range" max="100" min="-100" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                    <p>沿固定轴Z移动：<input type="text"value="0" style="width: 50px"onchange="changeTransTxt(this)">
+                        <input class="transInput" type="range" max="100" min="-100" value="0" step="1" onchange="changeTrans(this)">
+                    </p>
+                </form>
             </div>
-            <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
-                <div class="message_div" style="height: 23%;">
-                    <p>设置示教点</p>
-                    <textarea id="points" name="points" style="width: 90%;height: 66%;margin: 10px">
-                    </textarea>
-                    <div class="rowFlex-div">
-                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
-                        <button type="button" id="delete" onclick="changePoints(2)">删除</button>
-                        <button type="button" id="clear" onclick="changePoints(0)">清空</button>
-                    </div>
-                </div>
-                <div class="message_div" style="height: 22%;">
-                    <p>控制指令</p>
-                    <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
-                    <div class="rowFlex-div">
-                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button><button type="button" onclick="submitInstructions()">上传</button>
-                    </div>
-                </div>
-            </form>
+            <div class="message_div">
+                <h4>齐次变换方程</h4>
+                R=
+                <table class="matrix_table" id="formula_table">
+                    <tr>
+                        <td class="matrix_top"></td>
+                        <td>1</td><td>0</td><td>0</td><td>0</td>
+                        <td class="matrix_top"></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td>0</td><td>1</td><td>0</td><td>0</td>
+                        <td ></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td>0</td><td>0</td><td>1</td><td>0</td>
+                        <td ></td>
+                    </tr>
+                    <tr>
+                        <td class="matrix_bottom">&nbsp;</td>
+                        <td>0</td><td>0</td><td>0</td><td>1</td>
+                        <td class="matrix_bottom">&nbsp;</td>
+                    </tr>
+                    <!--<tr>
+                        <td class="matrix_top"></td>
+                        <td>cα*cβ</td><td>cα*sβ*sγ-sα*cγ</td><td>cα*sβ*cγ+sα*sγ</td><td>x</td>
+                        <td class="matrix_top"></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td>sα*cβ</td><td>sα*sβ*sγ+cα*cγ</td><td>sα*sβ*cγ-cα*sγ</td><td>y</td>
+                        <td ></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td>-sβ</td><td>cβ*sγ</td><td>cβ*cγ</td><td>z</td>
+                        <td ></td>
+                    </tr>
+                    <tr>
+                        <td class="matrix_bottom">&nbsp;</td>
+                        <td>0</td><td>0</td><td>0</td><td>1</td>
+                        <td class="matrix_bottom">&nbsp;</td>
+                    </tr>-->
+                </table>
+            </div>
+            <div class="message_div" id="matrix">
+               <h4>齐次变换矩阵</h4>
+                <table class="matrix_table" id="result_table">
+                    <tr>
+                        <td class="matrix_top"></td>
+                        <td>1</td><td>0</td><td>0</td><td>0</td>
+                        <td class="matrix_top"></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td>0</td><td>1</td><td>0</td><td>0</td>
+                        <td ></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td>0</td><td>0</td><td>1</td><td>0</td>
+                        <td ></td>
+                    </tr>
+                    <tr>
+                        <td class="matrix_bottom">&nbsp;</td>
+                        <td>0</td><td>0</td><td>0</td><td>1</td>
+                        <td class="matrix_bottom">&nbsp;</td>
+                    </tr>
+                </table>
+                <h4 style="text-align: left;padding-top: 0.5em">注：</h4>
+                <div id="note"></div>
+            </div>
+            <div class="message_div">
+                <h4>四元数表示：</h4>
+                <p class="rowFlex-div">
+                    q1:<span class="quaternion">1</span>
+                    q2:<span class="quaternion">0</span>
+                    q3:<span class="quaternion">0</span>
+                    q4:<span class="quaternion">0</span>
+                </p>
+
+            </div>
+
         </div>
     </div>
 
@@ -117,183 +196,117 @@
 <!--弹出框-->
 <script src="js/layui/lay/dest/layui.all.js"></script>
 <script src="js/communication.js"></script>
-<!--<script>
+<script>
     'use strict';
-    let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
-    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a120");
-    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"a120");
-//    let kinematicsEquationVI= new VILibrary.VI.KinematicsEquationVI($('#resultDiv'), true);
-    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 1);
-    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
-//    VILibrary.InnerObjects.bindDataLine(robot120VI.id, instructionCompiling.id, 1, 2);
-//    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, kinematicsEquationVI.id, 5, 5);
-    let val=[0],ang;
-    let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
-    let s=[],indexI=0;
-   /* if ("WebSocket" in window)
-    {
-        // 打开一个 web socket
-        var ws = new WebSocket("ws://127.0.0.1:3002");
+    let  coordSystemVI = new VILibrary.VI.CoordSystemVI($('#X3d'), true);
 
-        ws.onopen = function()
-        {
-            // Web Socket 已连接上，使用 send() 方法发送数据
-            ws.send("发送数据");
-            console.log("数据发送中...");
-        };
-
-        ws.onmessage = function (evt)
-        {
-            var received_msg = evt.data;
-            console.log("已接收数据",received_msg);
-            if(received_msg=="go"){
-                Instructions();
-            }
-            else console.log(received_msg)
-        };
-
-        ws.onclose = function()
-        {
-            // 关闭 websocket
-            console.log("连接已关闭...");
-        };
-    }
-    else
-    {
-        // 浏览器不支持 WebSocket
-        alert("您的浏览器不支持 WebSocket!");
-    }*/
-   let wsServerAddr={
-       port:'3002',
-      // host:'127.0.0.1',/*本地测试用*/
-       host:'drvi.net'//wss连接必须用域名，不能用IP地址
-   }
-   let ws=new communcication(wsServerAddr);
-   ws.connect();
-   function submitInstructions() {
-       let data=$('#myform').serialize();
-       ws.send(data);
-   }
-    /*function PostData() {
-        $.ajax({
-            type: "POST",
-            url: "/",
-            data :$('#myform').serialize(),
-            success: function(msg) {
-            }
+    let transElement=document.getElementById("transDiv");
+    let transInputs=transElement.getElementsByClassName('transInput');
+    let rotElements=$(".rotateDiv");
+    let quterSpans=$('.quaternion');
+    let method="RPY";
+    let R_E=[
+        ['cα*cβ*cγ-sα*sγ','-cα*cβ*sγ-sα*cγ','cα*sβ','x'],
+        ['sα*cβ*cγ+cα*sγ','-sα*cβ*sγ+cα*cγ','sα*sβ','y'],
+        ['-sβ*cγ','sβ*sγ','cβ','z'],
+        ['0','0','0','1']
+    ],
+        R_R=[
+            ['cα*cβ','cα*sβ*sγ-sα*cγ','cα*sβ*cγ+sα*sγ','x'],
+            ['sα*cβ','sα*sβ*sγ+cα*cγ','sα*sβ*cγ-cα*sγ','y'],
+            ['-sβ','cβ*sγ','cβ*cγ','z'],
+            ['0','0','0','1']
+    ],R_A=[
+            ['kx*kx*Versθ+cθ','ky*kx*Versθ-kz*sθ','kz*kx*Versθ+ky*sθ','x'],
+            ['ky*kx*Versθ+kz*sθ','ky*ky*Versθ+cθ','kz*ky*Versθ-kx*sθ','y'],
+            ['kx*kz*Versθ-ky*sθ','ky*kz*Versθ+kx*sθ','kz*kz*Versθ+cθ','z'],
+            ['0','0','0','1']
+        ];
+    let note_A='sθ=sinθ,cθ=cosθ,Versθ=(1-cosθ);',
+        note_E='运动坐标系绕其Z轴旋转角度α，后绕其Y轴旋转角度β，最后绕其Z轴旋转角度γ；sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推',
+        note_R='运动坐标系绕固定坐标系X轴旋转角度γ，称为偏转(Yaw)；绕固定Y轴旋转角度β，称为俯仰(Pitch)；绕固定Z轴旋转角度α，称为回转(Roll);sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推';
+    let f_trs=document.getElementById("formula_table").getElementsByTagName("tr");
+    $(document).ready(function() {
+        changeMethod();
+        $('input[type=radio][name=typeRadio]').change(function() {
+            method=this.value;
+            changeMethod()
         });
-//        Instructions();
-        return false;
-    }*/
-    function changeAng(input) {
-        let currentAng=[0,0,0,0,Math.PI/6,0];
-        document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
-        for(let i=0;i<=5;i++){
-            currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
+    });
+    function changeMethod() {
+        //切换显示的旋转方式
+        for(let ele of rotElements){
+            ele.style.display=ele.id==('rotate_'+method)?'block':'none'
         }
-        instructionCompiling.moveJ(currentAng,500);
-    }
-    function changeAngTxt(input) {
-        document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
-        changeAng(input);
-    }
-    function changePos() {
-        let x=parseFloat(document.getElementById("posX").value),
-            y=parseFloat(document.getElementById("posY").value),
-            z=parseFloat(document.getElementById("posZ").value),
-            gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
-            beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
-            alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
-            let pos=[x,y,z,gamma,beta,alpha];
-        instructionCompiling.moveL(pos,100);
-    }
-    function Instructions() {
-        instructionCompiling.toggleObserver(true);
-    }
-    function changePoints(type) {
-        let turnPoints;
-        switch (type){
-            case 0:/*清空*/
-                s=[];
-                indexI=0;
-                /*&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集清空-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
-                document.getElementById("Robot__PointSet_points").setAttribute('point','');
-                /*-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
+
+        //切换公式显示和注释
+        let RR,note;
+        switch(method){
+            case "Euler":
+                RR=R_E;
+                note=note_E;
                 break;
-            case 1:/*增加示教点*/
-                let x=parseFloat(document.getElementById("posX").value),
-                    y=parseFloat(document.getElementById("posY").value),
-                    z=parseFloat(document.getElementById("posZ").value),
-                    gamma=parseFloat(document.getElementById("eulerX").value),
-                    beta=parseFloat(document.getElementById("eulerY").value),
-                    alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
-                    +beta+"°,"+alpha+"°];\n";
-                /*&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集增加点的坐标-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
-                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
-                turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                /*-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
-                indexI++;
+            case "RPY":
+                RR=R_R;
+                note=note_R;
                 break;
-            case 2:/*删除示教点*/
-                s.pop();
-                /*&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集删除最后一点的坐标-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
-                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
-//                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
-                turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                /*-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;*/
-                indexI&#45;&#45;;
+            case "Axis_Ang":
+                RR=R_A;
+                note=note_A;
                 break;
-            case -1:
-                s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3[346.62,0,225.29,180°,0°,-180°];\n"],
-                document.getElementById("instrInput").value="moveJ p0,v500;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v500;";
-                //&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;点集-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
-                turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-               /* s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
-                pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],
-                    [0.8454374896660531, 0.6958627727701391, 0.2769837522915001, 0, 0.5979498017332573, 0.8454374896660531],
-                    [0.8454374896660531, 0.9161233243718235, 0.23596851486963336, 0, 0.41887902047863906, 0.8454374896660531],
-                    [-0, 0.6030112565640408, 0.438601241026175, 0, 0.5291838292046808, -0],
-                    [-0, 0.8422958970124633, 0.39671333897831107, 0, 0.33161255787892263, -0]];
-                pPos=[[480.94675050769, 1.3045864533829317e-14, 565.944863728671, -3.141592653589793, 1.0471848490249271, -3.141592653589793],
-                    [299.99999999999994, 300.00000000000006, 99.99999999999994, 3.141592653589793, -0, -3.141592653589793],
-                    [300, 300.00000000000006, 20, 3.141592653589793, -0, -3.141592653589793],
-                    [400.00000000000006, 4.157675883105265e-14, 99.99999999999994, 3.141592653589793, 0, -3.141592653589793],
-                    [400, 4.6475346027642046e-14, 19.999999999999943, 3.141592653589793, 0, -3.141592653589793]];
-                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
-                turnPoints="480.95 565.94 0 300 100 -300 300 20 -300 400 100 0 400 20 0";
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                indexI=5;*/
+            default:
+                console.log("error")
+                return false;
         }
-        let str="";
-        for(let m=0;m<s.length;m++){
-            str= str + s[m] ;
+        for(let i=0;i<f_trs.length;i++){
+            let f_tds=(f_trs[i]).getElementsByTagName('td');
+            for(let j=0;j<4;j++){
+                f_tds[j+1].innerText=RR[i][j];
+            }
         }
-        document.getElementById("points").value=str;
+        $('#note')[0].innerText=note;
+
+        //重置模型和表单
+        coordSystemVI.reset();
+        document.getElementById('rotate_'+method).reset();
+        transElement.reset();
     }
-    /*function changeTool() {
-        var  myselect=document.getElementById("toolSelect");
-        var toolFlag=myselect.selectedIndex ;
-        instructionCompiling.changeTool(toolFlag);
-    }*/
-    function openTeachPendant() {
-        layer.open({
-            type: 2,
-            title: 'iframe父子操作',
-            maxmin: true,
-            shadeClose: true, //点击遮罩关闭层
-            area : ['800px' , '520px'],
-            content: 'teachPendant.html'
-        });
+    function axis() {
+        let rotEle=document.getElementById('rotate_Axis_Ang').getElementsByClassName("rotInput");
+        let len=Math.sqrt(rotEle[0].value*rotEle[0].value+rotEle[1].value*rotEle[1].value+rotEle[2].value*rotEle[2].value);
+        let rot=[];
+        for(let i=0;i<3;i++){
+            if(len==0&&i==0){
+                len=1;
+                rot[i]=1;
+            }
+            else rot[i]=rotEle[i].value/len;
+            rotEle[i].value=rot[i];
+            rotEle[i].previousElementSibling.value= rot[i];
+        }
+        coordSystemVI.setAxis(rot);
     }
 
-
-
-
-
-</script>-->
+    function changeTrans(input) {
+        input.previousElementSibling.value=input.value;
+        let currentTrans=[];
+        if(!(method=="Axis_Ang"&&input.id!='a_Ang'&&input.className=="rotInput")){
+            for(let ele of transInputs){
+                currentTrans.push(parseFloat(ele.value));
+            }
+            let rotElements=document.getElementById('rotate_'+method).getElementsByClassName("rotInput");
+            for(let ele of rotElements){
+            currentTrans.push(parseFloat(ele.value));
+            }
+            coordSystemVI.setData(currentTrans,method);
+        }
+    }
+    function changeTransTxt(input) {
+        input.nextElementSibling.value=input.value;
+        if(!(method=="Axis_Ang"&&input.id!='a_Ang'&&input.nextElementSibling.className=="rotInput")){
+            changeTrans(input.nextElementSibling);
+        }
+    }
+</script>
 </body>
 </html>
