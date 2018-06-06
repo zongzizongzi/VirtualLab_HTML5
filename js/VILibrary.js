@@ -9853,7 +9853,7 @@ VILibrary.VI = {
 					let pPoints=Split('points');
 					pPos=[];
 					for(let p of pPoints){
-						p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');
+						p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');//获取[]中间的内容并去掉[],以逗号分隔内容
 						for(let i=0;i<p.length;i++){
 							if(p[i]!=''){
 								p[i]=i<3?parseFloat(p[i]):(parseFloat(p[i])/180*Math.PI);
@@ -11107,7 +11107,7 @@ VILibrary.VI = {
             super(VICanvas, draw3DFlag,robNum);
             const _this = this;
             let haveTool=false;
-            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0';
+            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40';
             function draw() {
             	switch(robNum){
 					case "k60":
@@ -11130,7 +11130,8 @@ VILibrary.VI = {
                         // jiajuRotate="0.45749571099781405,-0.7624928516630234,-0.45749571099781405,2.2834529548131237"
                         // jiajuRotate="0.5144957554275265,-0.6859943405700353,-0.5144957554275265,1.9390642202315367"
                         jiajuTrans="98.5,125,58.5";
-                        boxTrans='400,20,-400'
+                        boxTrans='195,100,0';
+						boxSize='40,200,40';
 						break;
 					case "a120":default:break;
 				}
@@ -11150,7 +11151,7 @@ VILibrary.VI = {
                 $("#Robot__lastLink").after(toolSwitch);
                 var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
 							"<appearance><material diffuseColor='1 0 0'></material></appearance>" +
-							"<box size='40,40,40'></box>" +
+							"<box size="+boxSize+"></box>" +
 						"</shape></transform>";
                 $("#Robot__platform").after(box);
                 haveTool=true;
@@ -11164,12 +11165,12 @@ VILibrary.VI = {
             function toolSwitch(input){
                 if(!haveTool)draw();
                 document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
-                if(robNum!="epson"){
+                // if(robNum!="epson"){
                     if(input){
                         document.getElementById("Robot__box").setAttribute("render", 'true');
                     }
                     else document.getElementById("Robot__box").setAttribute("render", 'false');
-				}
+				// }
 
             }
             function toolDo(input) {
@@ -11367,25 +11368,5 @@ VILibrary.VI = {
 
         }
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 };

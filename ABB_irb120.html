@@ -117,11 +117,8 @@
     let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
     let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a120");
     let tool=new VILibrary.VI.ToolVI($('#tool'),true,"a120");
-//    let kinematicsEquationVI= new VILibrary.VI.KinematicsEquationVI($('#resultDiv'), true);
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 1);
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
-//    VILibrary.InnerObjects.bindDataLine(robot120VI.id, instructionCompiling.id, 1, 2);
-//    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, kinematicsEquationVI.id, 5, 5);
     let val=[0],ang;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
     let s=[],indexI=0;
@@ -166,20 +163,30 @@
    let ws=new communcication(wsServerAddr);
    ws.connect();
    function submitInstructions() {
+       layer.open({
+           title: '管理员登录',
+           maxmin: true,
+           shadeClose: true, //点击遮罩关闭层
+           content: '<form id="login" name="n&p">' +
+           '<p><label for="name" style="width: 60px;display:inline-block">用户名：</label><input type="text" name="name" ></p>' +
+           '<p><label for="pw" style="width: 60px;display:inline-block">密码：</label><input type="password" name="pw"></p>' +
+           '</form>',
+           btn:'提交',
+           yes: function(index, layero){
+               console.log($('#login').serialize())
+               if(ws.onOpen){
+                   let logData=$('#login').serialize();
+                  ws.send(logData);
+               }
+               else {
+                   alert('远程服务器未连接,请稍后重试')
+               }
+           },
+
+       });
        let data=$('#myform').serialize();
        ws.send(data);
    }
-    /*function PostData() {
-        $.ajax({
-            type: "POST",
-            url: "/",
-            data :$('#myform').serialize(),
-            success: function(msg) {
-            }
-        });
-//        Instructions();
-        return false;
-    }*/
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -269,11 +276,6 @@
         }
         document.getElementById("points").value=str;
     }
-    /*function changeTool() {
-        var  myselect=document.getElementById("toolSelect");
-        var toolFlag=myselect.selectedIndex ;
-        instructionCompiling.changeTool(toolFlag);
-    }*/
     function openTeachPendant() {
         layer.open({
             type: 2,

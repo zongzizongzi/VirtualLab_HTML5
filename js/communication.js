@@ -8,24 +8,34 @@ function communcication(object){
     const _this=this;
     this.webSocket = null;
     //需要的函数
+    let i=0;
+    this.onOpen=false;
     this.openFun = function(){
+        i=0;
+        _this.onOpen=true;
         console.log("连接已打开");
     };
     this.messageFun = function(event){
         let received_msg=event.data;
         console.log("收到的消息为:" + received_msg);
         if(received_msg==="go"){
-            Instructions();
+            Instructions();//收到消息为go后执行RAPID指令
         }
-        else{console.log(received_msg)}
+        else{console.log(received_msg)};
     };
     this.errorFun = function(err){
         console.log("发生错误");
     };
     this.closeFun = function(){
+        i++;
+        _this.onOpen=false;
         console.log("已经关闭与服务器的连接，正在尝试重新连接");
-	_this.disconnect();
-	_this.connect();
+        _this.disconnect();
+        if(i>=10){
+            alert('远程服务器已断开服务器，请与管理员联系');
+            return;
+        }
+        _this.connect();
     };
 }
 
@@ -36,7 +46,7 @@ communcication.prototype = {
     	{
         	this.webSocket = new WebSocket("wss://" + this.host + ":" + this.port);
         	this.eventListener();
-        	console.log("连接到：","ws://" + this.host + ":" + this.port);
+        	console.log("正在连接：","ws://" + this.host + ":" + this.port);
 	}
 	else{
  		alert("您的浏览器不支持 WebSocket!")
