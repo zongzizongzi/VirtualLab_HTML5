@@ -28,8 +28,8 @@
                                                  </PointSet>
                                  </Shape>
                             </Transform>
-                            <transform  translation="0,0,0" scale="2,2,2">
-                                <inline DEF="platform" url="../platform.x3d"> </inline>
+                            <transform DEF="platform"  translation="0,0,0" scale="2,2,2">
+                                <inline url="../platform.x3d"> </inline>
                             </transform>
                             <inline url="base.x3d"> </inline>
                             <transform DEF="link0" id="link0" rotation="0,1,0,0">

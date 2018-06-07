@@ -9781,7 +9781,7 @@ VILibrary.VI = {
                     ALPHA=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                     THETA=[0,0,-Math.PI/2,0,0,0,0,Math.PI];
                     currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
-                    Range=[[-185,185],[-135,35],[-120,158],[-350,350],[-119,119],[-350,350]];
+                    Range=[[-185,185],[-135,135],[-120,158],[-350,350],[-119,119],[-350,350]];
                     OMEGA=[128,102,128,260,245,322];
 					break;
 				case "a910":
@@ -10346,6 +10346,9 @@ VILibrary.VI = {
             	if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
             	if(input){
                     var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                    if(robNumber=="k60"){
+
+					}
                     let boxPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
                     /*let boxPos=document.getElementById("Robot__box").getAttribute('translation').split(",");
                     let tmp=boxPos[1];
@@ -11113,6 +11116,8 @@ VILibrary.VI = {
 					case "k60":
                         jiajuScal="2,2,2";
                         jiajuTrans="15,0,0"
+                        boxTrans='1000,40,1000'
+						boxSize='80,80,80'
 						break;
 					case "a910":
 						jiajuRotate='0,0,1,-1.5707963';
@@ -11155,8 +11160,6 @@ VILibrary.VI = {
 						"</shape></transform>";
                 $("#Robot__platform").after(box);
                 haveTool=true;
-
-
             }
 			this.setData=function (input) {
             	toolSwitch(input[0]);
@@ -11213,10 +11216,13 @@ VILibrary.VI = {
             this.draw();
             this.setData=function (input,method) {
                 let R=[],rot=[];
-                let pos=[input[0],input[1],input[2]];
-                let trans=''+input[0]+","+input[2]+","+(-input[1]);
-                if(!floatAxis) floatAxis=document.getElementById('axis__floating');
-                floatAxis.setAttribute("translation",trans);
+                let len=input.length;
+
+				let pos=[input[0],input[1],input[2]];
+				let trans=''+input[0]+","+input[2]+","+(-input[1]);
+				if(!floatAxis) floatAxis=document.getElementById('axis__floating');
+				floatAxis.setAttribute("translation",trans);
+
                 switch (method){
 					case "Euler":
                         rot=[input[3]/180*Math.PI,input[4]/180*Math.PI,input[5]/180*Math.PI];
@@ -11236,6 +11242,15 @@ VILibrary.VI = {
                         let rott=''+rot[0]+","+rot[2]+","+(-rot[1])+","+rot[3];
                         floatAxis.setAttribute("rotation",rott);
                         break;
+					case 'Quaternion':
+                        if(Math.abs(input[3]*input[3]+input[4]*input[4]+input[5]*input[5]+input[6]*input[6]-1)>0.1){
+                            alert("请先归一化旋转轴！")
+                            return;
+                        }
+                        else{
+                            rot=[input[3],input[4],input[5],input[6]];
+                            R=Quernion(rot,pos);
+						}
 				}
 				if(method!='Axis_Ang') R_to_AA(R);
                /* R=[
@@ -11303,6 +11318,12 @@ VILibrary.VI = {
                     [0,0,0,1]
 				]
                 return R
+            }
+            function Quernion(rot,pos) {
+				let q0=rot[0],q1=rot[1],q2=rot[2],q3=rot[3];
+				let R=[
+					[1-2*q2*q2-2*q3*q3,2*q1*q2-2*q3*q0]
+				]
             }
             function R_to_AA(R) {
             	let nx=R[0][0],ox=R[0][1],ax=R[0][2],

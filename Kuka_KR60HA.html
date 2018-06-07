@@ -138,7 +138,6 @@
          instructionCompiling.inverseKinematics(R);*/
         let pos=[x,y,z,gamma,beta,alpha];
         instructionCompiling.moveL(pos,100);
-
     }
     function Instructions() {
         instructionCompiling.toggleObserver(true);
@@ -147,8 +146,11 @@
         let turnPoints;
         switch (type){
             case 0:/*清空*/
-                s=[];pAngle=[];indexI=0;pPos=[];
+                s=[];
+                indexI=0;
+                /*----------------点集清空-------------------*/
                 document.getElementById("Robot__PointSet_points").setAttribute('point','');
+                /*-----------------------------------*/
                 break;
             case 1:/*增加示教点*/
                 let x=parseFloat(document.getElementById("posX").value),
@@ -157,9 +159,8 @@
                     gamma=parseFloat(document.getElementById("eulerX").value),
                     beta=parseFloat(document.getElementById("eulerY").value),
                     alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+indexI+": x"+x+" y"+y+" z"+z+" "+gamma+"° "
-                    +beta+"° "+alpha+"°;\n";
-                s.push(si);
+                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
+                    +beta+"°,"+alpha+"°];\n";
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
@@ -171,21 +172,33 @@
                 s.pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
-                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
+//                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
                 indexI--;
                 break;
             case -1:
-                s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],
+                /*s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],
                 document.getElementById("instrInput").value="moveJ p0,v400;\nmoveC p1,p2,v400;\nmoveL p3,v400;\nmoveJ p0,v400;";
                 turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                indexI=4;
+                indexI=4;*/
+                s=[
+                    "p0:[1550.41,0,1668.89,-180°,60°,-180°];\n",
+                    "p1:[1000,-1000,200,180°,0°,-180°];\n",
+                    "p2:[1000,-1000,40,180°,0°,-180°];\n",
+                    "p3:[1000,0,200,180°,0°,-180°];\n",
+                    "p4:[1000,0,40,180°,0°,180°];\n"
+                ];
+                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveJ p1,v400;\nmoveL p2,v400;\nset do1;\nmoveL p1,v400;\nmoveJ p3,v400;\nmoveL p4,v400;\nreset do1;\nmoveL p3,v400;\nmoveJ p0,v400;";
+
+                //------------------点集-------------------------
+                turnPoints=" 1550.41 1668.89 0 1000 200 1000 1000 40 1000 1000 40 0 1000 200 0";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
         }
         let str="";
-        for(let m=0;m<indexI;m++){
+        for(let m=0;m<s.length;m++){
             str= str + s[m] ;
         }
         document.getElementById("points").value=str;
