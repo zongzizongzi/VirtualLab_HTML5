@@ -1,7 +1,7 @@
 <x3d id="coordTrans" style="width: 100%;height: 100%;">
     <scene>
         <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
-        <Viewpoint position="70 90 120" orientation="-0.54111 0.83041 0.13275 0.66909"></Viewpoint>
+        <Viewpoint position="25.56096 12.47916 52.89325" orientation="-0.21936 0.97487 0.03900 0.52536" zNear="0.02419" zFar="241.89149" description=""></Viewpoint>
         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
         <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
         <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>

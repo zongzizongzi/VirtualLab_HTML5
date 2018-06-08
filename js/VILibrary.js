@@ -11218,38 +11218,39 @@ VILibrary.VI = {
                 let R=[],rot=[];
                 let len=input.length;
 
-				let pos=[input[0],input[1],input[2]];
+				/*let pos=[input[0],input[1],input[2]];
 				let trans=''+input[0]+","+input[2]+","+(-input[1]);
 				if(!floatAxis) floatAxis=document.getElementById('axis__floating');
-				floatAxis.setAttribute("translation",trans);
+				floatAxis.setAttribute("translation",trans);*/
 
                 switch (method){
 					case "Euler":
-                        rot=[input[3]/180*Math.PI,input[4]/180*Math.PI,input[5]/180*Math.PI];
-						R=Euler(rot,pos);
+                        rot=[input[0]/180*Math.PI,input[1]/180*Math.PI,input[2]/180*Math.PI];
+						R=Euler(rot);
 						break;
                     case "RPY":
-                        rot=[input[3]/180*Math.PI,input[4]/180*Math.PI,input[5]/180*Math.PI];
-                        R=RPY(rot,pos);
+                        rot=[input[0]/180*Math.PI,input[1]/180*Math.PI,input[2]/180*Math.PI];
+                        R=RPY(rot);
                         break;
                     case "Axis_Ang":
-                    	if(Math.abs(input[3]*input[3]+input[4]*input[4]+input[5]*input[5]-1)>0.1&&input[6]!=0){
+                    	if(Math.abs(input[0]*input[0]+input[1]*input[1]+input[2]*input[2]-1)>0.1&&input[3]!=0){
                             alert("请先归一化旋转轴！")
                             return;
 						}
-                        rot=[input[3],input[4],input[5],input[6]/180*Math.PI];
-                        R=Axis_Ang(rot,pos);
+                        rot=[input[0],input[1],input[2],input[3]/180*Math.PI];
+                        R=Axis_Ang(rot);
                         let rott=''+rot[0]+","+rot[2]+","+(-rot[1])+","+rot[3];
+                        if(!floatAxis) floatAxis=document.getElementById('axis__floating');
                         floatAxis.setAttribute("rotation",rott);
                         break;
 					case 'Quaternion':
-                        if(Math.abs(input[3]*input[3]+input[4]*input[4]+input[5]*input[5]+input[6]*input[6]-1)>0.1){
+                        if(Math.abs(input[0]*input[0]+input[1]*input[1]+input[2]*input[2]+input[3]*input[3]-1)>0.1){
                             alert("请先归一化旋转轴！")
                             return;
                         }
                         else{
-                            rot=[input[3],input[4],input[5],input[6]];
-                            R=Quernion(rot,pos);
+                            rot=[input[0],input[1],input[2],input[3]];
+                            R=Quernion(rot);
 						}
 				}
 				if(method!='Axis_Ang') R_to_AA(R);
@@ -11259,8 +11260,8 @@ VILibrary.VI = {
                     [R[2][0],R[2][1],R[2][2],input[2]],
 					[0,0,0,1]
 				]*/
-                R_to_Martrix(R);
-                R_to_Quternion(R);
+                // R_to_Martrix(R);
+                // R_to_Quternion(R);
             }
             this.setAxis=function(rot){
                 if(!rotAxis) rotAxis=document.getElementById('axis__LineSet_points');
@@ -11270,7 +11271,6 @@ VILibrary.VI = {
                 if(rotAxis)rotAxis.setAttribute('point','0 0 0 0 0 0');
                 if(floatAxis) {
                 	floatAxis.setAttribute("rotation",'1,0,0,0');
-                	floatAxis.setAttribute("translation",'0,0,0');
                 }
                 let R_0=[
                     [1,0,0,0],
@@ -11278,8 +11278,8 @@ VILibrary.VI = {
                     [0,0,1,0],
                     [0,0,0,1]
                 ]
-				R_to_Martrix(R_0);
-                R_to_Quternion(R_0)
+				// R_to_Martrix(R_0);
+                // R_to_Quternion(R_0)
             }
             function Euler(rot,pos) {
                 let alpha=rot[0],belta=rot[1],gamma=rot[2];
@@ -11287,10 +11287,9 @@ VILibrary.VI = {
                     cb=Math.cos(belta), sb=Math.sin(belta),
                     cy=Math.cos(gamma), sy=Math.sin(gamma);
                 let R=[
-                	[ca*cb*cy-sa*sy,-ca*cb*sy-sa*cy,ca*sb,pos[0]],
-					[sa*cb*cy+ca*sy,-sa*cb*sy+ca*cy,sa*sb,pos[1]],
-					[-sb*cy,sb*sy,cb,pos[2]],
-                    [0,0,0,1]
+                	[ca*cb*cy-sa*sy,-ca*cb*sy-sa*cy,ca*sb],
+					[sa*cb*cy+ca*sy,-sa*cb*sy+ca*cy,sa*sb],
+					[-sb*cy,sb*sy,cb]
 				];
                 return R
             }
@@ -11301,10 +11300,9 @@ VILibrary.VI = {
                     cb=Math.cos(belta), sb=Math.sin(belta),
                     cy=Math.cos(gamma), sy=Math.sin(gamma);
                 let R=[
-                	[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,pos[0]],
-					[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,pos[1]],
-					[-sb,cb*sy,cb*cy,pos[2]],
-					[0,0,0,1]
+                	[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy],
+					[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy],
+					[-sb,cb*sy,cb*cy]
 				];
                 return R
             }
@@ -11312,18 +11310,21 @@ VILibrary.VI = {
             	let kx=rot[0],ky=rot[1],kz=rot[2],theta=rot[3];
             	let s0=Math.sin(theta),c0=Math.cos(theta),vers0=1-c0;
             	let R=[
-            		[kx*kx*vers0+c0,ky*kx*vers0-kz*s0,kz*kx*vers0+ky*s0,pos[0]],
-					[ky*kx*vers0+kz*s0,ky*ky*vers0+c0,kz*ky*vers0-kx*s0,pos[1]],
-                    [kx*kz*vers0-ky*s0,ky*kz*vers0+kx*s0,kz*kz*vers0+c0,pos[2]],
-                    [0,0,0,1]
+            		[kx*kx*vers0+c0,ky*kx*vers0-kz*s0,kz*kx*vers0+ky*s0],
+					[ky*kx*vers0+kz*s0,ky*ky*vers0+c0,kz*ky*vers0-kx*s0],
+                    [kx*kz*vers0-ky*s0,ky*kz*vers0+kx*s0,kz*kz*vers0+c0],
 				]
                 return R
             }
             function Quernion(rot,pos) {
 				let q0=rot[0],q1=rot[1],q2=rot[2],q3=rot[3];
 				let R=[
-					[1-2*q2*q2-2*q3*q3,2*q1*q2-2*q3*q0]
+					[1-2*q2*q2-2*q3*q3,2*q1*q2-2*q3*q0,2*q1*q3+2*q2*q0],
+					[2*q1*q2+2*q3*q0,1-2*q1*q1-2*q3*q3,2*q2*q3-2*q1*q0],
+					[2*q1*q3-2*q2*q0,2*q2*q3+2*q1*q0,1-2*q1*q1-2*q2*q2],
 				]
+				//参考：https://blog.csdn.net/shenxiaolu1984/article/details/50639298
+				return R;
             }
             function R_to_AA(R) {
             	let nx=R[0][0],ox=R[0][1],ax=R[0][2],
@@ -11334,6 +11335,7 @@ VILibrary.VI = {
                     ky=(ax-nz)/(2*Math.sin(theta)),
                     kz=(ny-ox)/(2*Math.sin(theta));
                 let rot=''+kx+","+kz+","+(-ky)+","+theta;
+                if(!floatAxis) floatAxis=document.getElementById('axis__floating');
                 floatAxis.setAttribute("rotation",rot);
             }
             function R_to_Quternion(R) {

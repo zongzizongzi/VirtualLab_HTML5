@@ -161,8 +161,8 @@
        host:'drvi.net'//wss连接必须用域名，不能用IP地址
    }
    let ws=new communcication(wsServerAddr);
-   ws.connect();
    function submitInstructions() {
+       ws.connect();
        layer.open({
            title: '管理员登录',
            maxmin: true,
@@ -286,10 +286,6 @@
             content: 'teachPendant.html'
         });
     }
-
-
-
-
 
 </script>
 </body>

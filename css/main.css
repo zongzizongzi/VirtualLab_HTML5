@@ -601,6 +601,11 @@ html {
     background-color: #aaddff;
     height: 100%
 }
+.msgLable{
+    width: 100px;
+    display: inline-block;
+    text-align: left;
+}
 
 
 
