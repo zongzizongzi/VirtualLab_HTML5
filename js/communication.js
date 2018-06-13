@@ -29,13 +29,13 @@ function communcication(object){
     this.closeFun = function(){
         i++;
         _this.onOpen=false;
-        console.log("已经关闭与服务器的连接，正在尝试重新连接");
+        console.log("远程服务器已断开,请稍后重试");
         _this.disconnect();
-        if(i>=10){
-            alert('远程服务器已断开服务器，请与管理员联系');
+       /* if(i>=5){
+            alert('远程服务器已断开，请与管理员联系');
             return;
         }
-        _this.connect();
+        _this.connect();*/
     };
 }
 
@@ -47,11 +47,10 @@ communcication.prototype = {
         	this.webSocket = new WebSocket("wss://" + this.host + ":" + this.port);
         	this.eventListener();
         	console.log("正在连接：","ws://" + this.host + ":" + this.port);
-	}
-	else{
- 		alert("您的浏览器不支持 WebSocket!")
-	}
-		
+	    }
+        else{
+            alert("您的浏览器不支持 WebSocket!");
+            }
     },
     //断开连接
     disconnect : function(){

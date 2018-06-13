@@ -11188,7 +11188,6 @@ VILibrary.VI = {
             }
         }
 	},
-
 	CoordSystemVI:class CoordSystemVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas, draw3DFlag);
