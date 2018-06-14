@@ -4,6 +4,7 @@
 function communcication(object){
     this.port = object.port ? object.port : "3002";
     this.host = object.host ? object.host : "114.215.189.49";
+    // this.host = object.host ? object.host : "localhost";
     this.isConnect = false;//默认没有连接
     const _this=this;
     this.webSocket = null;
@@ -19,6 +20,7 @@ function communcication(object){
         let received_msg=event.data;
         console.log("收到的消息为:" + received_msg);
         if(received_msg==="go"){
+            layer.closeAll();
             Instructions();//收到消息为go后执行RAPID指令
         }
         else{console.log(received_msg)};
@@ -44,9 +46,9 @@ communcication.prototype = {
     connect : function(){
 	if ("WebSocket" in window)
     	{
-        	this.webSocket = new WebSocket("wss://" + this.host + ":" + this.port);
+        	this.webSocket = new WebSocket("ws://" + this.host + ":" + this.port);
         	this.eventListener();
-        	console.log("正在连接：","ws://" + this.host + ":" + this.port);
+        	console.log("正在连接：","wss://" + this.host + ":" + this.port);
 	    }
         else{
             alert("您的浏览器不支持 WebSocket!");

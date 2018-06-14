@@ -10244,7 +10244,7 @@ VILibrary.VI = {
 				let Ept=SLERP(p0,p2,N);//四元数插补
                 _this.timer = window.setInterval(function () {
                     let tPos,tAng,gamma,alpha,beta;
-                    if(i+1==N){
+                    if(i+1>=N){
                         window.clearInterval(_this.timer);
                         _this.timer=0;
                         targetANG=inverseKinematics(p2);
@@ -10289,7 +10289,7 @@ VILibrary.VI = {
                     if (_this.dataLine){
                         VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                     }
-                    if(i+1==N){
+                    if(i+1>=N){
                         if(executiveFlag){
                             instrIndex++;
                             if(instrIndex<instrSplit.length){

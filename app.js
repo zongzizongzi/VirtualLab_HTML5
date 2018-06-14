@@ -5,7 +5,8 @@
 global.tcp=require('./lib/TCPserver');
 var ws=require('./lib/connectWS');
 var login=require('./lib/login');
-var logState=false;
+global.logState=false;
+global.tcpConnectState=false;
 /*
 var app = express();
 app.use("/",express.static(__dirname));

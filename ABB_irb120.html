@@ -157,23 +157,25 @@
     }*/
    let wsServerAddr={
        port:'3002',
-      // host:'127.0.0.1',/*本地测试用*/
-       host:'drvi.net'//wss连接必须用域名，不能用IP地址
+       host:'localhost',/*本地测试用*/
+//       host:'drvi.net'//wss连接必须用域名，不能用IP地址
    }
    let ws=new communcication(wsServerAddr);
+   let logStatus=false;
    function submitInstructions() {
-       layer.open({
-           title: '管理员登录',
-           maxmin: true,
-           shadeClose: true, //点击遮罩关闭层
-           content: '<form id="login" name="n&p">' +
-           '<p><label for="name" style="width: 60px;display:inline-block">用户名：</label><input type="text" name="name" ></p>' +
-           '<p><label for="password" style="width: 60px;display:inline-block">密码：</label><input type="password" name="password"></p>' +
-           '</form>',
-           btn:'提交',
-           yes: function(index, layero){
+       if(!logStatus){
+           var logLayer=layer.open({
+               title: '管理员登录 <sup>2</sup>',
+               maxmin: true,
+               shadeClose: true, //点击遮罩关闭层
+               content: '<form id="login" name="n&p">' +
+               '<p><label for="name" style="width: 60px;display:inline-block">用户名：</label><input type="text" name="name" ></p>' +
+               '<p><label for="password" style="width: 60px;display:inline-block">密码：</label><input type="password" name="password"></p>' +
+               '</form>',
+               btn:'提交',
+               yes: function(index, layero){
                    let logData=$('#login').serialize();
-//                    let formData=$('#myform').serialize();
+//
                    $.ajax({
                        url:'http://localhost:3003',
                        type:"POST",
@@ -181,14 +183,9 @@
                        success: function(data){    //    alert后台返回的参数
                            console.log(data.statusTxt);
                            if(data.status=="success"){
-                               if(ws.onOpen){
-                                   let formData=$('#myform').serialize();
-                                   ws.connect();
-                                   ws.send(formData);
-                               }
-                               else {
-                                   alert('远程服务器未连接,请稍后重试')
-                               }
+                               layer.close(logLayer);
+                               logStatus=true;
+                               loginSuccess();
                            }
                            else{alert(data.statusTxt);}
 
@@ -199,10 +196,33 @@
                        }
                    })
                    /*ws.send(logData);
-                   let data=$('#myform').serialize();
-                   ws.send(data);*/
+                    let data=$('#myform').serialize();
+                    ws.send(data);*/
+               }
+           });
+       }
+       else {
+           loginSuccess();
+       }
+   }
+   function loginSuccess() {
+       let formData=$('#myform').serialize();
+       sendFormData();
+       layer.open({
+           content: '登录成功，数据传输中……'
+       })
+   }
+   function sendFormData() {
+       ws.connect();
+       setTimeout(function () {
+           if(ws.onOpen){
+               let formData=$('#myform').serialize();
+               ws.send(formData);
            }
-       });
+           else {
+               alert('远程服务器未连接,请稍后重试')
+           }
+       },500);
    }
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
