@@ -208,9 +208,7 @@
    function loginSuccess() {
        let formData=$('#myform').serialize();
        sendFormData();
-       layer.open({
-           content: '登录成功，数据传输中……'
-       })
+       layer.msg( '登录成功，数据传输中……')
    }
    function sendFormData() {
        ws.connect();

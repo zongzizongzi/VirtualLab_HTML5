@@ -9860,7 +9860,7 @@ VILibrary.VI = {
 							}
 						}
 						pPos.push(p)
-						console.log(pPos)
+						// console.log(pPos)
 					}
                     executiveFlag=true;
                     instrIndex=0;

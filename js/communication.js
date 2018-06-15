@@ -18,12 +18,13 @@ function communcication(object){
     };
     this.messageFun = function(event){
         let received_msg=event.data;
-        console.log("收到的消息为:" + received_msg);
         if(received_msg==="go"){
             layer.closeAll();
             Instructions();//收到消息为go后执行RAPID指令
         }
-        else{console.log(received_msg)};
+        else{
+            layer.msg(received_msg,{title:"来自服务器的消息：",icon: 7});
+        };
     };
     this.errorFun = function(err){
         console.log("发生错误");
@@ -31,7 +32,7 @@ function communcication(object){
     this.closeFun = function(){
         i++;
         _this.onOpen=false;
-        console.log("远程服务器已断开,请稍后重试");
+        layer.msg("远程服务器已断开,请稍后重试",{title:"来自服务器的消息：",icon: 7});
         _this.disconnect();
        /* if(i>=5){
             alert('远程服务器已断开，请与管理员联系');
