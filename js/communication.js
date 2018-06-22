@@ -3,7 +3,7 @@
  */
 function communcication(object){
     this.port = object.port ? object.port : "3002";
-    this.host = object.host ? object.host : "114.215.189.49";
+    this.host = object.host ? object.host : 'drvi.net';
     // this.host = object.host ? object.host : "localhost";
     this.isConnect = false;//默认没有连接
     const _this=this;
@@ -21,6 +21,10 @@ function communcication(object){
         if(received_msg==="go"){
             layer.closeAll();
             Instructions();//收到消息为go后执行RAPID指令
+        }
+        else if(received_msg=='relog'){
+            logStatus=false;
+            layer.msg("请登录后重试",{title:"来自服务器的消息：",icon: 7});
         }
         else{
             layer.msg(received_msg,{title:"来自服务器的消息：",icon: 7});
@@ -47,7 +51,7 @@ communcication.prototype = {
     connect : function(){
 	if ("WebSocket" in window)
     	{
-        	this.webSocket = new WebSocket("ws://" + this.host + ":" + this.port);
+        	this.webSocket = new WebSocket("wss://" + this.host + ":" + this.port);
         	this.eventListener();
         	console.log("正在连接：","wss://" + this.host + ":" + this.port);
 	    }

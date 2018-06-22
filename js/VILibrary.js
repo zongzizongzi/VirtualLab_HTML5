@@ -9772,6 +9772,9 @@ VILibrary.VI = {
 			let ToolFlag=0,//加载工具标志
 				ToolDO=false,
 				LoadFlag=false;//是否夹持工件
+            let gongjianIndex=0;//当前工件序号
+            let objFlag=0;
+
 			let executiveFlag=false;//是否正在执行程序
 			//判断机器人类型，
 			switch (robNumber){
@@ -9806,7 +9809,7 @@ VILibrary.VI = {
                     D=[0,0,0,0,0,0];//d[3]<=0;
                     ALPHA=[0,0,0,0,0,0];
                     THETA=[0,0,0,0,0,0];
-                    THETA=[92,80,227];
+                    // THETA=[92,80,227];
                     currentANG=[92,80,227],targetANG=[92,80,227];//theta,theta2,n0,n1,n2,x,y,z
                     Range=[[30,470],[55,500],[0,300]];
                     OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];break;
@@ -9821,7 +9824,7 @@ VILibrary.VI = {
                 	OMEGA=[250,250,250,420,590,600];
                 	let lasdjsikdj=1111;
             }
-            const baseA=A,baseD=D;
+            const baseA=A,baseD=D,baseTHETA=THETA;
 			if(robNumber!="epson")Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {
             	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;
@@ -9853,13 +9856,27 @@ VILibrary.VI = {
 					let pPoints=Split('points');
 					pPos=[];
 					for(let p of pPoints){
+						let pNum=p.match(/p\d+/);
+						if(pNum==null){
+							alert("示教点格式错误！",p);
+							return;
+						}
+						pNum=parseInt(pNum[0].replace(/p/g,''));
+						if(isNaN(pNum)){
+                            alert("示教点格式错误！",p);
+                            return;
+						}
+						if(pPos[pNum]!=undefined){
+                            alert("示教点重复定义错误！");
+                            return;
+						}
 						p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');//获取[]中间的内容并去掉[],以逗号分隔内容
 						for(let i=0;i<p.length;i++){
 							if(p[i]!=''){
-								p[i]=i<3?parseFloat(p[i]):(parseFloat(p[i])/180*Math.PI);
+								p[i]=i<3?parseFloat(p[i]):(parseFloat(p[i])/180*Math.PI);//前三个数为坐标；后三个数为角度，需要转换为弧度
 							}
 						}
-						pPos.push(p)
+						pPos[pNum]=p;
 						// console.log(pPos)
 					}
                     executiveFlag=true;
@@ -9917,7 +9934,7 @@ VILibrary.VI = {
                         let n1 = Number(pNum[0].replace(/p/,""));//p后面的数字
 						let vNum=instrI.match(/v\d+/);
 						let m=Number(vNum[0].replace(/v/,""))//v后面的数字
-                        if(isNaN(n1)||(n1>=pPos.length)){layer.open({
+                        if(isNaN(n1)||(pPos[n1]==undefined)){layer.open({
                             title: '系统提示'
                             ,content: '未知示教点'
                         });return;}
@@ -10312,7 +10329,7 @@ VILibrary.VI = {
                 ToolFlag=input;
                 if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
                 let len=baseA.length;
-                let A_add=Array(len).fill(0),D_add=Array(len).fill(0);
+                let A_add=Array(len).fill(0),D_add=Array(len).fill(0),THETA_add=Array(len).fill(0);
                 switch(input){
                     case 1:
                     	switch (robNumber){
@@ -10336,28 +10353,70 @@ VILibrary.VI = {
                     case 0:
                         $('#setDO').enabled=false;
                         break;
+                    case 2:
+                        switch (robNumber) {
+                            case "a120":
+                                A_add[len - 1] += 50;
+                                D_add[len - 1] += 104.5;
+                                //THETA[len - 1] = Math.PI/4;
+                                THETA_add[len - 2] -= Math.PI/4;
+                                break;
+                            default:
+                                break;
+                        }
+                        $('#setDO').enabled=true;
+                        break;
+                    case 3:
+                        switch (robNumber) {
+                            case "a120":
+                                A_add[len - 1] += 50;
+                                D_add[len - 1] += 160;
+                                THETA_add[len - 2] -= Math.PI/4;
+                                //D_add[2] += 35.355339;
+                                //THETA[len - 1] += Math.PI/4;
+                                //ALPHA_add[len - 1] = -Math.PI/4;
+                                break;
+                            default:
+                                break;
+                        }
+                        $('#setDO').enabled=false;
+                        break;
                 }
                 A=math.add(baseA,A_add);
                 D=math.add(baseD,D_add);
+                THETA=math.add(baseTHETA,THETA_add);
                 kinematicsEquation(currentANG);
                     }
             this.setIO=function (input) {
             	ToolDO=input;
             	if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
             	if(input){
-                    var trans = document.getElementById('Robot__box').getFieldValue('translation');
-                    if(robNumber=="k60"){
-
-					}
-                    let boxPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
-                    /*let boxPos=document.getElementById("Robot__box").getAttribute('translation').split(",");
-                    let tmp=boxPos[1];
-                    boxPos[1]=0-parseFloat(boxPos[2]);
-                    boxPos[2]=tmp;*/
-                    for(var i=0;i<3;i++){
-                    	if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>10)break;
-                        if(i==2)LoadFlag=true;
-					}
+                    switch (ToolFlag) {
+                        case 1:
+                            var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                            let boxPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
+                            for(var i=0;i<3;i++){
+                                if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>10)break;
+                                if(i==2)LoadFlag=true;
+                            }
+                            break;
+                        case 2:
+                            var i=0,j=0;
+                            for(i=1;i<7;i++) {
+                                var trans = document.getElementById('Robot__gongjian'+i).getFieldValue('translation');
+                                let gongjianPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
+                                for(j=0;j<3;j++){
+                                    if(Math.abs(parseFloat(gongjianPos[j])-currentPOS[j])>15)break;
+                                    if(j==2) {
+                                        LoadFlag=true;
+                                        gongjianIndex=i;
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
 					document.getElementById("setDO").innerText='1';
 				}
 				else {
@@ -10575,18 +10634,38 @@ VILibrary.VI = {
 				}
 				//若夹持工件，工件坐标与末端坐标保持一致
 				if(LoadFlag&&(!flag)){
-                    var trans = document.getElementById('Robot__box').getFieldValue('translation');
-                    if(robNumber=="a360"){
-                        trans.x=currentPOS[1];
-                        trans.y=currentPOS[2];
-                        trans.z=currentPOS[0];
-					}
-					else {
-                        trans.x=currentPOS[0];
-                        trans.y=currentPOS[2];
-                        trans.z=-currentPOS[1];
-					}
-                    document.getElementById('Robot__box').setFieldValue('translation',trans);
+                    switch (ToolFlag) {
+                        case 1:
+                            var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                            if(robNumber=="a360"){
+                                trans.x=currentPOS[1];
+                                trans.y=currentPOS[2];
+                                trans.z=currentPOS[0];
+                            }
+                            else {
+                                trans.x=currentPOS[0];
+                                trans.y=currentPOS[2];
+                                trans.z=-currentPOS[1];
+                            }
+                            document.getElementById('Robot__box').setFieldValue('translation',trans);
+                            break;
+                        case 2:
+                            var trans = document.getElementById('Robot__gongjian'+gongjianIndex).getFieldValue('translation');
+                            if(robNumber=="a360"){
+                                trans.x=currentPOS[1];
+                                trans.y=currentPOS[2];
+                                trans.z=currentPOS[0];
+                            }
+                            else {
+                                trans.x=currentPOS[0];
+                                trans.y=currentPOS[2]-12.308;
+                                trans.z=-currentPOS[1];
+                            }
+                            document.getElementById('Robot__gongjian'+gongjianIndex).setFieldValue('translation',trans);
+                            break;
+                        default:
+                            break;
+                    }
 				}
 
             }
@@ -11110,7 +11189,98 @@ VILibrary.VI = {
             super(VICanvas, draw3DFlag,robNum);
             const _this = this;
             let haveTool=false;
-            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40';
+            let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40',qijiaTrans="13,0,0",qijiaRotate="1,0,0,-0.785398163";
+            let gongjianTrans1='461.395,0,285.5',gongjianTrans2='461.395,0,225.5',gongjianTrans3='460,0,165.5';
+            let gongjianTrans4='401.395,0,285.609',gongjianTrans5='401.395,0,225.609',gongjianTrans6='401.395,0,165.609';            function draw() {
+                switch(robNum){
+                    case "k60":
+                        jiajuScal="2,2,2";
+                        jiajuTrans="15,0,0"
+                        break;
+                    case "a910":
+                        jiajuRotate='0,0,1,-1.5707963';
+                        jiajuTrans="0,65,0";
+                        boxTrans='300,40,-300';
+                        break;
+                    case "a360":
+                        jiajuRotate='0,0,1,-1.5707963';
+                        jiajuTrans="0,5,0";
+                        boxTrans='250,-1180,-250';
+                        break;
+                    case "epson":
+                        jiajuRotate='0,1,0,-1.5707963';
+                        jiajuRotate2='1,0,0,3.1415926';
+                        // jiajuRotate="0.45749571099781405,-0.7624928516630234,-0.45749571099781405,2.2834529548131237"
+                        // jiajuRotate="0.5144957554275265,-0.6859943405700353,-0.5144957554275265,1.9390642202315367"
+                        jiajuTrans="98.5,125,58.5";
+                        boxTrans='400,20,-400'
+                        break;
+                    case "a120":default:break;
+                }
+                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
+                    "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
+                    "<inline url='../tool/jiajuL.x3d' > </inline>" +
+                    "</Transform>" +
+                    "<Transform DEF='jiajuR' translation='0 0 -10' nameSpaceName id='Robot__jiajuR'>" +
+                    "<inline url='../tool/jiajuR.x3d'> </inline>" +
+                    "</Transform>" +
+                    "<inline url='../tool/jiaju.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+                    "<Transform translation="+qijiaTrans+" scale="+jiajuScal+" rotation="+qijiaRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<Transform DEF='qijiaL' translation='0 0 -20' nameSpaceName id='Robot__qijiaL'>" +
+                    "<inline url='../qijia/jiajuL.x3d' > </inline>" +
+                    "</Transform>" +
+                    "<Transform DEF='qijiaR' translation='0 0 -20' nameSpaceName id='Robot__qijiaR'>" +
+                    "<inline url='../qijia/jiajuR.x3d' nameSpaceName='QijiaR' mapDEFToID='true'> </inline>" +
+                    "</Transform>" +
+                    "<inline url='../qijia/jiajuBase.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+                    "<Transform translation="+qijiaTrans+" scale="+jiajuScal+" rotation="+qijiaRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<inline url='../huabi/huabi.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+                    "</switch>";
+                $("#Robot__lastLink").after(toolSwitch);
+                var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
+                    "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
+                    "<box size='40,40,40'></box>" +
+                    "</shape></transform>";
+                var gongjian1="<transform DEF='gongjian1' translation="+gongjianTrans1+" nameSpaceName id='Robot__gongjian1' render='true'>" +
+                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian2="<transform DEF='gongjian2' translation="+gongjianTrans2+" nameSpaceName id='Robot__gongjian2' render='true'>" +
+                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian3="<transform DEF='gongjian3' translation="+gongjianTrans3+" nameSpaceName id='Robot__gongjian3' render='true'>" +
+                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian4="<transform DEF='gongjian4' translation="+gongjianTrans4+" nameSpaceName id='Robot__gongjian4' render='true'>" +
+                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian5="<transform DEF='gongjian5' translation="+gongjianTrans5+" nameSpaceName id='Robot__gongjian5' render='true'>" +
+                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian6="<transform DEF='gongjian6' translation="+gongjianTrans6+" nameSpaceName id='Robot__gongjian6' render='true'>" +
+                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                $("#Robot__platform").after(box);
+                $("#Robot__platform").after(gongjian1);
+                $("#Robot__platform").after(gongjian2);
+                $("#Robot__platform").after(gongjian3);
+                $("#Robot__platform").after(gongjian4);
+                $("#Robot__platform").after(gongjian5);
+                $("#Robot__platform").after(gongjian6);
+                haveTool=true;
+
+
+            }
+
             function draw() {
             	switch(robNum){
 					case "k60":
@@ -11140,7 +11310,67 @@ VILibrary.VI = {
 						break;
 					case "a120":default:break;
 				}
-                var toolSwitch= "<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
+                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
+                    "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
+                    "<inline url='../TOOLS/tool1/jiajuL.x3d' > </inline>" +
+                    "</Transform>" +
+                    "<Transform DEF='jiajuR' translation='0 0 -10' nameSpaceName id='Robot__jiajuR'>" +
+                    "<inline url='../TOOLS/tool1/jiajuR.x3d'> </inline>" +
+                    "</Transform>" +
+                    "<inline url='../TOOLS/tool1/jiaju.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+                    "<Transform translation="+qijiaTrans+" scale="+jiajuScal+" rotation="+qijiaRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<Transform DEF='qijiaL' translation='0 0 -20' nameSpaceName id='Robot__qijiaL'>" +
+                    "<inline url='../TOOLS/qijia/jiajuL.x3d' > </inline>" +
+                    "</Transform>" +
+                    "<Transform DEF='qijiaR' translation='0 0 -20' nameSpaceName id='Robot__qijiaR'>" +
+                    "<inline url='../TOOLS/qijia/jiajuR.x3d' nameSpaceName='QijiaR' mapDEFToID='true'> </inline>" +
+                    "</Transform>" +
+                    "<inline url='../TOOLS/qijia/jiajuBase.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+                    "<Transform translation="+qijiaTrans+" scale="+jiajuScal+" rotation="+qijiaRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<inline url='../TOOLS/huabi/huabi.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+                    "</switch>";
+                $("#Robot__lastLink").after(toolSwitch);
+                var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
+                    "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
+                    "<box size='40,40,40'></box>" +
+                    "</shape></transform>";
+                var gongjian1="<transform DEF='gongjian1' translation="+gongjianTrans1+" nameSpaceName id='Robot__gongjian1' render='true'>" +
+                    "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian2="<transform DEF='gongjian2' translation="+gongjianTrans2+" nameSpaceName id='Robot__gongjian2' render='true'>" +
+                    "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian3="<transform DEF='gongjian3' translation="+gongjianTrans3+" nameSpaceName id='Robot__gongjian3' render='true'>" +
+                    "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian4="<transform DEF='gongjian4' translation="+gongjianTrans4+" nameSpaceName id='Robot__gongjian4' render='true'>" +
+                    "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian5="<transform DEF='gongjian5' translation="+gongjianTrans5+" nameSpaceName id='Robot__gongjian5' render='true'>" +
+                    "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                var gongjian6="<transform DEF='gongjian6' translation="+gongjianTrans6+" nameSpaceName id='Robot__gongjian6' render='true'>" +
+                    "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
+                    "</transform>";
+                $("#Robot__platform").after(box);
+                $("#Robot__platform").after(gongjian1);
+                $("#Robot__platform").after(gongjian2);
+                $("#Robot__platform").after(gongjian3);
+                $("#Robot__platform").after(gongjian4);
+                $("#Robot__platform").after(gongjian5);
+                $("#Robot__platform").after(gongjian6);
+                haveTool=true;
+               /* var toolSwitch= "<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
 						"<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
 							"<Transform rotation="+jiajuRotate2+">"+
 								"<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
@@ -11159,7 +11389,7 @@ VILibrary.VI = {
 							"<box size="+boxSize+"></box>" +
 						"</shape></transform>";
                 $("#Robot__platform").after(box);
-                haveTool=true;
+                haveTool=true;*/
             }
 			this.setData=function (input) {
             	toolSwitch(input[0]);
@@ -11168,22 +11398,46 @@ VILibrary.VI = {
             function toolSwitch(input){
                 if(!haveTool)draw();
                 document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
-                // if(robNum!="epson"){
-                    if(input){
+				/*if(input){
+					document.getElementById("Robot__box").setAttribute("render", 'true');
+				}
+				else document.getElementById("Robot__box").setAttribute("render", 'false');*/
+                switch (input) {
+                    case 1:
                         document.getElementById("Robot__box").setAttribute("render", 'true');
-                    }
-                    else document.getElementById("Robot__box").setAttribute("render", 'false');
-				// }
+                        for (var i=1;i<7;i++) {
+                            document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
+                        }
+                        break;
+                    case 2:
+                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        for (var i=1;i<7;i++) {
+                            document.getElementById("Robot__gongjian"+i).setAttribute("render", 'true');
+                        }
+                        break;
+                    default:
+                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        for (var i=1;i<7;i++) {
+                            document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
+                        }
+                        break;
+                }
 
             }
             function toolDo(input) {
                 if(input){
                     document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,0');
                     document.getElementById("Robot__jiajuR").setAttribute('translation','0,0,0');
+
+                    document.getElementById("Robot__qijiaL").setAttribute('translation','0,0,-10');
+                    document.getElementById("Robot__qijiaR").setAttribute('translation','0,0,10');
                 }
                 else{
                     document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,10');
                     document.getElementById("Robot__jiajuR").setAttribute('translation','0,0,-10');
+
+                    document.getElementById("Robot__qijiaL").setAttribute('translation','0,0,0');
+                    document.getElementById("Robot__qijiaR").setAttribute('translation','0,0,0');
                 }
             }
         }

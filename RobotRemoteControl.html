@@ -61,11 +61,9 @@
                     <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
                 </p>
                 <p id="tool" style="padding-top: 4px">Tool :
-                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
+                    <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
                         <option value="0">tool0</option>
-                        <option value="1">tool1</option>
                         <option value="2">qijia</option>
-                        <option value="3">huabi</option>
                     </select>&nbsp;&nbsp;&nbsp;
                     Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
                 </p>
@@ -99,12 +97,13 @@
                     <p>控制指令</p>
                     <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
                     <div class="rowFlex-div">
-                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
+                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button><button type="button" onclick="submitInstructions()">上传</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
 </div>
 
 <script src="js/VILibrary.js"></script>
@@ -113,6 +112,7 @@
 <!--弹出框-->
 <script src="js/layui/lay/dest/layui.all.js"></script>
 <script src="js/communication.js"></script>
+<script src="js/connectServer.js"></script>
 <script>
     'use strict';
     let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
@@ -123,6 +123,106 @@
     let val=[0],ang;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
     let s=[];
+    /* if ("WebSocket" in window)
+     {
+     // 打开一个 web socket
+     var ws = new WebSocket("ws://127.0.0.1:3002");
+
+     ws.onopen = function()
+     {
+     // Web Socket 已连接上，使用 send() 方法发送数据
+     ws.send("发送数据");
+     console.log("数据发送中...");
+     };
+
+     ws.onmessage = function (evt)
+     {
+     var received_msg = evt.data;
+     console.log("已接收数据",received_msg);
+     if(received_msg=="go"){
+     Instructions();
+     }
+     else console.log(received_msg)
+     };
+
+     ws.onclose = function()
+     {
+     // 关闭 websocket
+     console.log("连接已关闭...");
+     };
+     }
+     else
+     {
+     // 浏览器不支持 WebSocket
+     alert("您的浏览器不支持 WebSocket!");
+     }*/
+   /* let wsServerAddr={
+        port:'3002',
+//       host:'localhost',/!*本地测试用*!/
+        host:'drvi.net'//wss连接必须用域名，不能用IP地址
+    }
+    let ws=new communcication(wsServerAddr);
+    let logStatus=false,logName='';
+    function submitInstructions() {
+        if(!logStatus){
+            var logLayer=layer.open({
+                title: '管理员登录 ',
+                maxmin: true,
+                shadeClose: true, //点击遮罩关闭层
+                content: '<form id="login" name="n&p">' +
+                '<p><label for="name" style="width: 60px;display:inline-block">用户名：</label><input type="text" name="name" ></p>' +
+                '<p><label for="password" style="width: 60px;display:inline-block">密码：</label><input type="password" name="password"></p>' +
+                '</form>',
+                btn:'提交',
+                yes: function(index, layero){
+                    let logData=$('#login').serialize();
+                    $.ajax({
+                        url:'https://drvi.net:3003',
+//                       url:'http://localhost:3003',
+                        type:"POST",
+                        data:logData,
+                        success: function(data){    //    alert后台返回的参数
+                            console.log(data.statusTxt);
+                            if(data.status=="success"){
+                                layer.close(logLayer);
+                                logStatus=true;
+                                logName=data.userName;
+                                loginSuccess();
+                                ws.connect();
+                            }
+                            else{alert(data.statusTxt);}
+                        },
+                        error:function (err) {
+                            alert("访问失败");
+                            console.log(err);
+                        }
+                    })
+                    /!*ws.send(logData);
+                     let data=$('#myform').serialize();
+                     ws.send(data);*!/
+                }
+            });
+        }
+        else {
+            loginSuccess();
+        }
+    }
+    function loginSuccess() {
+        let formData=$('#myform').serialize();
+        sendFormData();
+        layer.msg( '登录成功，数据传输中……')
+    }
+    function sendFormData() {
+        setTimeout(function () {
+            if(ws.onOpen){
+                let formData=$('#myform').serialize()+"&name="+logName;
+                ws.send(formData);
+            }
+            else {
+                alert('远程服务器未连接,请稍后重试')
+            }
+        },500);
+    }*/
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -142,7 +242,7 @@
             gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
             beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
             alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
-            let pos=[x,y,z,gamma,beta,alpha];
+        let pos=[x,y,z,gamma,beta,alpha];
         instructionCompiling.moveL(pos,100);
     }
     function Instructions() {
@@ -188,22 +288,17 @@
 
                 switch (val) {
                     case '0':
-                        s=["p0:[364.35,0,594,-180°,60°,-180°];\n",
+                        s = ["p0:[364.35,0,594,-180°,60°,-180°];\n",
                             "p1[464.35,0,594,-180°,60°,-180°];\n",
                             "p2:[467.54,0,371.09,180°,30°,-180°];\n",
                             "p3[346.62,0,225.29,180°,0°,-180°];\n"],
-                        Instruction="moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
+                            Instruction = "moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
                         /*------------------点集-------------------------*/
-                        turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
+                        turnPoints = "364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
                         /*---------------------------------------------*/
                         break;
-                    case '1':
-                        s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
-                        Instruction="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
-                        turnPoints="480.95 565.94 0 300 100 -300 300 20 -300 400 100 0 400 20 0";
-                        break;
                     case '2':
-                        s=["p0:[472.53,35.36,572.37,-129.23°,37.76°,-116.57°];\n",//472.53 572.37 -35.36
+                        s = ["p0:[472.53,35.36,572.37,-129.23°,37.76°,-116.57°];\n",//472.53 572.37 -35.36
                             "p1:[365,0,189.5,180°,0°,-180°];\n",//365 189.5 0
                             "p2:[461.395,-285.61,12.3038,180°,0°,-180°];\n",//461.395 12.3038 285.61
                             "p3:[461.395,-225.609,12.3038,180°,0°,-180°];\n",//461.395 12.3038 225.609
@@ -237,35 +332,10 @@
                             "p31:[460.897,162.528,62.275,180°,0°,-180°];\n",//460.897 62.275 -162.528
                             "p32:[460.90,102.53,87.275,180°,0°,-180°];\n",//460.90 87.275 -102.53
                             "p33:[460.897,162.528,87.275,180°,0°,-180°];\n"];//460.897 87.275 -162.528
-                       Instruction="reset do1;\nmoveJ p1,v100;\nmoveJ p14,v100;\nmoveJ p22,v50;\nmoveL p2,v10;\nset do1;\nmoveL p14,v100;\nmoveJ p20,v100;\nmoveJ p28,v50;\nmoveL p8,v10;\nreset do1;\nmoveL p20,v100;\nmoveJ p15,v100;\nmoveJ p23,v50;\nmoveL p3,v10;\nset do1;\nmoveL p15,v100;\nmoveJ p21,v100;\nmoveJ p29,v50;\nmoveL p9,v10;\nreset do1;\nmoveL p21,v100;\nmoveJ p16,v100;\nmoveJ p24,v50;\nmoveL p4,v10;\nset do1;\nmoveL p16,v100;\nmoveJ p20,v100;\nmoveJ p30,v50;\nmoveL p10,v10;\nreset do1;\nmoveL p20,v100;\nmoveJ p17,v100;\nmoveJ p25,v50;\nmoveL p5,v10;\nset do1;\nmoveL p17,v100;\nmoveJ p21,v100;\nmoveJ p31,v50;\nmoveL p11,v10;\nreset do1;\nmoveL p21,v100;\nmoveJ p18,v100;\nmoveJ p26,v50;\nmoveL p6,v10;\nset do1;\nmoveL p18,v100;\nmoveJ p20,v100;\nmoveJ p32,v50;\nmoveL p12,v10;\nreset do1;\nmoveL p20,v100;\nmoveJ p19,v100;\nmoveJ p27,v50;\nmoveL p7,v10;\nset do1;\nmoveL p19,v100;\nmoveJ p21,v100;\nmoveJ p33,v50;\nmoveL p13,v10;\nreset do1;\nmoveL p21,v100;\nmoveJ p1,v100;\nmoveJ p0,v100;";
-                       turnPoints="472.53 -572.37 35.36 365 189.5 0 461.395 12.3038 285.61 461.395 12.3038 225.609 461.395 12.3038 165.609 401.395 12.3038 285.609 401.395 12.3038 225.609 401.395 12.3038 165.609 460.90 12.275 -102.53 460.897 12.275 -162.528 460.897 37.275 -102.528 460.897 37.27 -162.528 460.897 62.27 -102.528 460.897 62.275 -162.528 461.395 120 285.609 461.395 120 225.609 461.395 120 165.609 401.395 120 285.609 401.395 120 225.609 401.395 120 165.609 460.897 120 -102.528 460.897 120 -162.528 461.395 37.3038 285.61 461.395 37.3038 225.61 461.395 37.3038 165.61 401.395 37.3038 285.61 401.395 37.3038 225.61 401.395 37.3038 165.61 460.90 37.275 -102.53 460.897 37.275 -162.528 460.90 62.275 -102.53 460.897 62.275 -162.528 460.90 87.275 -102.53 460.897 87.275 -162.528";
-
+                        Instruction = "reset do1;\nmoveJ p1,v100;\nmoveJ p14,v100;\nmoveJ p22,v50;\nmoveL p2,v10;\nset do1;\nmoveL p14,v100;\nmoveJ p20,v100;\nmoveJ p28,v50;\nmoveL p8,v10;\nreset do1;\nmoveL p20,v100;\nmoveJ p15,v100;\nmoveJ p23,v50;\nmoveL p3,v10;\nset do1;\nmoveL p15,v100;\nmoveJ p21,v100;\nmoveJ p29,v50;\nmoveL p9,v10;\nreset do1;\nmoveL p21,v100;\nmoveJ p16,v100;\nmoveJ p24,v50;\nmoveL p4,v10;\nset do1;\nmoveL p16,v100;\nmoveJ p20,v100;\nmoveJ p30,v50;\nmoveL p10,v10;\nreset do1;\nmoveL p20,v100;\nmoveJ p17,v100;\nmoveJ p25,v50;\nmoveL p5,v10;\nset do1;\nmoveL p17,v100;\nmoveJ p21,v100;\nmoveJ p31,v50;\nmoveL p11,v10;\nreset do1;\nmoveL p21,v100;\nmoveJ p18,v100;\nmoveJ p26,v50;\nmoveL p6,v10;\nset do1;\nmoveL p18,v100;\nmoveJ p20,v100;\nmoveJ p32,v50;\nmoveL p12,v10;\nreset do1;\nmoveL p20,v100;\nmoveJ p19,v100;\nmoveJ p27,v50;\nmoveL p7,v10;\nset do1;\nmoveL p19,v100;\nmoveJ p21,v100;\nmoveJ p33,v50;\nmoveL p13,v10;\nreset do1;\nmoveL p21,v100;\nmoveJ p1,v100;";
+                        turnPoints = "472.53 -572.37 35.36 365 189.5 0 461.395 12.3038 285.61 461.395 12.3038 225.609 461.395 12.3038 165.609 401.395 12.3038 285.609 401.395 12.3038 225.609 401.395 12.3038 165.609 460.90 12.275 -102.53 460.897 12.275 -162.528 460.897 37.275 -102.528 460.897 37.27 -162.528 460.897 62.27 -102.528 460.897 62.275 -162.528 461.395 120 285.609 461.395 120 225.609 461.395 120 165.609 401.395 120 285.609 401.395 120 225.609 401.395 120 165.609 460.897 120 -102.528 460.897 120 -162.528 461.395 37.3038 285.61 461.395 37.3038 225.61 461.395 37.3038 165.61 401.395 37.3038 285.61 401.395 37.3038 225.61 401.395 37.3038 165.61 460.90 37.275 -102.53 460.897 37.275 -162.528 460.90 62.275 -102.53 460.897 62.275 -162.528 460.90 87.275 -102.53 460.897 87.275 -162.528";
                         break;
-                    case "3":
-                        s=[];
                 }
-
-/*
-                s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1:[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3:[346.62,0,225.29,180°,0°,-180°];\n"],
-                Instruction="moveJ p0,v500;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v500;";
-                //------------------点集-------------------------
-                turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);*/
-               /* s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
-                pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],
-                    [0.8454374896660531, 0.6958627727701391, 0.2769837522915001, 0, 0.5979498017332573, 0.8454374896660531],
-                    [0.8454374896660531, 0.9161233243718235, 0.23596851486963336, 0, 0.41887902047863906, 0.8454374896660531],
-                    [-0, 0.6030112565640408, 0.438601241026175, 0, 0.5291838292046808, -0],
-                    [-0, 0.8422958970124633, 0.39671333897831107, 0, 0.33161255787892263, -0]];
-                pPos=[[480.94675050769, 1.3045864533829317e-14, 565.944863728671, -3.141592653589793, 1.0471848490249271, -3.141592653589793],
-                    [299.99999999999994, 300.00000000000006, 99.99999999999994, 3.141592653589793, -0, -3.141592653589793],
-                    [300, 300.00000000000006, 20, 3.141592653589793, -0, -3.141592653589793],
-                    [400.00000000000006, 4.157675883105265e-14, 99.99999999999994, 3.141592653589793, 0, -3.141592653589793],
-                    [400, 4.6475346027642046e-14, 19.999999999999943, 3.141592653589793, 0, -3.141592653589793]];
-                Instruction="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
-                turnPoints="480.95 565.94 0 300 100 -300 300 20 -300 400 100 0 400 20 0";
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);*/
-
         }
         let str="";
         for(let m=0;m<s.length;m++){
