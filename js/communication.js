@@ -15,6 +15,7 @@ function communcication(object){
         i=0;
         _this.onOpen=true;
         console.log("连接已打开");
+        // alert('communication.js')
     };
     this.messageFun = function(event){
         let received_msg=event.data;
@@ -22,9 +23,15 @@ function communcication(object){
             layer.closeAll();
             Instructions();//收到消息为go后执行RAPID指令
         }
-        else if(received_msg=='relog'){
+        else if(received_msg==='relog'){
             logStatus=false;
             layer.msg("请登录后重试",{title:"来自服务器的消息：",icon: 7});
+        }
+        else if(received_msg.match('rtcpId')!==null){
+            let msg=JSON.parse(received_msg).rtcpId;
+            RTCPID=msg;
+            document.getElementById('videoFrame').src="RTCP/sub.html";
+            console.log("RTCPID:",msg);
         }
         else{
             layer.msg(received_msg,{title:"来自服务器的消息：",icon: 7});

@@ -567,7 +567,7 @@ class RobotTemplateVI extends TemplateVI {
 				 </scene>
 				 </x3d>*!/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
 				 document.getElementById("x3d120").innerHTML=my_html;*/
-                this.container.innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
+                this.container.innerHTML='<x3d style="width: 100%;height: 100%;border:none"><scene>'+
                     '<inline nameSpaceName="Robot"  mapDEFToID="true" url='+this.robotURL+'></inline>'+
                     '</scene></x3d>';
             }
