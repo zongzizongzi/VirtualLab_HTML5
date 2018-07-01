@@ -168,7 +168,6 @@ html {
     top: 15%;
     left: 80%;
 }
-
 #control-div {
     display: flex;
     flex-direction: column;
@@ -453,18 +452,20 @@ html {
 }
 #index_div{
     width: 100%;
-    border: 1px solid white;
+    border-top: 1px solid white;
     margin:0  auto;
     text-align: center
 }
 #index_0{
-    width:1000px ;
+    width:100% ;
     bottom: 10px;
-    top: 130px;
+    display: none;
+    height: 800px;
+   /* top: 130px;
     left: 50%;
     margin-left: -500px;
     position: absolute;
-    display: none;
+   */
 
 }
 #index_1{//说明书
@@ -512,7 +513,7 @@ html {
    /* margin-left: auto;
     margin-right: auto;*/
     margin: 10px;
-    margin-top: 0px;
+    /*margin-top: 0px;*/
     padding: 10px;
 }
 .robotPA{
@@ -605,6 +606,21 @@ html {
     width: 100px;
     display: inline-block;
     text-align: left;
+}
+.remoteDiv{
+    width: 50%;
+    height: 100%;
+    float: left;
+    box-sizing: border-box;
+    border: 1px solid #01AAED
+}
+.message_title{
+    font-size: 16px;
+    flex-grow: 0;
+}
+.flex_items{
+    flex-grow: 1;
+    align-items: stretch;
 }
 
 

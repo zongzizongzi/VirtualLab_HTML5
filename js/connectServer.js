@@ -7,6 +7,7 @@ let wsServerAddr={
     host:'drvi.net'//wss连接必须用域名，不能用IP地址
 };
 let ws=new communcication(wsServerAddr);
+ws.connect();
 let logStatus=false,logName='';
 function submitInstructions() {
     if(!logStatus){
@@ -33,7 +34,7 @@ function submitInstructions() {
                             logStatus=true;
                             logName=data.userName;
                             loginSuccess();
-                            ws.connect();
+
                         }
                         else{alert(data.statusTxt);}
 
@@ -54,14 +55,13 @@ function submitInstructions() {
     }
 }
 function loginSuccess() {
-    let formData=$('#myform').serialize();
     sendFormData();
     layer.msg( '登录成功，数据传输中……')
 }
 function sendFormData() {
     setTimeout(function () {
         if(ws.onOpen){
-            let formData=$('#myform').serialize()+"&name="+logName;
+            let formData=$('#points').serialize()+"&"+$('#instrInput').serialize()+"&name="+logName;
             ws.send(formData);
         }
         else {

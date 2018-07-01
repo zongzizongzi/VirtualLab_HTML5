@@ -24,83 +24,105 @@
     </script>
 </head>
 <body>
-<div class="main-div" style="width: 1500px;">
-    <div class="title"><b>机器人操作实验(型号：ABB_IRB120)</b></div>
+<div class="main-div" style="width: 1900px;">
+    <h1 class="title"><b>机器人远程控制实验(机器人型号：ABB_IRB120)</b></h1>
     <div class="back" ><a href="index.html">←返回目录</a></div>
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_div">
         <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn"  onclick="show(3)">实验操作视频</button>
     </div>
-    <div id="index_0" style="width: 1500px;    margin-left: -750px;"> <embed id="instructTxt" src="pdf/ABBRobot.htm" ></embed></div>
+    <div id="index_0" style="/*width: 1900px; margin-left: -50%;*/  height: 800px "> <embed id="instructTxt" src="pdf/ABBRobot.htm" ></embed></div>
     <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
     <div id="index_3"><video id="exm_video" src="" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div style="width: 80%;height: 100%;display: inline;float: left">
-            <div id="robotX3d" style="width: 100%;height: 100%;">
+        <div style="height: 500px">
+            <div class="remoteDiv">
+                <div id="robotX3d" style="width: 100%;height: 100%;">
+                </div>
+            </div>
+            <div class="remoteDiv">
+                <iframe id="videoFrame" style="width: 750px;height: 500px;overflow: hidden" frameborder="0">
+                <!--src="RTCP/sub.html" -->
+                </iframe>
             </div>
         </div>
-        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
-            <div class="message_div" id="messageDiv">
-                <p>关节转角：</p><br>
-                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
-                    <input id="angInput0" type="range" max="165" min="-165" value="0" step="1" onchange="changeAng(0)">
-                </p>
-                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
-                    <input  id="angInput1" type="range" max="110" min="-110" value="0" step="1" onchange="changeAng(1)">
-                </p>
-                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
-                    <input id="angInput2" type="range" max="70" min="-70" value="0" step="1" onchange="changeAng(2)">
-                </p>
-                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
-                    <input id="angInput3" type="range" max="160" min="-160" value="0" step="1" onchange="changeAng(3)">
-                </p>
-                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
-                    <input id="angInput4" type="range" max="120" min="-120" value="30" step="1" onchange="changeAng(4)">
-                </p>
-                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
-                    <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
-                </p>
-                <p id="tool" style="padding-top: 4px">Tool :
-                    <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
-                        <option value="0">tool0</option>
-                        <option value="2">qijia</option>
-                    </select>&nbsp;&nbsp;&nbsp;
-                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
-                </p>
-            </div>
-            <div class="message_div" id="resultDiv" onchange="changePos()">
-                <div style="width: 50%;display: inline;float: left">
-                    <p>末端坐标：</p><br>
-                    <p>P_X：<input id="posX" type="text" value="364.35" class="robotPA"></p>
-                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
-                    <p>P_Z：<input id="posZ" type="text" value="594" class="robotPA"></p>
-                </div>
-                <div style="width: 50%;display: inline;">
-                    <p>末端姿态：</p><br>
-                    <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
-                    <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
-                    <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
+        <div  class="rowFlex-div" style="height: 300px;align-items: stretch;background-color: #aaddff;">
+            <div class="message_div flex_items columnFlex-div" id="messageDiv">
+                <h3 class="message_title">关节转角：</h3>
+                <div class="rowFlex-div flex_items">
+                    <div class="columnFlex-div">
+                        <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
+                            <input id="angInput0" type="range" max="165" min="-165" value="0" step="1" onchange="changeAng(0)">
+                        </p>
+                        <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
+                            <input  id="angInput1" type="range" max="110" min="-110" value="0" step="1" onchange="changeAng(1)">
+                        </p>
+                        <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
+                            <input id="angInput2" type="range" max="70" min="-70" value="0" step="1" onchange="changeAng(2)">
+                        </p>
+                        <p id="tool" style="padding-top: 4px">Tool :
+                            <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
+                                <option value="0">tool0</option>
+                                <option value="2">qijia</option>
+                            </select>
+                        </p>
+                    </div>
+                    <div class="columnFlex-div">
+                        <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
+                            <input id="angInput3" type="range" max="160" min="-160" value="0" step="1" onchange="changeAng(3)">
+                        </p>
+                        <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
+                            <input id="angInput4" type="range" max="120" min="-120" value="30" step="1" onchange="changeAng(4)">
+                        </p>
+                        <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
+                            <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
+                        </p>
+                        <p>Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button></p>
+                    </div>
                 </div>
             </div>
-            <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
-                <div class="message_div" style="height: 23%;">
-                    <p>设置示教点</p>
-                    <textarea id="points" name="points" style="width: 90%;height: 66%;margin: 10px">
-                    </textarea>
+            <div class="message_div flex_items rowFlex-div" id="resultDiv" onchange="changePos()">
+                <div class="columnFlex-div remoteDiv" style="border: none">
+                    <h3 class="message_title">末端坐标：</h3>
+                    <div class="flex_items columnFlex-div">
+                        <p >P_X：<input id="posX" type="text" value="364.35" class="robotPA"></p>
+                        <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
+                        <p>P_Z：<input id="posZ" type="text" value="594" class="robotPA"></p>
+                    </div>
+                </div>
+                <div class="columnFlex-div remoteDiv" style="border: none">
+                    <h3 class="message_title">末端姿态：</h3>
+                    <div class="flex_items columnFlex-div">
+                        <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
+                        <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
+                        <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
+                    </div>
+                </div>
+            </div>
+            <!--<form id="myform flex_items" onsubmit="return PostData()" style="height: 100%;height: 100%">-->
+                <div class="message_div flex_items columnFlex-div" >
+                    <h3 class="message_title">设置示教点</h3>
+                    <textarea class="flex_items"  id="points" name="points" style="width: 90%;height: 150px;margin: 10px"></textarea>
+                    <!--<div class="flex_items">-->
+                         <!--<textarea  id="points" name="points" style="width: 90%;height: 100%;margin: 10px"></textarea>-->
+                    <!--</div>-->
                     <div class="rowFlex-div">
                         <button type="button" id="add" onclick="changePoints(1)">添加</button>
                         <button type="button" id="delete" onclick="changePoints(2)">删除</button>
                         <button type="button" id="clear" onclick="changePoints(0)">清空</button>
                     </div>
                 </div>
-                <div class="message_div" style="height: 22%;">
-                    <p>控制指令</p>
-                    <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <div class="message_div flex_items columnFlex-div">
+                    <h3 class="message_title">控制指令</h3>
+                    <textarea class="flex_items" id="instrInput" name="instrInput" style="width: 90%;height: 150px;margin: 10px"></textarea>
+                    <!--<div>-->
+                        <!--<textarea id="instrInput" name="instrInput" style="width: 90%;height: 100%;margin: 10px"></textarea>-->
+                    <!--</div>-->
                     <div class="rowFlex-div">
                         <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button><button type="button" onclick="submitInstructions()">上传</button>
                     </div>
                 </div>
-            </form>
+            <!--</form>-->
         </div>
     </div>
 
@@ -123,106 +145,8 @@
     let val=[0],ang;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
     let s=[];
-    /* if ("WebSocket" in window)
-     {
-     // 打开一个 web socket
-     var ws = new WebSocket("ws://127.0.0.1:3002");
+    let RTCPID='';
 
-     ws.onopen = function()
-     {
-     // Web Socket 已连接上，使用 send() 方法发送数据
-     ws.send("发送数据");
-     console.log("数据发送中...");
-     };
-
-     ws.onmessage = function (evt)
-     {
-     var received_msg = evt.data;
-     console.log("已接收数据",received_msg);
-     if(received_msg=="go"){
-     Instructions();
-     }
-     else console.log(received_msg)
-     };
-
-     ws.onclose = function()
-     {
-     // 关闭 websocket
-     console.log("连接已关闭...");
-     };
-     }
-     else
-     {
-     // 浏览器不支持 WebSocket
-     alert("您的浏览器不支持 WebSocket!");
-     }*/
-   /* let wsServerAddr={
-        port:'3002',
-//       host:'localhost',/!*本地测试用*!/
-        host:'drvi.net'//wss连接必须用域名，不能用IP地址
-    }
-    let ws=new communcication(wsServerAddr);
-    let logStatus=false,logName='';
-    function submitInstructions() {
-        if(!logStatus){
-            var logLayer=layer.open({
-                title: '管理员登录 ',
-                maxmin: true,
-                shadeClose: true, //点击遮罩关闭层
-                content: '<form id="login" name="n&p">' +
-                '<p><label for="name" style="width: 60px;display:inline-block">用户名：</label><input type="text" name="name" ></p>' +
-                '<p><label for="password" style="width: 60px;display:inline-block">密码：</label><input type="password" name="password"></p>' +
-                '</form>',
-                btn:'提交',
-                yes: function(index, layero){
-                    let logData=$('#login').serialize();
-                    $.ajax({
-                        url:'https://drvi.net:3003',
-//                       url:'http://localhost:3003',
-                        type:"POST",
-                        data:logData,
-                        success: function(data){    //    alert后台返回的参数
-                            console.log(data.statusTxt);
-                            if(data.status=="success"){
-                                layer.close(logLayer);
-                                logStatus=true;
-                                logName=data.userName;
-                                loginSuccess();
-                                ws.connect();
-                            }
-                            else{alert(data.statusTxt);}
-                        },
-                        error:function (err) {
-                            alert("访问失败");
-                            console.log(err);
-                        }
-                    })
-                    /!*ws.send(logData);
-                     let data=$('#myform').serialize();
-                     ws.send(data);*!/
-                }
-            });
-        }
-        else {
-            loginSuccess();
-        }
-    }
-    function loginSuccess() {
-        let formData=$('#myform').serialize();
-        sendFormData();
-        layer.msg( '登录成功，数据传输中……')
-    }
-    function sendFormData() {
-        setTimeout(function () {
-            if(ws.onOpen){
-                let formData=$('#myform').serialize()+"&name="+logName;
-                ws.send(formData);
-            }
-            else {
-                alert('远程服务器未连接,请稍后重试')
-            }
-        },500);
-    }*/
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -356,7 +280,6 @@
             content: 'teachPendant.html'
         });
     }
-
 </script>
 </body>
 </html>

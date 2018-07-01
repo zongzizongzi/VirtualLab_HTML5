@@ -7,6 +7,7 @@ global.ws=require('./lib/connectWS');
 var login=require('./lib/login');
 global.db=require('./lib/database');
 global.tcpConnectState=false;
+
 /*
 var app = express();
 app.use("/",express.static(__dirname));
