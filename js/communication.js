@@ -11,6 +11,7 @@ function communcication(object){
     //需要的函数
     let i=0;
     this.onOpen=false;
+    var remoting=false;//是否正在远程控制中
     this.openFun = function(){
         i=0;
         _this.onOpen=true;
@@ -21,8 +22,23 @@ function communcication(object){
         let received_msg=event.data;
         if(received_msg==="go"){
             layer.closeAll();
-            Instructions();//收到消息为go后执行RAPID指令
+                let points=document.getElementById("points").value.toString();
+                let cmd=document.getElementById("instrInput").value.toString();
+                remoting=true;
+                instructionCompiling.toggleObserver(points,cmd,true);//收到消息为go后执行RAPID指令
+
         }
+        if(received_msg==="continue"){
+            if(remoting){
+                instructionCompiling.instrCompiling();
+            }
+        }
+        /*else if(received_msg.match('cmd')!==null){
+            received_msg=received_msg.replace('cmd:','');
+            let points=document.getElementById("points").value.toString();
+            instructionCompiling.toggleObserver(points,received_msg);
+
+        }*/
         else if(received_msg==='relog'){
             logStatus=false;
             layer.msg("请登录后重试",{title:"来自服务器的消息：",icon: 7});

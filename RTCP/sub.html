@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body style="margin:0;height: 500px;width: 750px;overflow: hidden">
+
+    <!--<input type="text" id="pubid">-->
+    <!--<button type="buutton" id="doSub">订阅</button>-->
+    <!--<div class="">-->
+    <!--</div>-->
+    <script src="./adapter.js"></script>
+    <script src="./xmlhttp.js"></script>
+    <script src="./anyrtc.js"></script>
+    <script src="./RTCPKit.js"></script>
+    <script src="../js/communication.js"></script>
+    <script>
+//        var pubInput = document.getElementById('pubid');
+//        var doSubBtn = document.getElementById('doSub');
+
+
+        var rtcSub = new (RtcpKit || window.RtcpKit)();
+        // rtcSub.configServerForPriCloud('teameeting.anyrtc.io', 9091);
+		
+		rtcSub.setVideoMode("RTCP_Videos_QHD");
+
+        //添加视频窗口
+        rtcSub.on("onRTCOpenVideoRender", function(strRtcpId){
+            var videoDom = document.createElement('video');
+            videoDom.id = strRtcpId;
+            videoDom.autoplay = "autoplay";
+            videoDom.style.width = "750px";
+            videoDom.style.height = "500px";
+            videoDom.style.objectFit='fill';
+            document.body.appendChild(videoDom);
+        });
+        //设置远程流
+        rtcSub.on("onRTCRemoteStream", function(stream, strRtcpId){
+            rtcSub.setRTCVideoRender(stream, document.getElementById(strRtcpId));
+        });
+
+        //初始化，请填写自己账号的应用信息
+        rtcSub.initEngineWithAnyRTCInfo("64401489","anyrtcOi21n647F0W5","89R58zWKYSEetloAYn7NQNc2OJ32kzan2Hu9KvtZgxU","62b8df9b8140682d2405f1d4d9baa082","www.mtvedio.com");
+        //输入对方的频道id
+//        alert('sub.js')
+        var id=parent.RTCPID;
+        rtcSub.subscribe(id);
+
+    </script>
+</body>
+</html>

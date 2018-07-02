@@ -145,7 +145,7 @@
     let val=[0],ang;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
     let s=[];
-    let RTCPID='';
+    var RTCPID='';
 
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
@@ -170,7 +170,9 @@
         instructionCompiling.moveL(pos,100);
     }
     function Instructions() {
-        instructionCompiling.toggleObserver(true);
+        let points=document.getElementById("points").value.toString();
+        let cmd=document.getElementById("instrInput").value.toString();
+        instructionCompiling.toggleObserver(points,cmd);
     }
     function changePoints(type) {
         let turnPoints,Instruction;

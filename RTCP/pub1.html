@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+
+
+
+    <script src="./adapter.js"></script>
+    <script src="./xmlhttp.js"></script>
+    <script src="./anyrtc.js"></script>
+    <script src="./RTCPKit.js"></script>
+    <script>
+        listDevices(function(videoinput){
+            getRTC(videoinput[1]);
+        });
+        function getRTC(videoId){
+            var rtcPub = new (RtcpKit || window.RtcpKit)(videoId);
+            // rtcPub.configServerForPriCloud('teameeting.anyrtc.io', 9091);
+
+            // var rtcPub = new (RtcpKit || window.RtcpKit)();
+            //rtcPub.setLocalVideoCapturer("RTCP_Videos_myself");
+            rtcPub.setVideoMode('RTCP_Videos_myVideo');
+
+            //采集摄像头结果
+            rtcPub.on("onSetLocalVideoCapturerResult", function (nCode, dVideoRender) {
+                if (nCode === 0) {
+                    console.log("采集成功", dVideoRender);
+                    dVideoRender.style.width = "100%";
+                    dVideoRender.style.height = "370px";
+                    dVideoRender.autoplay = "autoplay";
+                    document.body.appendChild(dVideoRender);
+
+                    //发布视频流
+                    rtcPub.publish(0, '123123123');
+                } else {
+                    console.log('打开摄像头错误：：' + nCode);
+                }
+            });
+            //发布视频流成功
+            rtcPub.on("onPublishOK", function (strRtcpId) {
+                console.log('发布视频流成功,频道ID:: ' + strRtcpId);
+                sendAjax(JSON.stringify({"two" :strRtcpId}));
+            });
+            //添加视频窗口
+            rtcPub.on("onRTCOpenVideoRender", function(strRtcpId){
+                var videoDom = document.createElement('video');
+                videoDom.id = strRtcpId;
+                videoDom.autoplay = "autoplay";
+                videoDom.style.width = "100%";
+                videoDom.style.height = "480px";
+                document.body.appendChild(videoDom);
+            });
+            //设置远程流
+            rtcPub.on("onRTCRemoteStream", function(stream, strRtcpId){
+                rtcPub.setRTCVideoRender(stream, document.getElementById(strRtcpId));
+            });
+
+            //初始化，请填写自己账号的应用信息
+            rtcPub.initEngineWithAnyRTCInfo("64401489","anyrtcOi21n647F0W5","89R58zWKYSEetloAYn7NQNc2OJ32kzan2Hu9KvtZgxU","62b8df9b8140682d2405f1d4d9baa082","www.mtvedio.com");
+            //采集摄像头
+            rtcPub.setLocalVideoCapturer(document.createElement('video'));
+            //订阅媒体（对方的频道ID）
+            // rtcPub.subscribe('对方的频道id');
+        }
+
+        function sendAjax(message){
+            let request = new XMLHttpRequest();
+            request.open("POST" , "http://114.215.189.49:8540");
+            request.send(message);
+        }
+
+        /*console.log(listDevices());*/
+        /**查看所有的设备*/
+        function listDevices(callback){
+            let audioinput = [];
+            let videoinput = [];
+            if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices){
+                console.log("enumerateDevices() not supported");
+                return;
+            }
+
+            //列出摄像头和麦克风
+            navigator.mediaDevices.enumerateDevices()
+                .then(function(devices) {
+                    devices.forEach(function(device) {
+                        //console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
+                        if(device.kind === "videoinput"){
+                            videoinput.push(device.deviceId);
+                        }else if(device.kind === "audioinput"){
+                            audioinput.push(device.deviceId);
+                        }
+                    });
+                    callback(videoinput)
+                })
+                .catch(function(err){
+                    console.log(err.name + ": " + err.message);
+                });
+            return [videoinput , audioinput];
+        }
+    </script>
+    
+</body>
+</html>

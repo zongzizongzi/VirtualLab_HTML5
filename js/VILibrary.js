@@ -753,7 +753,6 @@ VILibrary.VI = {
 				}
 				else {
 					if (this.timer) {
-						
 						//切断音频输出
 						analyser.disconnect(audioCtx.destination);
 						window.cancelAnimationFrame(_this.timer);
@@ -9774,6 +9773,7 @@ VILibrary.VI = {
 				LoadFlag=false;//是否夹持工件
             let gongjianIndex=0;//当前工件序号
             let objFlag=0;
+            let singleStepFlag=false;
 
 			let executiveFlag=false;//是否正在执行程序
 			//判断机器人类型，
@@ -9841,8 +9841,8 @@ VILibrary.VI = {
 				 	A[2]=a_D[5];
                 kinematicsEquation(currentANG);
             }
-            function Split(idName) {
-                let str= document.getElementById(idName).value.toString();
+            function Split(str) {
+                // let str= document.getElementById(idName).value.toString();
                 let arr=(str.replace(/\r|\n|\s|°/g,'')).split(";");//剔除所有换行回车和空格，并以分号分割
                 let newArr=[];//用于存储不为''的元素
                 for(let value of arr){
@@ -9850,10 +9850,11 @@ VILibrary.VI = {
                 }
                 return newArr;
             }
-            this.toggleObserver = function (flag) {
-                if (flag) {
+            this.toggleObserver = function (str_points,str_cmd,stFlag) {
                     // instrParse();
-					let pPoints=Split('points');
+				if(stFlag)singleStepFlag=true;
+				else singleStepFlag=false;
+					let pPoints=Split(str_points);
 					pPos=[];
 					for(let p of pPoints){
 						let pNum=p.match(/p\d+/);
@@ -9881,7 +9882,8 @@ VILibrary.VI = {
 					}
                     executiveFlag=true;
                     instrIndex=0;
-                    let instrAll=document.getElementById("instrInput").value.toString();//输入指令,获取字符串
+                    let instrAll=str_cmd;
+                    // let instrAll=document.getElementById("instrInput").value.toString();//输入指令,获取字符串
                     let replacedStr=instrAll.replace(/[\n]/g,"");//去掉回车
 					instrSplit=replacedStr.split(";");//以分号分割字符串
 					let points="";
@@ -9889,8 +9891,7 @@ VILibrary.VI = {
                     else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
                     document.getElementById("Robot__LineSet_points").setAttribute('point',points);
                     document.getElementById("Robot__LineSet_index").setAttribute('coordIndex','0');
-                    instrCompiling(); //逐条指令解析
-                }
+                    _this.instrCompiling(); //逐条指令解析
             };
             function errInfo() {
                 layer.open({
@@ -9898,17 +9899,15 @@ VILibrary.VI = {
                     ,content: '输入指令不符合语法规则'
                 });
             }
-            function instrCompiling() {
+            this.instrCompiling=function() {
                 let instrLen=instrSplit.length;
                 if(instrIndex<instrLen){
                     let instrI=instrSplit[instrIndex];
                     if(instrI.replace(/[\s]/g,"")==""){
                         instrIndex++;
                         if(instrIndex<(instrSplit.length-1)){
-                            setTimeout(function () {
-                                instrCompiling();
-                            },500);
-                            // instrCompiling();
+                                _this.instrCompiling();
+                            // _this.instrCompiling();
                         }
                         else {
                             executiveFlag=false;
@@ -10031,10 +10030,13 @@ VILibrary.VI = {
                     if(executiveFlag){
                         instrIndex++;
                         if(instrIndex<instrSplit.length){
-                            setTimeout(function () {
-                                instrCompiling();
-                            },500);
-                            // instrCompiling();
+                            if(!singleStepFlag){
+                                setTimeout(function () {
+                                    _this.instrCompiling();
+                                },100);
+                                // _this.instrCompiling();
+                            }
+                            else return;
                         }
                         else {
                             executiveFlag=false;
@@ -10066,7 +10068,7 @@ VILibrary.VI = {
                     let maxStep=Math.max.apply(Math,math.abs(STEP)),
 						N=parseInt(maxDiff/maxStep)+1;//计算步进次数
                     let i=0;
-                    _this.timer = window.setInterval(function () {
+                    this.timer = window.setInterval(function () {
                         let current=math.multiply(-1,currentANG);
                         let diff=math.add(instructAng, current);
                         // let maxDiff=Math.max.apply(Math,math.abs(diff));
@@ -10087,10 +10089,12 @@ VILibrary.VI = {
                             if(executiveFlag){
                                 instrIndex++;
                                 if(instrIndex<instrSplit.length){
-                                    setTimeout(function () {
-                                        instrCompiling();
-                                    },500);
-                                    // instrCompiling();
+                                    if(!singleStepFlag) {
+                                        setTimeout(function () {
+                                            _this.instrCompiling();
+                                        }, 100);
+                                    }
+                                    // _this.instrCompiling();
                                 }
                                 else {
                                     executiveFlag=false;
@@ -10120,7 +10124,7 @@ VILibrary.VI = {
 				let step=math.multiply(diffPos,1/N);
                 let maxStep=Math.max.apply(Math,math.abs(step));
 				let k=0;
-                _this.timer = window.setInterval(function () {
+                this.timer = window.setInterval(function () {
                     let current=math.multiply(-1,currentPOS);
                     let diff=math.add(instructPos, current);
                     let maxDiff=Math.max.apply(Math,math.abs(diff));
@@ -10139,7 +10143,7 @@ VILibrary.VI = {
                     let tAng=inverseKinematics(tPos);
 					if(tAng==0){
 						window.clearInterval(_this.timer);
-						_this.timer=0;
+                        _this.timer=0;
 						alert("超出工作空间或靠近奇异点！");return;
 					}
 					else targetANG=tAng.concat();
@@ -10151,10 +10155,14 @@ VILibrary.VI = {
                         if(executiveFlag){
                             instrIndex++;//指向下一行指令
                             if(instrIndex<instrSplit.length){
-                                setTimeout(function () {
-                                    instrCompiling();//延时0.5秒解析下一行指令
-                                },500);
-                                // instrCompiling();
+                            	if(!singleStepFlag){
+                                    setTimeout(function () {
+                                        _this.instrCompiling();//延时0.1秒解析下一行指令
+                                    },100);
+								}
+								else return;
+
+                                // _this.instrCompiling();
                             }
                             else {
                                 executiveFlag=false;//指令解析完毕
@@ -10259,7 +10267,7 @@ VILibrary.VI = {
 				let m=[],n=[],l=[],X=[x0],Y=[y0],Z=[z0];
 				let i=0;
 				let Ept=SLERP(p0,p2,N);//四元数插补
-                _this.timer = window.setInterval(function () {
+                this.timer = window.setInterval(function () {
                     let tPos,tAng,gamma,alpha,beta;
                     if(i+1>=N){
                         window.clearInterval(_this.timer);
@@ -10310,10 +10318,13 @@ VILibrary.VI = {
                         if(executiveFlag){
                             instrIndex++;
                             if(instrIndex<instrSplit.length){
-                                setTimeout(function () {
-                                    instrCompiling();
-                                },500);
-                                // instrCompiling();
+                            	if(!singleStepFlag){
+                                    setTimeout(function () {
+                                        _this.instrCompiling();
+                                    },100);
+								}
+								else return;
+                                // _this.instrCompiling();
                             }
                             else {
                                 executiveFlag=false;
@@ -10426,7 +10437,11 @@ VILibrary.VI = {
                 if(executiveFlag){
                     instrIndex++;
                     if(instrIndex<instrSplit.length){
-                        instrCompiling();
+                        if(!singleStepFlag){
+                            _this.instrCompiling();
+                        }
+                        else return;
+
                     }
                     else {
                         executiveFlag=false;
@@ -10601,10 +10616,9 @@ VILibrary.VI = {
 				}
                 
                 if(flag){
-                    currentPOS=[x,y,z];
-                    return currentPOS;//若仅用于计算目标点，不再执行后面代码
+                    let pos=[x,y,z];
+                    return pos;//若仅用于计算目标点，不再执行后面代码
                 }
-
                 document.getElementById("posX").value=x.toFixed(2);
                 document.getElementById("posY").value=y.toFixed(2);
                 document.getElementById("posZ").value=z.toFixed(2);

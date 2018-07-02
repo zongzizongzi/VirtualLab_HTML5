@@ -140,7 +140,9 @@
 
     }
     function Instructions() {
-        instructionCompiling.toggleObserver(true);
+        let points=document.getElementById("points").value.toString();
+        let cmd=document.getElementById("instrInput").value.toString();
+        instructionCompiling.toggleObserver(points,cmd);
     }
     function changePoints(type) {
         let turnPoints;
