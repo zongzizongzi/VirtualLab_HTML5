@@ -51,7 +51,8 @@
 		//远程地址
 		var ishttps = 'https:' == document.location.protocol ? true : false;
 		if (ishttps) {
-			this.url = "https://www.teameeting.cn";
+			// this.url = "https://www.teameeting.cn";
+            this.url = "https://www.anyrtc.io"
 		}
 		else {
 			// this.url = "http://teameeting.anyrtc.io:9091";	//"http://192.168.199.219:9091";//

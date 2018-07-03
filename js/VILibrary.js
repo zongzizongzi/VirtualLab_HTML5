@@ -9773,7 +9773,8 @@ VILibrary.VI = {
 				LoadFlag=false;//是否夹持工件
             let gongjianIndex=0;//当前工件序号
             let objFlag=0;
-            let singleStepFlag=false;
+            let singleStepFlag=false;//单步（指令）执行标志，用于远程控制；
+			this.stepsNum=0;//积累的单步执行量
 
 			let executiveFlag=false;//是否正在执行程序
 			//判断机器人类型，
@@ -10036,7 +10037,11 @@ VILibrary.VI = {
                                 },100);
                                 // _this.instrCompiling();
                             }
-                            else return;
+                            else{
+                                _this.stepsNum--;
+                                if(_this.stepsNum) _this.instrCompiling();
+                                else return;
+							}
                         }
                         else {
                             executiveFlag=false;
@@ -10074,7 +10079,7 @@ VILibrary.VI = {
                         // let maxDiff=Math.max.apply(Math,math.abs(diff));
                         if(i+1>=N){
                             window.clearInterval(_this.timer);
-                            _this.timer=0;
+                            _this.timer=null;
                             targetANG=instructAng.concat();
                         }
                         else{
@@ -10094,7 +10099,11 @@ VILibrary.VI = {
                                             _this.instrCompiling();
                                         }, 100);
                                     }
-                                    // _this.instrCompiling();
+                                    else{
+                                        _this.stepsNum--;
+                                        if(_this.stepsNum) _this.instrCompiling();
+                                        else return;
+                                    }
                                 }
                                 else {
                                     executiveFlag=false;
@@ -10129,9 +10138,9 @@ VILibrary.VI = {
                     let diff=math.add(instructPos, current);
                     let maxDiff=Math.max.apply(Math,math.abs(diff));
                     let x,y,z,alpha,beta,gamma,tPos;
-                    if(k+1==N){//最后一步
+                    if(k+1>=N){//最后一步
                         window.clearInterval(_this.timer);
-                        _this.timer=0;
+                        _this.timer=null;
                         tPos=instructPos.concat();
                     }
 					else {
@@ -10143,7 +10152,7 @@ VILibrary.VI = {
                     let tAng=inverseKinematics(tPos);
 					if(tAng==0){
 						window.clearInterval(_this.timer);
-                        _this.timer=0;
+                        _this.timer=null;
 						alert("超出工作空间或靠近奇异点！");return;
 					}
 					else targetANG=tAng.concat();
@@ -10151,7 +10160,7 @@ VILibrary.VI = {
 					if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                         }
-					if(k+1==N){
+					if(k+1>=N){
                         if(executiveFlag){
                             instrIndex++;//指向下一行指令
                             if(instrIndex<instrSplit.length){
@@ -10160,7 +10169,11 @@ VILibrary.VI = {
                                         _this.instrCompiling();//延时0.1秒解析下一行指令
                                     },100);
 								}
-								else return;
+                                else{
+                                    _this.stepsNum--;
+                                    if(_this.stepsNum) _this.instrCompiling();
+                                    else return;
+                                }
 
                                 // _this.instrCompiling();
                             }
@@ -10192,7 +10205,6 @@ VILibrary.VI = {
                 let p2=input2.concat();
                 let p0=currentPOS.concat();
                 let diffPos=math.add(p2,math.multiply(-1,p0));
-
               //计算半径和圆心坐标
 				let xc,yc,zc;
 				let x0,y0,z0,x1,y1,z1,x2,y2,z2;
@@ -10271,7 +10283,7 @@ VILibrary.VI = {
                     let tPos,tAng,gamma,alpha,beta;
                     if(i+1>=N){
                         window.clearInterval(_this.timer);
-                        _this.timer=0;
+                        _this.timer=null;
                         targetANG=inverseKinematics(p2);
                     }
                     else {
@@ -10285,7 +10297,7 @@ VILibrary.VI = {
                         tPos=[X[i+1],Y[i+1],Z[i+1],Ept[i][0],Ept[i][1],Ept[i][2]];
                         tAng=inverseKinematics(tPos);
                         if(tAng==0){window.clearInterval(_this.timer);
-                            _this.timer=0;
+                            _this.timer=null;
                             alert("超出工作空间或靠近奇异点！");
                             return;}
                         else {targetANG=tAng.concat();}
@@ -10305,7 +10317,7 @@ VILibrary.VI = {
 
                         if(tAng==0){
                             window.clearInterval(_this.timer);
-                            _this.timer=0;
+                            _this.timer=null;
                             alert("超出工作空间或靠近奇异点！");
                             return;
                         }*/
@@ -10323,7 +10335,11 @@ VILibrary.VI = {
                                         _this.instrCompiling();
                                     },100);
 								}
-								else return;
+								else {
+                            		_this.stepsNum--;
+                            		if(_this.stepsNum) _this.instrCompiling();
+                            		else return
+								}
                                 // _this.instrCompiling();
                             }
                             else {
@@ -10440,7 +10456,11 @@ VILibrary.VI = {
                         if(!singleStepFlag){
                             _this.instrCompiling();
                         }
-                        else return;
+                        else{
+                            _this.stepsNum--;
+                            if(_this.stepsNum) _this.instrCompiling();
+                            else return;
+                        }
 
                     }
                     else {

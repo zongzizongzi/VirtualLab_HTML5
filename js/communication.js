@@ -25,12 +25,17 @@ function communcication(object){
                 let points=document.getElementById("points").value.toString();
                 let cmd=document.getElementById("instrInput").value.toString();
                 remoting=true;
+                instructionCompiling.stepsNum++;
                 instructionCompiling.toggleObserver(points,cmd,true);//收到消息为go后执行RAPID指令
 
         }
         if(received_msg==="continue"){
             if(remoting){
-                instructionCompiling.instrCompiling();
+                if(!instructionCompiling.stepsNum){
+                    instructionCompiling.stepsNum++;
+                    instructionCompiling.instrCompiling();
+                }
+                else instructionCompiling.stepsNum++;
             }
         }
         /*else if(received_msg.match('cmd')!==null){
