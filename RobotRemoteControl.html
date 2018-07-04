@@ -26,7 +26,10 @@
 <body>
 <div class="main-div" style="width: 1900px;">
     <h1 class="title"><b>机器人远程控制实验(机器人型号：ABB_IRB120)</b></h1>
-    <div class="back" ><a href="index.html">←返回目录</a></div>
+    <div style="background-color: #aaddff" >
+        <div class="back" style="float: left"><a href="index.html">←返回目录</a></div>
+        <div class="back" style="text-align: right"><a href="RTCP/pub.html">直播源</a></div>
+    </div>
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_div">
         <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn"  onclick="show(3)">实验操作视频</button>
@@ -35,18 +38,18 @@
     <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
     <div id="index_3"><video id="exm_video" src="" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div style="height: 500px">
+        <div style="height: 550px">
             <div class="remoteDiv">
                 <div id="robotX3d" style="width: 100%;height: 100%;">
                 </div>
             </div>
             <div class="remoteDiv">
-                <iframe id="videoFrame" style="width: 750px;height: 500px;overflow: hidden" frameborder="0">
+                <iframe id="videoFrame" style="width: 950px;height: 550px;overflow: hidden" frameborder="0">
                 <!--src="RTCP/sub.html" -->
                 </iframe>
             </div>
         </div>
-        <div  class="rowFlex-div" style="height: 300px;align-items: stretch;background-color: #aaddff;">
+        <div  class="rowFlex-div" style="height: 250px;align-items: stretch;background-color: #aaddff;">
             <div class="message_div flex_items columnFlex-div" id="messageDiv">
                 <h3 class="message_title">关节转角：</h3>
                 <div class="rowFlex-div flex_items">
@@ -102,7 +105,7 @@
             <!--<form id="myform flex_items" onsubmit="return PostData()" style="height: 100%;height: 100%">-->
                 <div class="message_div flex_items columnFlex-div" >
                     <h3 class="message_title">设置示教点</h3>
-                    <textarea class="flex_items"  id="points" name="points" style="width: 90%;height: 150px;margin: 10px"></textarea>
+                    <textarea class="flex_items"  id="points" name="points" style="width: 90%;height: 100px;margin: 10px"></textarea>
                     <!--<div class="flex_items">-->
                          <!--<textarea  id="points" name="points" style="width: 90%;height: 100%;margin: 10px"></textarea>-->
                     <!--</div>-->
@@ -114,7 +117,7 @@
                 </div>
                 <div class="message_div flex_items columnFlex-div">
                     <h3 class="message_title">控制指令</h3>
-                    <textarea class="flex_items" id="instrInput" name="instrInput" style="width: 90%;height: 150px;margin: 10px"></textarea>
+                    <textarea class="flex_items" id="instrInput" name="instrInput" style="width: 90%;height: 100px;margin: 10px"></textarea>
                     <!--<div>-->
                         <!--<textarea id="instrInput" name="instrInput" style="width: 90%;height: 100%;margin: 10px"></textarea>-->
                     <!--</div>-->
