@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/math/math.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script type='text/javascript' src='x3dom/x3dom.js'> </script>
+    <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+    <script>
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<3;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+            if(i!=3)document.getElementById("exm_video").pause();
+            else document.getElementById("exm_video").play();
+        }
+    </script>
+</head>
+<body>
+<div class="main-div" style="width: 1500px;">
+    <div class="title"><b>机器人绘图实验(机器人型号：ABB_IRB120)</b></div>
+    <div class="back" ><a href="index.html">←返回主目录</a>/<a href="Robotics.html">机器人目录</a></div>
+    <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
+    <div id="index_div">
+        <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn"  onclick="show(3)">实验操作视频</button>
+    </div>
+    <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/ABBRobot.htm" ></embed></div>
+    <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
+    <div id="index_3"><video id="exm_video" src="" controls></video></div>
+    <div id="index_1" style="height: 800px">
+        <div style="width: 80%;height: 100%;display: inline;float: left">
+            <div id="robotX3d" style="width: 100%;height: 100%;">
+            </div>
+        </div>
+        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+            <div class="message_div" id="messageDiv">
+                <p>关节转角：</p><br>
+                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
+                    <input id="angInput0" type="range" max="165" min="-165" value="0" step="1" onchange="changeAng(0)">
+                </p>
+                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
+                    <input  id="angInput1" type="range" max="110" min="-110" value="0" step="1" onchange="changeAng(1)">
+                </p>
+                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
+                    <input id="angInput2" type="range" max="70" min="-70" value="0" step="1" onchange="changeAng(2)">
+                </p>
+                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
+                    <input id="angInput3" type="range" max="160" min="-160" value="0" step="1" onchange="changeAng(3)">
+                </p>
+                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
+                    <input id="angInput4" type="range" max="120" min="-120" value="30" step="1" onchange="changeAng(4)">
+                </p>
+                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
+                    <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
+                </p>
+                <p id="tool" style="padding-top: 4px">Tool :
+                    <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
+                        <option value="0">tool0</option>
+                        <option value="3">huabi</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
+                </p>
+            </div>
+            <div class="message_div" id="resultDiv" onchange="changePos()">
+                <div style="width: 50%;display: inline;float: left">
+                    <p>末端坐标：</p><br>
+                    <p>P_X：<input id="posX" type="text" value="364.35" class="robotPA"></p>
+                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
+                    <p>P_Z：<input id="posZ" type="text" value="594" class="robotPA"></p>
+                </div>
+                <div style="width: 50%;display: inline;">
+                    <p>末端姿态：</p><br>
+                    <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
+                    <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
+                    <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
+                </div>
+            </div>
+            <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
+                <div class="message_div" style="height: 21%;">
+                    <p>设置示教点</p>
+                    <textarea id="points" name="points" style="width: 90%;height: 60%;margin: 10px">
+                    </textarea>
+                    <div class="rowFlex-div">
+                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
+                        <button type="button" id="delete" onclick="changePoints(2)">删除</button>
+                        <button type="button" id="clear" onclick="changePoints(0)">清空</button>
+                    </div>
+                </div>
+                <div class="message_div" style="height: 22%;">
+                    <p>控制指令</p>
+                    <textarea id="instrInput" name="instrInput" style="width: 90%;height: 60%;margin: 10px"></textarea><br>
+                    <div class="rowFlex-div">
+                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script src="js/VILibrary.js"></script>
+<!--js简写方法-->
+<script src="js/jquery-3.1.1.min.js"></script>
+<!--弹出框-->
+<script src="js/layui/lay/dest/layui.all.js"></script>
+<script>
+    'use strict';
+    let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
+    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a120");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"a120");
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 1);
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
+    let val=[0],ang;
+    let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
+    let s=[];
+    var RTCPID='';
+    /*//切换视角
+    setTimeout(function () {
+        document.getElementById("Robot__viewP").setAttribute('position',"-83.39889 237.17003 -1446.33305");
+        document.getElementById("Robot__viewP").setAttribute('orientation',"-0.01371 0.98526 0.17053 3.25211");
+    },100)*/
+    function changeAng(input) {
+        let currentAng=[0,0,0,0,Math.PI/6,0];
+        document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
+        for(let i=0;i<=5;i++){
+            currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
+        }
+        instructionCompiling.moveJ(currentAng,500);
+    }
+    function changeAngTxt(input) {
+        document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
+        changeAng(input);
+    }
+    function changePos() {
+        let x=parseFloat(document.getElementById("posX").value),
+            y=parseFloat(document.getElementById("posY").value),
+            z=parseFloat(document.getElementById("posZ").value),
+            gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
+            beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
+            alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
+        let pos=[x,y,z,gamma,beta,alpha];
+        instructionCompiling.moveL(pos,100);
+    }
+    function Instructions() {
+        let points=document.getElementById("points").value.toString();
+        let cmd=document.getElementById("instrInput").value.toString();
+        instructionCompiling.toggleObserver(points,cmd);
+    }
+    function changePoints(type) {
+        let turnPoints,Instruction;
+        switch (type){
+            case 0:/*清空*/
+                s=[];
+                /*----------------点集清空-------------------*/
+                turnPoints='';
+                Instruction='';
+                /*-----------------------------------*/
+                break;
+            case 1:/*增加示教点*/
+                let x=parseFloat(document.getElementById("posX").value),
+                    y=parseFloat(document.getElementById("posY").value),
+                    z=parseFloat(document.getElementById("posZ").value),
+                    gamma=parseFloat(document.getElementById("eulerX").value),
+                    beta=parseFloat(document.getElementById("eulerY").value),
+                    alpha=parseFloat(document.getElementById("eulerZ").value);
+                let si="p"+s.length+":["+x+","+y+","+z+","+gamma+"°,"
+                    +beta+"°,"+alpha+"°];\n";
+                /*----------------点集增加点的坐标-------------------*/
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
+                /*-----------------------------------*/
+                s.push(si);
+                break;
+            case 2:/*删除示教点*/
+                s.pop();
+                /*----------------点集删除最后一点的坐标-------------------*/
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+//                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
+                turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
+                /*-----------------------------------*/
+                break;
+            case -1:
+                var obj=document.getElementById('toolSelect');
+                var index=obj.selectedIndex; //序号，取当前选中选项的序号
+                var val = obj.options[index].value;
+
+                switch (val) {
+                    case '0':
+                        s = ["p0:[364.35,0,594,-180°,60°,-180°];\n",
+                            "p1[464.35,0,594,-180°,60°,-180°];\n",
+                            "p2:[467.54,0,371.09,180°,30°,-180°];\n",
+                            "p3[346.62,0,225.29,180°,0°,-180°];\n"],
+                            Instruction = "moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
+                        /*------------------点集-------------------------*/
+                        turnPoints = "364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
+                        /*---------------------------------------------*/
+                        break;
+                    case '2':
+                        s = ["p0:[472.53,35.36,572.37,-129.23°,37.76°,-116.57°];\n",//472.53 572.37 -35.36
+                            "p1:[365,0,189.5,180°,0°,-180°];\n",//365 189.5 0
+                            "p2:[461.395,-285.61,12.3038,180°,0°,-180°];\n",//461.395 12.3038 285.61
+                            "p3:[461.395,-225.609,12.3038,180°,0°,-180°];\n",//461.395 12.3038 225.609
+                            "p4:[461.395,-165.609,12.3038,180°,0°,-180°];\n",//461.395 12.3038 165.609
+                            "p5:[401.395,-285.609,12.3038,180°,0°,-180°];\n",//401.395 12.3038 285.609
+                            "p6:[401.395,-225.609,12.3038,180°,0°,-180°];\n",//401.395 12.3038 225.609
+                            "p7:[401.395,-165.609,12.3038,180°,0°,-180°];\n",//401.395 12.3038 165.609
+                            "p8:[460.90,102.53,12.275,180°,0°,-180°];\n",//460.90 12.275 -102.53
+                            "p9:[460.897,162.528,12.275,180°,0°,-180°];\n",//460.897 12.275 -162.528
+                            "p10:[460.897,102.528,37.275,180°,0°,-180°];\n",//460.897 37.275 -102.528
+                            "p11:[460.897,162.528,37.275,180°,0°,-180°];\n",//460.897 37.27 -162.528
+                            "p12:[460.897,102.528,62.275,180°,0°,-180°];\n",//460.897 62.27 -102.528
+                            "p13:[460.897,162.528,62.275,180°,0°,-180°];\n",//460.897 62.275 -162.528
+                            "p14:[461.395,-285.609,120,180°,0°,-180°];\n",//461.395 120 285.609
+                            "p15:[461.395,-225.609,120,180°,0°,-180°];\n",//461.395 120 225.609
+                            "p16:[461.395,-165.609,120,180°,0°,-180°];\n",//461.395 120 165.609
+                            "p17:[401.395,-285.609,120,180°,0°,-180°];\n",//401.395 120 285.609
+                            "p18:[401.395,-225.609,120,180°,0°,-180°];\n",//401.395 120 225.609
+                            "p19:[401.395,-165.609,120,180°,0°,-180°];\n",//401.395 120 165.609
+                            "p20:[460.897,102.528,120,180°,0°,-180°];\n",//460.897 120 -102.528
+                            "p21:[460.897,162.528,120,180°,0°,-180°];\n",//460.897 120 162.528
+                            "p22:[461.395,-285.61,37.3038,180°,0°,-180°];\n",//461.395 37.3038 285.61
+                            "p23:[461.395,-225.61,37.3038,180°,0°,-180°];\n",//461.395 37.3038 225.61
+                            "p24:[461.395,-165.61,37.3038,180°,0°,-180°];\n",//461.395 37.3038 165.61
+                            "p25:[401.395,-285.61,37.3038,180°,0°,-180°];\n",//401.395 37.3038 285.61
+                            "p26:[401.395,-225.61,37.3038,180°,0°,-180°];\n",//401.395 37.3038 225.61
+                            "p27:[401.395,-165.61,37.3038,180°,0°,-180°];\n",//401.395 37.3038 165.61
+                            "p28:[460.90,102.53,37.275,180°,0°,-180°];\n",//460.90 37.275 -102.53
+                            "p29:[460.897,162.528,37.275,180°,0°,-180°];\n",//460.897 37.275 -162.528
+                            "p30:[460.90,102.53,62.275,180°,0°,-180°];\n",//460.90 62.275 -102.53
+                            "p31:[460.897,162.528,62.275,180°,0°,-180°];\n",//460.897 62.275 -162.528
+                            "p32:[460.90,102.53,87.275,180°,0°,-180°];\n",//460.90 87.275 -102.53
+                            "p33:[460.897,162.528,87.275,180°,0°,-180°];\n"];//460.897 87.275 -162.528
+                        Instruction = "reset do1;\nmoveJ p1,v120;\nmoveJ p14,v120;\nmoveJ p22,v60;\nmoveL p2,v30;\nset do1;\nmoveL p14,v120;\nmoveJ p20,v120;\nmoveJ p28,v60;\nmoveL p8,v30;\nreset do1;\nmoveL p20,v120;\nmoveJ p15,v120;\nmoveJ p23,v60;\nmoveL p3,v30;\nset do1;\nmoveL p15,v120;\nmoveJ p21,v120;\nmoveJ p29,v60;\nmoveL p9,v30;\nreset do1;\nmoveL p21,v120;\nmoveJ p16,v120;\nmoveJ p24,v60;\nmoveL p4,v30;\nset do1;\nmoveL p16,v120;\nmoveJ p20,v120;\nmoveJ p30,v60;\nmoveL p10,v30;\nreset do1;\nmoveL p20,v120;\nmoveJ p17,v120;\nmoveJ p25,v60;\nmoveL p5,v30;\nset do1;\nmoveL p17,v120;\nmoveJ p21,v120;\nmoveJ p31,v60;\nmoveL p11,v30;\nreset do1;\nmoveL p21,v120;\nmoveJ p18,v120;\nmoveJ p26,v60;\nmoveL p6,v30;\nset do1;\nmoveL p18,v120;\nmoveJ p20,v120;\nmoveJ p32,v60;\nmoveL p12,v30;\nreset do1;\nmoveL p20,v120;\nmoveJ p19,v120;\nmoveJ p27,v60;\nmoveL p7,v30;\nset do1;\nmoveL p19,v120;\nmoveJ p21,v120;\nmoveJ p33,v60;\nmoveL p13,v30;\nreset do1;\nmoveL p21,v120;\nmoveJ p1,v120;";
+                        turnPoints = "472.53 -572.37 35.36 365 189.5 0 461.395 12.3038 285.61 461.395 12.3038 225.609 461.395 12.3038 165.609 401.395 12.3038 285.609 401.395 12.3038 225.609 401.395 12.3038 165.609 460.90 12.275 -102.53 460.897 12.275 -162.528 460.897 37.275 -102.528 460.897 37.27 -162.528 460.897 62.27 -102.528 460.897 62.275 -162.528 461.395 120 285.609 461.395 120 225.609 461.395 120 165.609 401.395 120 285.609 401.395 120 225.609 401.395 120 165.609 460.897 120 -102.528 460.897 120 -162.528 461.395 37.3038 285.61 461.395 37.3038 225.61 461.395 37.3038 165.61 401.395 37.3038 285.61 401.395 37.3038 225.61 401.395 37.3038 165.61 460.90 37.275 -102.53 460.897 37.275 -162.528 460.90 62.275 -102.53 460.897 62.275 -162.528 460.90 87.275 -102.53 460.897 87.275 -162.528";
+                        break;
+                    case '3':
+                        document.getElementById("Robot__viewP").setAttribute('position',"-83.39889 237.17003 -1446.33305");
+                        document.getElementById("Robot__viewP").setAttribute('orientation',"-0.01371 0.98526 0.17053 3.25211");
+                        s=["p0:[-97.421,500.932,100,180,0,-90];\n",
+                        "p1:[-97.421,500.932,30,180,0,-90];\n",
+                        "p2:[-97.421,500.932,11.357,180,0,-90];\n",
+                        "p3:[-96.66,502.881,11.357,180,0,-90];\n",
+                        "p4:[-95.727,504.706,11.357,180,0,-90];\n",
+                        "p5:[-93.434,508.045,11.357,180,0,-90];\n",
+                        "p6:[-90.725,511.074,11.357,180,0,-90];\n",
+                        "p7:[-87.781,513.918,11.357,180,0,-90];\n",
+                        "p8:[-85.444,516.02,11.357,180,0,-90];\n",
+                        "p9:[-82.978,517.932,11.357,180,0,-90];\n",
+                        "p10:[-79.434,520.015,11.357,180,0,-90];\n",
+                        "p11:[-75.693,521.816,11.357,180,0,-90];\n",
+                        "p12:[-71.315,523.795,11.357,180,0,-90];\n",
+                        "p13:[-66.815,525.311,11.357,180,0,-90];\n",
+                        "p14:[-63.155,525.935,11.357,180,0,-90];\n",
+                        "p15:[-59.418,526.271,11.357,180,0,-90];\n",
+                        "p16:[-53.651,526.648,11.357,180,0,-90];\n",
+                        "p17:[-50.783,526.671,11.357,180,0,-90];\n",
+                        "p18:[-47.936,526.486,11.357,180,0,-90];\n",
+                        "p19:[-44.073,525.842,11.357,180,0,-90];\n",
+                        "p20:[-36.626,524.142,11.357,180,0,-90];\n",
+                        "p21:[-33.158,522.997,11.357,180,0,-90];\n",
+                        "p22:[-29.715,521.327,11.357,180,0,-90];\n",
+                        "p23:[-26.654,519.962,11.357,180,0,-90];\n",
+                        "p24:[-23.745,518.402,11.357,180,0,-90];\n",
+                        "p25:[-21.439,516.494,11.357,180,0,-90];\n",
+                        "p26:[-19.307,514.292,11.357,180,0,-90];\n",
+                        "p27:[-16.202,510.857,11.357,180,0,-90];\n",
+                        "p28:[-14.875,509.028,11.357,180,0,-90];\n",
+                        "p29:[-13.848,507.066,11.357,180,0,-90];\n",
+                        "p30:[-12.944,503.701,11.357,180,0,-90];\n",
+                        "p31:[-11.937,496.16,11.357,180,0,-90];\n",
+                        "p32:[-11.824,494.202,11.357,180,0,-90];\n",
+                        "p33:[-11.929,492.271,11.357,180,0,-90];\n",
+                        "p34:[-12.739,489.955,11.357,180,0,-90];\n",
+                        "p35:[-15.029,482.586,11.357,180,0,-90];\n",
+                        "p36:[-16.404,479.708,11.357,180,0,-90];\n",
+                        "p37:[-17.524,478.15,11.357,180,0,-90];\n",
+                        "p38:[-18.819,476.699,11.357,180,0,-90];\n",
+                        "p39:[-21.587,473.877,11.357,180,0,-90];\n",
+                        "p40:[-24.008,471.188,11.357,180,0,-90];\n",
+                        "p41:[-26.571,468.73,11.357,180,0,-90];\n",
+                        "p42:[-29.438,466.898,11.357,180,0,-90];\n",
+                        "p43:[-36.24,463.503,11.357,180,0,-90];\n",
+                        "p44:[-40.052,461.905,11.357,180,0,-90];\n",
+                        "p45:[-44.733,460.599,11.357,180,0,-90];\n",
+                        "p46:[-47.64,460.037,11.357,180,0,-90];\n",
+                        "p47:[-48.772,459.913,11.357,180,0,-90];\n",
+                        "p48:[-49.982,458.704,11.357,180,0,-90];\n",
+                        "p49:[-50.029,457.692,11.357,180,0,-90];\n",
+                        "p50:[-49.873,453.643,11.357,180,0,-90];\n",
+                        "p51:[-49.552,452.671,11.357,180,0,-90];\n",
+                        "p52:[-48.238,452.129,11.357,180,0,-90];\n",
+                        "p53:[-46.897,452.405,11.357,180,0,-90];\n",
+                        "p54:[-45.556,452.682,11.357,180,0,-90];\n",
+                        "p55:[-44.703,451.457,11.357,180,0,-90];\n",
+                        "p56:[-45.504,449.756,11.357,180,0,-90];\n",
+                        "p57:[-46.993,448.889,11.357,180,0,-90];\n",
+                        "p58:[-48.576,449.187,11.357,180,0,-90];\n",
+                        "p59:[-49.735,450.043,11.357,180,0,-90];\n",
+                        "p60:[-51.172,449.958,11.357,180,0,-90];\n",
+                        "p61:[-51.78,449.143,11.357,180,0,-90];\n",
+                        "p62:[-53.48,448.689,11.357,180,0,-90];\n",
+                        "p63:[-54.789,449.481,11.357,180,0,-90];\n",
+                        "p64:[-55.16,450.511,11.357,180,0,-90];\n",
+                        "p65:[-54.068,451.47,11.357,180,0,-90];\n",
+                        "p66:[-52.53,451.713,11.357,180,0,-90];\n",
+                        "p67:[-51.367,453.159,11.357,180,0,-90];\n",
+                        "p68:[-50.903,454.615,11.357,180,0,-90];\n",
+                        "p69:[-50.855,456.773,11.357,180,0,-90];\n",
+                        "p70:[-51.219,458.952,11.357,180,0,-90];\n",
+                        "p71:[-51.932,460.323,11.357,180,0,-90];\n",
+                        "p72:[-53.157,460.842,11.357,180,0,-90];\n",
+                        "p73:[-58.265,460.981,11.357,180,0,-90];\n",
+                        "p74:[-62.133,461.959,11.357,180,0,-90];\n",
+                        "p75:[-67.159,463.794,11.357,180,0,-90];\n",
+                        "p76:[-70.614,465.609,11.357,180,0,-90];\n",
+                        "p77:[-73.847,467.818,11.357,180,0,-90];\n",
+                        "p78:[-76.606,470.101,11.357,180,0,-90];\n",
+                        "p79:[-79.211,472.568,11.357,180,0,-90];\n",
+                        "p80:[-81.204,474.668,11.357,180,0,-90];\n",
+                        "p81:[-82.983,476.93,11.357,180,0,-90];\n",
+                        "p82:[-85.154,480.676,11.357,180,0,-90];\n",
+                        "p83:[-86.825,483.663,11.357,180,0,-90];\n",
+                        "p84:[-88.753,486.396,11.357,180,0,-90];\n",
+                        "p85:[-90.041,487.739,11.357,180,0,-90];\n",
+                        "p86:[-91.556,488.992,11.357,180,0,-90];\n",
+                        "p87:[-92.694,489.732,11.357,180,0,-90];\n",
+                        "p88:[-93.849,490.03,11.357,180,0,-90];\n",
+                        "p89:[-95.219,489.336,11.357,180,0,-90];\n",
+                        "p90:[-96.409,488.003,11.357,180,0,-90];\n",
+                        "p91:[-97.539,486.358,11.357,180,0,-90];\n",
+                        "p92:[-98.042,484.649,11.357,180,0,-90];\n",
+                        "p93:[-98.102,482.892,11.357,180,0,-90];\n",
+                        "p94:[-97.558,481.304,11.357,180,0,-90];\n",
+                        "p95:[-96.307,480.203,11.357,180,0,-90];\n",
+                        "p96:[-94.118,479.431,11.357,180,0,-90];\n",
+                        "p97:[-92.565,478.698,11.357,180,0,-90];\n",
+                        "p98:[-91.125,477.744,11.357,180,0,-90];\n",
+                        "p99:[-89.031,476.022,11.357,180,0,-90];\n",
+                        "p100:[-87.857,474.791,11.357,180,0,-90];\n",
+                        "p101:[-86.903,473.4,11.357,180,0,-90];\n",
+                        "p102:[-86.278,471.887,11.357,180,0,-90];\n",
+                        "p103:[-85.882,470.285,11.357,180,0,-90];\n",
+                        "p104:[-85.613,468.281,11.357,180,0,-90];\n",
+                        "p105:[-85.727,466.236,11.357,180,0,-90];\n",
+                        "p106:[-86.341,464.635,11.357,180,0,-90];\n",
+                        "p107:[-88.099,463.795,11.357,180,0,-90];\n",
+                        "p108:[-90.365,463.805,11.357,180,0,-90];\n",
+                        "p109:[-91.901,464.006,11.357,180,0,-90];\n",
+                        "p110:[-93.315,464.368,11.357,180,0,-90];\n",
+                        "p111:[-96.318,465.878,11.357,180,0,-90];\n",
+                        "p112:[-98.16,467.336,11.357,180,0,-90];\n",
+                        "p113:[-99.354,469.092,11.357,180,0,-90];\n",
+                        "p114:[-100.238,469.941,11.357,180,0,-90];\n",
+                        "p115:[-101.223,470.34,11.357,180,0,-90];\n",
+                        "p116:[-102.685,469.521,11.357,180,0,-90];\n",
+                        "p117:[-104.057,467.906,11.357,180,0,-90];\n",
+                        "p118:[-105.519,466.721,11.357,180,0,-90];\n",
+                        "p119:[-107.129,465.938,11.357,180,0,-90];\n",
+                        "p120:[-109.306,465.247,11.357,180,0,-90];\n",
+                        "p121:[-111.588,465.019,11.357,180,0,-90];\n",
+                        "p122:[-113.505,465.355,11.357,180,0,-90];\n",
+                        "p123:[-115.239,466.23,11.357,180,0,-90];\n",
+                        "p124:[-116.39,467.747,11.357,180,0,-90];\n",
+                        "p125:[-116.555,468.752,11.357,180,0,-90];\n",
+                        "p126:[-116.32,470.92,11.357,180,0,-90];\n",
+                        "p127:[-115.89,472.482,11.357,180,0,-90];\n",
+                        "p128:[-115.297,473.922,11.357,180,0,-90];\n",
+                        "p129:[-114.537,475.238,11.357,180,0,-90];\n",
+                        "p130:[-113.603,476.431,11.357,180,0,-90];\n",
+                        "p131:[-111.898,477.974,11.357,180,0,-90];\n",
+                        "p132:[-109.939,479.191,11.357,180,0,-90];\n",
+                        "p133:[-104.822,481.175,11.357,180,0,-90];\n",
+                        "p134:[-103.895,481.76,11.357,180,0,-90];\n",
+                        "p135:[-102.942,483.396,11.357,180,0,-90];\n",
+                        "p136:[-102.458,485.419,11.357,180,0,-90];\n",
+                        "p137:[-101.065,490.204,11.357,180,0,-90];\n",
+                        "p138:[-99.212,494.781,11.357,180,0,-90];\n",
+                        "p139:[-98.696,495.758,11.357,180,0,-90];\n",
+                        "p140:[-95.763,500.21,11.357,180,0,-90];\n",
+                        "p141:[-93,503.888,11.357,180,0,-90];\n",
+                        "p142:[-90.654,506.599,11.357,180,0,-90];\n",
+                        "p143:[-88.367,508.733,11.357,180,0,-90];\n",
+                        "p144:[-85.852,510.613,11.357,180,0,-90];\n",
+                        "p145:[-82.831,512.373,11.357,180,0,-90];\n",
+                        "p146:[-79.665,513.779,11.357,180,0,-90];\n",
+                        "p147:[-75.218,515.301,11.357,180,0,-90];\n",
+                        "p148:[-73.87,515.837,11.357,180,0,-90];\n",
+                        "p149:[-72.806,516.704,11.357,180,0,-90];\n",
+                        "p150:[-72.38,517.663,11.357,180,0,-90];\n",
+                        "p151:[-72.252,520.028,11.357,180,0,-90];\n",
+                        "p152:[-71.928,521.293,11.357,180,0,-90];\n",
+                        "p153:[-71.357,522.494,11.357,180,0,-90];\n",
+                        "p154:[-70.646,523.359,11.357,180,0,-90];\n",
+                        "p155:[-69.406,523.317,11.357,180,0,-90];\n",
+                        "p156:[-68.01,521.21,11.357,180,0,-90];\n",
+                        "p157:[-66.833,519.903,11.357,180,0,-90];\n",
+                        "p158:[-65.247,519.044,11.357,180,0,-90];\n",
+                        "p159:[-63.437,518.545,11.357,180,0,-90];\n",
+                        "p160:[-60.915,518.328,11.357,180,0,-90];\n",
+                        "p161:[-58.732,518.651,11.357,180,0,-90];\n",
+                        "p162:[-56.576,519.246,11.357,180,0,-90];\n",
+                        "p163:[-50.849,520.937,11.357,180,0,-90];\n",
+                        "p164:[-48.188,521.294,11.357,180,0,-90];\n",
+                        "p165:[-43.463,521.475,11.357,180,0,-90];\n",
+                        "p166:[-37.13,520.817,11.357,180,0,-90];\n",
+                        "p167:[-33.28,520.289,11.357,180,0,-90];\n",
+                        "p168:[-29.678,519.681,11.357,180,0,-90];\n",
+                        "p169:[-28.045,518.999,11.357,180,0,-90];\n",
+                        "p170:[-26.653,517.84,11.357,180,0,-90];\n"
+                        ];
+                        Instruction='moveJ p0,v200;\nmoveL p1,v150;\nmoveL p2,v100;\nmoveL p3,v100;\nmoveL p4,v100;\nmoveL p5,v100;\nmoveL p6,v100;\nmoveL p7,v100;\
+                        moveL p8,v100;\
+                        moveL p9,v100;\
+                        moveL p10,v100;\
+                        moveL p11,v100;\
+                        moveL p12,v100;\
+                        moveL p13,v100;\
+                        moveL p14,v100;\
+                        moveL p15,v100;\
+                        moveL p16,v100;\
+                        moveL p17,v100;\
+                        moveL p18,v100;\
+                        moveL p19,v100;\
+                        moveL p20,v100;\
+                        moveL p21,v100;\
+                        moveL p22,v100;\
+                        moveL p23,v100;\
+                        moveL p24,v100;\
+                        moveL p25,v100;\
+                        moveL p26,v100;\
+                        moveL p27,v100;\
+                        moveL p28,v100;\
+                        moveL p29,v100;\
+                        moveL p30,v100;\
+                        moveL p31,v100;\
+                        moveL p32,v100;\
+                        moveL p33,v100;\
+                        moveL p34,v100;\
+                        moveL p35,v100;\
+                        moveL p36,v100;\
+                        moveL p37,v100;\
+                        moveL p38,v100;\
+                        moveL p39,v100;\
+                        moveL p40,v100;\
+                        moveL p41,v100;\
+                        moveL p42,v100;\
+                        moveL p43,v100;\
+                        moveL p44,v100;\
+                        moveL p45,v100;\
+                        moveL p46,v100;\
+                        moveL p47,v100;\
+                        moveL p48,v100;\
+                        moveL p49,v100;\
+                        moveL p50,v100;\
+                        moveL p51,v100;\
+                        moveL p52,v100;\
+                        moveL p53,v100;\
+                        moveL p54,v100;\
+                        moveL p55,v100;\
+                        moveL p56,v100;\
+                        moveL p57,v100;\
+                        moveL p58,v100;\
+                        moveL p59,v100;\
+                        moveL p60,v100;\
+                        moveL p61,v100;\
+                        moveL p62,v100;\
+                        moveL p63,v100;\
+                        moveL p64,v100;\
+                        moveL p65,v100;\
+                        moveL p66,v100;\
+                        moveL p67,v100;\
+                        moveL p68,v100;\
+                        moveL p69,v100;\
+                        moveL p70,v100;\
+                        moveL p71,v100;\
+                        moveL p72,v100;\
+                        moveL p73,v100;\
+                        moveL p74,v100;\
+                        moveL p75,v100;\
+                        moveL p76,v100;\
+                        moveL p77,v100;\
+                        moveL p78,v100;\
+                        moveL p79,v100;\
+                        moveL p80,v100;\
+                        moveL p81,v100;\
+                        moveL p82,v100;\
+                        moveL p83,v100;\
+                        moveL p84,v100;\
+                        moveL p85,v100;\
+                        moveL p86,v100;\
+                        moveL p87,v100;\
+                        moveL p88,v100;\
+                        moveL p89,v100;\
+                        moveL p90,v100;\
+                        moveL p91,v100;\
+                        moveL p92,v100;\
+                        moveL p93,v100;\
+                        moveL p94,v100;\
+                        moveL p95,v100;\
+                        moveL p96,v100;\
+                        moveL p97,v100;\
+                        moveL p98,v100;\
+                        moveL p99,v100;\
+                        moveL p100,v100;\
+                        moveL p101,v100;\
+                        moveL p102,v100;\
+                        moveL p103,v100;\
+                        moveL p104,v100;\
+                        moveL p105,v100;\
+                        moveL p106,v100;\
+                        moveL p107,v100;\
+                        moveL p108,v100;\
+                        moveL p109,v100;\
+                        moveL p110,v100;\
+                        moveL p111,v100;\
+                        moveL p112,v100;\
+                        moveL p113,v100;\
+                        moveL p114,v100;\
+                        moveL p115,v100;\
+                        moveL p116,v100;\
+                        moveL p117,v100;\
+                        moveL p118,v100;\
+                        moveL p119,v100;\
+                        moveL p120,v100;\
+                        moveL p121,v100;\
+                        moveL p122,v100;\
+                        moveL p123,v100;\
+                        moveL p124,v100;\
+                        moveL p125,v100;\
+                        moveL p126,v100;\
+                        moveL p127,v100;\
+                        moveL p128,v100;\
+                        moveL p129,v100;\
+                        moveL p130,v100;\
+                        moveL p131,v100;\
+                        moveL p132,v100;\
+                        moveL p133,v100;\
+                        moveL p134,v100;\
+                        moveL p135,v100;\
+                        moveL p136,v100;\
+                        moveL p137,v100;\
+                        moveL p138,v100;\
+                        moveL p139,v100;\
+                        moveL p140,v100;\
+                        moveL p141,v100;\
+                        moveL p142,v100;\
+                        moveL p143,v100;\
+                        moveL p144,v100;\
+                        moveL p145,v100;\
+                        moveL p146,v100;\
+                        moveL p147,v100;\
+                        moveL p148,v100;\
+                        moveL p149,v100;\
+                        moveL p150,v100;\
+                        moveL p151,v100;\
+                        moveL p152,v100;\
+                        moveL p153,v100;\
+                        moveL p154,v100;\
+                        moveL p155,v100;\
+                        moveL p156,v100;\
+                        moveL p157,v100;\
+                        moveL p158,v100;\
+                        moveL p159,v100;\
+                        moveL p160,v100;\
+                        moveL p161,v100;\
+                        moveL p162,v100;\
+                        moveL p163,v100;\
+                        moveL p164,v100;\
+                        moveL p165,v100;\
+                        moveL p166,v100;\
+                        moveL p167,v100;\
+                        moveL p168,v100;\
+                        moveL p169,v100;\
+                        moveL p170,v100;\
+                        moveJ p0,v200;'
+                }
+        }
+        let str="";
+        for(let m=0;m<s.length;m++){
+            str= str + s[m] ;
+        }
+        document.getElementById("points").value=str;
+        if(Instruction)document.getElementById("instrInput").value=Instruction;
+        if(turnPoints)document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+    }
+</script>
+</body>
+</html>

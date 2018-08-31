@@ -4,7 +4,6 @@
   "description": "chatserver",
   "private": true,
   "dependencies": {
-    "mime": "~1.2.7",
     "mysql": "^2.15.0",
     "ws": "^5.2.0"
   }
