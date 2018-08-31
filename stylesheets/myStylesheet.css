@@ -1,0 +1,38 @@
+.outerBox{
+    overflow: auto;
+}
+.robotType{
+    width: 200px;
+    height: 200px;
+    display: block;
+    float: left;
+}
+.robotType>h3{
+    margin: 0;
+}
+
+.imgContainer{
+    display: block;
+    width: 100%;
+    height: 170px;
+}
+.txtContainer{
+    display: none;
+    width: 100%;
+    height: 170px;
+    margin: auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+}
+.txtContainer h4{
+    text-align: center;
+}
+.imgContainer>img{
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.typeTitle{
+    text-align: center;
+}

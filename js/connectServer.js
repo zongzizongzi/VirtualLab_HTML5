@@ -56,7 +56,7 @@ function submitInstructions() {
 }
 function loginSuccess() {
     sendFormData();
-    layer.msg( '登录成功，数据传输中……')
+    layer.msg( '登录成功，数据传输中……');
 }
 function sendFormData() {
     setTimeout(function () {
