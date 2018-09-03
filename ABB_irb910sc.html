@@ -199,10 +199,10 @@
                 indexI--;
                 break;
             case -1:
-                s=["p0:,[450,0,130,180°,0°,0°];\n","p1:[300,300,130,180°,0°,0°];\n","p2:[300,300,50,180°,0°,0°];\n","p3:[400,0,130,180°,0°,0°];\n","p4:[400,0,50,180°,0°,0°];\n",]
+                s=["p0:,[450,0,130,180°,0°,0°];\n","p1:[300,300,130,180°,0°,0°];\n","p2:[300,300,20,180°,0°,0°];\n","p3:[400,0,130,180°,0°,0°];\n","p4:[400,0,20,180°,0°,0°];\n",]
 
                 document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;";
-                turnPoints=" 300 130 -300 300 50 -300 400 130 0 400 50 0 450 130 0";
+                turnPoints=" 300 130 -300 300 20 -300 400 130 0 400 20 0 450 130 0";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 indexI=5;
         }

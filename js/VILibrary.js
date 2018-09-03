@@ -11225,7 +11225,8 @@ VILibrary.VI = {
             let haveTool=false;
             let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40',qijiaTrans="13,0,0",qijiaRotate="1,0,0,-0.785398163";
             let gongjianTrans1='461.395,0,285.5',gongjianTrans2='461.395,0,225.5',gongjianTrans3='460,0,165.5';
-            let gongjianTrans4='401.395,0,285.609',gongjianTrans5='401.395,0,225.609',gongjianTrans6='401.395,0,165.609';            function draw() {
+            let gongjianTrans4='401.395,0,285.609',gongjianTrans5='401.395,0,225.609',gongjianTrans6='401.395,0,165.609';
+            /*function draw() {
                 switch(robNum){
                     case "k60":
                         jiajuScal="2,2,2";
@@ -11313,7 +11314,7 @@ VILibrary.VI = {
                 haveTool=true;
 
 
-            }
+            }*/
 
             function draw() {
             	switch(robNum){
@@ -11326,7 +11327,7 @@ VILibrary.VI = {
 					case "a910":
 						jiajuRotate='0,0,1,-1.5707963';
                         jiajuTrans="0,65,0";
-                        boxTrans='300,40,-300';
+                        boxTrans='300,20,-300';
                         break;
                     case "a360":
                         jiajuRotate='0,0,1,-1.5707963';
@@ -11376,7 +11377,7 @@ VILibrary.VI = {
                 $("#Robot__lastLink").after(toolSwitch);
                 var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
                     "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
-                    "<box size='40,40,40'></box>" +
+                    "<box size="+boxSize+"></box>" +
                     "</shape></transform>";
                 var gongjian1="<transform DEF='gongjian1' translation="+gongjianTrans1+" nameSpaceName id='Robot__gongjian1' render='true'>" +
                     "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
