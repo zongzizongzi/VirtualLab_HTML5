@@ -133,42 +133,17 @@
                 注：p相对坐标系{A}的位置为<sup>A</sup>p,相对坐标系{B}的位置为<sup>B</sup>p,<br>
                 齐次变换矩阵T综合描述了{B}相对于{A}的平移和旋转变换。
                 <br><br>
-                <h4>计算浮动坐标系中点p[2,3,5]相对固定坐标系的坐标：</h4>
+                <h4>计算浮动坐标系中点p：<span id="pPos"></span>相对固定坐标系的坐标：</h4>
                 <table class="matrix_table" id="result_table" >
                     <tr>
-                        <td class="matrix_top"></td>
-                        <td><input value="1"></td>
+                        <td class="matrix_top matrix_bottom"></td>
                         <td><input value="0"></td>
                         <td><input value="0"></td>
                         <td><input value="0"></td>
-                        <td class="matrix_top"></td>
-                    </tr>
-                    <tr>
-                        <td ></td>
-                        <td><input value="0"></td>
-                        <td><input value="1"></td>
-                        <td><input value="0"></td>
-                        <td><input value="0"></td>
-                        <td ></td>
-                    </tr>
-                    <tr>
-                        <td ></td>
-                        <td><input value="0"></td>
-                        <td><input value="0"></td>
-                        <td><input value="1"></td>
-                        <td><input value="0"></td>
-                        <td ></td>
-                    </tr>
-                    <tr>
-                        <td class="matrix_bottom">&nbsp;</td>
-                        <td><input value="0"></td>
-                        <td><input value="0"></td>
-                        <td><input value="0"></td>
-                        <td><input value="1"></td>
-                        <td class="matrix_bottom">&nbsp;</td>
+                        <td class="matrix_top matrix_bottom"></td>
                     </tr>
                 </table>
-                <button class="button" style="float: right;margin-top: 0.5em">提交计算结果</button>
+                <button class="button" onclick="coordSystemVI.check(pos)" style="float: right;margin-top: 0.5em">提交计算结果</button>
             </div>
 
         </div>
@@ -177,7 +152,7 @@
 </div>
 
 <script src="js/VILibrary.js"></script>
-<!--js简写方法-->
+<script src="js/math/math.min.js"></script>
 <script src="js/jquery-3.1.1.min.js"></script>
 <!--弹出框-->
 <script src="js/layui/lay/dest/layui.all.js"></script>
@@ -185,46 +160,12 @@
 <script>
     'use strict';
     let  coordSystemVI = new VILibrary.VI.CoordSystemVI($('#X3d'), true);
+    let pos;
+    $(document).ready(function() {
+        pos=[parseInt(Math.random()*10),parseInt(Math.random()*10),parseInt(Math.random()*10)];
+        document.getElementById('pPos').innerText='['+pos.toString()+']';
 
-//    let transElement=document.getElementById("transDiv");
-//    let transInputs=transElement.getElementsByClassName('transInput');
-    let rotElements=$(".rotateDiv");
-    let quterSpans=$('.quaternion');
-    let method="RPY";
-    let  R_R=[
-        ['cα*cβ','cα*sβ*sγ-sα*cγ','cα*sβ*cγ+sα*sγ'],
-        ['sα*cβ','sα*sβ*sγ+cα*cγ','sα*sβ*cγ-cα*sγ'],
-        ['-sβ','cβ*sγ','cβ*cγ']];
-     function axis() {
-        let rotEle=document.getElementById('rotate_Axis_Ang').getElementsByClassName("rotInput");
-        let len=Math.sqrt(rotEle[0].value*rotEle[0].value+rotEle[1].value*rotEle[1].value+rotEle[2].value*rotEle[2].value);
-        let rot=[];
-        for(let i=0;i<3;i++){
-            if(len==0&&i==0){
-                len=1;
-                rot[i]=1;
-            }
-            else rot[i]=rotEle[i].value/len;
-            rotEle[i].value=rot[i];
-            rotEle[i].previousElementSibling.value= rot[i];
-        }
-        coordSystemVI.setAxis(rot);
-    }
-    function quater() {
-        let rotEle=document.getElementById('rotate_Quaternion').getElementsByClassName("rotInput");
-        let len=Math.sqrt(rotEle[0].value*rotEle[0].value+rotEle[1].value*rotEle[1].value+rotEle[2].value*rotEle[2].value+rotEle[3].value*rotEle[3].value);
-        let rot=[];
-        for(let i=0;i<rotEle.length;i++){
-            if(len==0&&i==0){
-                len=1;
-                rot[i]=1;
-            }
-            else rot[i]=rotEle[i].value/len;
-            rotEle[i].value=rot[i];
-            rotEle[i].previousElementSibling.value= rot[i];
-        }
-        coordSystemVI.setData(rot,method)
-    }
+    })
     function changeTrans(input) {
         input.previousElementSibling.value=input.value;
         let currentTrans=[];
@@ -242,9 +183,7 @@
     }
     function changeTransTxt(input) {
         input.nextElementSibling.value=input.value;
-        if(!(method=="Axis_Ang"&&input.id!='a_Ang'&&input.nextElementSibling.className=="rotInput")){
-            changeTrans(input.nextElementSibling);
-        }
+        changeTrans(input.nextElementSibling);
     }
 </script>
 </body>

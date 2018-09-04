@@ -11477,11 +11477,11 @@ VILibrary.VI = {
             }
         }
 	},
-	DirectionSystemVI:class CoordSystemVI extends TemplateVI{
+	DirectionSystemVI:class DirectionSystemVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas, draw3DFlag);
             const _this = this;
-            this.name = 'CoordSystem';
+            this.name = 'DirectionSystem';
             let floatAxis,rotAxis;
             this.R=[[1,0,0],
                 [0,1,0],
@@ -11698,8 +11698,7 @@ VILibrary.VI = {
                 [0,1,0,0],
                 [0,0,1,0],
                 [0,0,0,1]
-			]
-
+			];
             this.draw = function (){
                 if (draw3DFlag) {
                     //此处向网页插入HTML代码
@@ -11719,37 +11718,38 @@ VILibrary.VI = {
             }
             this.draw();
             this.setData=function (input) {
-                let R=[],rot=[];
-                let len=input.length;
 
 				/*let pos=[input[0],input[1],input[2]];
 				 let trans=''+input[0]+","+input[2]+","+(-input[1]);
                 if(!floatAxis) floatAxis=document.getElementById('axis__floating');
                 floatAxis.setAttribute("translation",trans);*/
-
-				rot=[input[0]/180*Math.PI,input[1]/180*Math.PI,input[2]/180*Math.PI];
-				R=RPY(rot);
-                if(method!='Axis_Ang') R_to_AA(R);
-                //平移坐标系模型
+				let trans=input.map(function (item,index) {
+					if(index<3) return item/180*Math.PI;
+					else return item;
+                })
+				let T=RPY(trans);//计算齐次矩阵
+                 R_to_AA(T);//旋转模型
+                R_to_Martrix(T);//填写矩阵
+                //平移模型
                 let trans=''+input[3]+","+input[5]+","+(-input[4]);
                 if(!floatAxis) floatAxis=document.getElementById('axis__floating');
                 floatAxis.setAttribute("translation",trans);
-                let T=R.concat();
-                T[0].push(input[3]);T[1].push(input[4]);T[2].push(input[5]);
-                T.push([0,0,0,1]);
-                this.T=T.concat();
-                R_to_Martrix(T)
+                // let T=R.concat();
+                // T[0].push(input[3]);T[1].push(input[4]);T[2].push(input[5]);
+                // T.push([0,0,0,1]);
+                // this.T=T.concat();
             }
-            function RPY(rot,pos) {
+            function RPY(trans) {
                 //计算alpha，belta,gamma的正余弦
-                let alpha=rot[2],belta=rot[1],gamma=rot[0];
+                let alpha=trans[2],belta=trans[1],gamma=trans[0];
                 let ca=Math.cos(alpha), sa=Math.sin(alpha),
                     cb=Math.cos(belta), sb=Math.sin(belta),
                     cy=Math.cos(gamma), sy=Math.sin(gamma);
                 let R=[
-                    [ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy],
-                    [sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy],
-                    [-sb,cb*sy,cb*cy]
+                    [ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,trans[3]],
+                    [sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,trans[4]],
+                    [-sb,cb*sy,cb*cy,trans[5]],
+					[0,0,0,1]
                 ];
                 return R
             }
@@ -11776,26 +11776,58 @@ VILibrary.VI = {
                     }
                 }
             }
-            this.check=function () {
-                let r_trs=document.getElementById("result_table").getElementsByTagName("tr");
-                let result=true;
-                for(let i=0;i<r_trs.length;i++){
-                    let tds=(r_trs[i]).getElementsByTagName('input');
-                    for(let j=0;j<tds.length;j++){
-                        if(Math.abs(parseFloat(tds[j].value)-this.T[i][j])<0.2){
-                            tds[j].style.backgroundColor='white'
-                            continue;
-                        }
-                        else {
-                            tds[j].style.backgroundColor='red';
-                            result=false;
-                        }
+            this.check=function (pos) {
+                let posRseult=math.multiply(this.T,pos.concat(1));
+                posRseult.pop();//去掉末尾的1
+                let resultIsCorrect=true;
+                let tds=document.getElementById("result_table").getElementsByTagName("input");
+                //结果只有一维
+                for(let j=0;j<tds.length;j++){
+                    if(Math.abs(parseFloat(tds[j].value)-posRseult[j])<0.2){
+                        tds[j].style.backgroundColor='white';
+                        continue;
+                    }
+                    else {
+                        tds[j].style.backgroundColor='red';
+                        resultIsCorrect=false;
                     }
                 }
-                if(!result)layer.msg("计算结果错误!",{icon: 2});
+                if(!resultIsCorrect)layer.msg("计算结果错误!",{icon: 2});
                 else layer.msg("计算结果正确，进入下一环节！",{icon: 1});
             }
 
+        }
+    },
+    RobotLinksVI:class RobotLinksVI extends TemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas, draw3DFlag);
+            const _this = this;
+            this.name = 'RobotLinks';
+            let floatAxis, rotAxis;
+            this.T=[
+                [1,0,0,0],
+                [0,1,0,0],
+                [0,0,1,0],
+                [0,0,0,1]
+            ];
+            this.draw = function (index){
+                if (draw3DFlag) {
+                    //此处向网页插入HTML代码
+                    this.container.innerHTML = '<x3d style="width: 100%;height: 100%;"><scene>' +
+                        '<inline nameSpaceName="axis" mapDEFToID="true" url="assets/RobotLinks/link'+index+'.x3d"></inline>' +
+                        '</scene></x3d>';
+                }
+                else {
+
+                    this.ctx = this.container.getContext("2d");
+                    let img = new Image();
+                    img.src = '';
+                    img.onload = function () {
+                        _this.ctx.drawImage(img, 0, 0, _this.container.width, _this.container.height);
+                    };
+                }
+            }
+            this.draw(0);
         }
     }
 };

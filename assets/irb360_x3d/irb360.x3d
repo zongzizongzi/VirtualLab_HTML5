@@ -4,7 +4,7 @@
         <directionalLight id="directional" direction='0 -0.5 -0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
         <!--<directionalLight id="directional" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>-->
         <directionalLight id="directional2"  direction='0 0.5 0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
-        <Viewpoint position="-88.42445 -2.01368 2393.32209" orientation="-0.98164 -0.19025 -0.01371 0.26097" zNear="100" zFar="6000" description=""></Viewpoint>
+        <Viewpoint position="-2387.25011 -157.14988 110.24701" orientation="-0.09035 -0.99049 -0.10378 1.54417"></Viewpoint>
         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
         <transform>
             <Transform def="line">

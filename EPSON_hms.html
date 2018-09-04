@@ -73,25 +73,24 @@
                     <p>E_Z：<input id="eulerZ" type="text" value="0" class="robotPA" disabled="disabled">°</p>
                 </div>
             </div>
-            <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
-                <div class="message_div" style="height: 23%;">
-                    <p>设置示教点</p>
-                    <textarea id="points" name="points" style="width: 90%;height: 66%;margin: 10px">
+            <div class="message_div" style="height: 23%;">
+                <p>设置示教点</p>
+                <textarea id="points" name="points" style="width: 90%;height: 66%;margin: 10px">
                     </textarea>
-                    <div class="rowFlex-div">
-                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
-                        <button type="button" id="delete" onclick="changePoints(2)">删除</button>
-                        <button type="button" id="clear" onclick="changePoints(0)">清空</button>
-                    </div>
+                <div class="rowFlex-div">
+                    <button type="button" id="add" onclick="changePoints(1)">添加</button>
+                    <button type="button" id="delete" onclick="changePoints(2)">删除</button>
+                    <button type="button" id="clear" onclick="changePoints(0)">清空</button>
                 </div>
-                <div class="message_div" style="height: 22%;">
-                    <p>控制指令</p>
-                    <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
-                    <div class="rowFlex-div">
-                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
-                    </div>
+            </div>
+            <div class="message_div" style="height: 22%;">
+                <p>控制指令</p>
+                <textarea id="instrInput" name="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <div class="rowFlex-div">
+                    <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
                 </div>
-            </form>
+            </div>
+            <div style="clear: both"></div>
         </div>
     </div>
 
