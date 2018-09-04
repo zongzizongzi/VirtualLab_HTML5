@@ -11477,13 +11477,15 @@ VILibrary.VI = {
             }
         }
 	},
-	CoordSystemVI:class CoordSystemVI extends TemplateVI{
+	DirectionSystemVI:class CoordSystemVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas, draw3DFlag);
             const _this = this;
             this.name = 'CoordSystem';
             let floatAxis,rotAxis;
-
+            this.R=[[1,0,0],
+                [0,1,0],
+                [0,0,1]];
             this.draw=function() {
                 if (draw3DFlag) {
                     //此处向网页插入HTML代码
@@ -11510,7 +11512,6 @@ VILibrary.VI = {
 				let trans=''+input[0]+","+input[2]+","+(-input[1]);
 				if(!floatAxis) floatAxis=document.getElementById('axis__floating');
 				floatAxis.setAttribute("translation",trans);*/
-
                 switch (method){
 					case "Euler":
                         rot=[input[0]/180*Math.PI,input[1]/180*Math.PI,input[2]/180*Math.PI];
@@ -11542,6 +11543,7 @@ VILibrary.VI = {
 						}
 				}
 				if(method!='Axis_Ang') R_to_AA(R);
+                this.R=R;
                /* R=[
                 	[R[0][0],R[0][1],R[0][2],input[0]],
 					[R[1][0],R[1][1],R[1][2],input[1]],
@@ -11556,16 +11558,13 @@ VILibrary.VI = {
                 rotAxis.setAttribute('point','0 0 0 '+rot[0]*20+' '+rot[2]*20+' '+(-rot[1]*20))
 			}
             this.reset=function() {
+                this.R=[[1,0,0],
+                    [0,1,0],
+                    [0,0,1]];
                 if(rotAxis)rotAxis.setAttribute('point','0 0 0 0 0 0');
                 if(floatAxis) {
                 	floatAxis.setAttribute("rotation",'1,0,0,0');
                 }
-                let R_0=[
-                    [1,0,0,0],
-                    [0,1,0,0],
-                    [0,0,1,0],
-                    [0,0,0,1]
-                ]
 				// R_to_Martrix(R_0);
                 // R_to_Quternion(R_0)
             }
@@ -11614,6 +11613,7 @@ VILibrary.VI = {
 				//参考：https://blog.csdn.net/shenxiaolu1984/article/details/50639298
 				return R;
             }
+            //转换成轴角模式并旋转模型
             function R_to_AA(R) {
             	let nx=R[0][0],ox=R[0][1],ax=R[0][2],
 					ny=R[1][0],oy=R[1][1],ay=R[1][2],
@@ -11665,19 +11665,137 @@ VILibrary.VI = {
 				}
 
             }
-            let r_trs=document.getElementById("result_table").getElementsByTagName("tr");
-            function R_to_Martrix(R) {
-            	for(let i=0;i<r_trs.length;i++){
-            		let tds=(r_trs[i]).getElementsByTagName('td');
-					for(let j=0;j<4;j++){
-            			tds[j+1].innerText=R[i][j].toFixed(3);
-					}
-				}
-
+            this.check=function () {
+                let r_trs=document.getElementById("result_table").getElementsByTagName("tr");
+                let result=true;
+                for(let i=0;i<r_trs.length;i++){
+                    let tds=(r_trs[i]).getElementsByTagName('input');
+                    for(let j=0;j<tds.length;j++){
+                        if(Math.abs(parseFloat(tds[j].value)-this.R[i][j])<0.2){
+                            tds[j].style.backgroundColor='white'
+                        	continue;
+                        }
+                        else {
+                        	tds[j].style.backgroundColor='red';
+                        	result=false;
+                        }
+                    }
+                }
+                if(!result)layer.msg("计算结果错误!",{icon: 2});
+				else layer.msg("计算结果正确，进入下一环节！",{icon: 1});
             }
 
+        }
+	},
+    CoordSystemVI:class CoordSystemVI extends TemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas, draw3DFlag);
+            const _this = this;
+            this.name = 'CoordSystem';
+            let floatAxis, rotAxis;
+            this.T=[
+            	[1,0,0,0],
+                [0,1,0,0],
+                [0,0,1,0],
+                [0,0,0,1]
+			]
+
+            this.draw = function (){
+                if (draw3DFlag) {
+                    //此处向网页插入HTML代码
+                    this.container.innerHTML = '<x3d style="width: 100%;height: 100%;"><scene>' +
+                        '<inline nameSpaceName="axis" mapDEFToID="true" url="assets/CoordTrans/coordTrans.x3d"></inline>' +
+                        '</scene></x3d>';
+                }
+                else {
+
+                    this.ctx = this.container.getContext("2d");
+                    let img = new Image();
+                    img.src = '';
+                    img.onload = function () {
+                        _this.ctx.drawImage(img, 0, 0, _this.container.width, _this.container.height);
+                    };
+                }
+            }
+            this.draw();
+            this.setData=function (input) {
+                let R=[],rot=[];
+                let len=input.length;
+
+				/*let pos=[input[0],input[1],input[2]];
+				 let trans=''+input[0]+","+input[2]+","+(-input[1]);
+                if(!floatAxis) floatAxis=document.getElementById('axis__floating');
+                floatAxis.setAttribute("translation",trans);*/
+
+				rot=[input[0]/180*Math.PI,input[1]/180*Math.PI,input[2]/180*Math.PI];
+				R=RPY(rot);
+                if(method!='Axis_Ang') R_to_AA(R);
+                //平移坐标系模型
+                let trans=''+input[3]+","+input[5]+","+(-input[4]);
+                if(!floatAxis) floatAxis=document.getElementById('axis__floating');
+                floatAxis.setAttribute("translation",trans);
+                let T=R.concat();
+                T[0].push(input[3]);T[1].push(input[4]);T[2].push(input[5]);
+                T.push([0,0,0,1]);
+                this.T=T.concat();
+                R_to_Martrix(T)
+            }
+            function RPY(rot,pos) {
+                //计算alpha，belta,gamma的正余弦
+                let alpha=rot[2],belta=rot[1],gamma=rot[0];
+                let ca=Math.cos(alpha), sa=Math.sin(alpha),
+                    cb=Math.cos(belta), sb=Math.sin(belta),
+                    cy=Math.cos(gamma), sy=Math.sin(gamma);
+                let R=[
+                    [ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy],
+                    [sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy],
+                    [-sb,cb*sy,cb*cy]
+                ];
+                return R
+            }
+            //转换成轴角模式并旋转模型
+            function R_to_AA(R) {
+                let nx=R[0][0],ox=R[0][1],ax=R[0][2],
+                    ny=R[1][0],oy=R[1][1],ay=R[1][2],
+                    nz=R[2][0],oz=R[2][1],az=R[2][2];
+                let theta=Math.acos(0.5*(nx+oy+az-1));
+                let kx=(oz-ay)/(2*Math.sin(theta)),
+                    ky=(ax-nz)/(2*Math.sin(theta)),
+                    kz=(ny-ox)/(2*Math.sin(theta));
+                let rot=''+kx+","+kz+","+(-ky)+","+theta;
+                if(!floatAxis) floatAxis=document.getElementById('axis__floating');
+                floatAxis.setAttribute("rotation",rot);
+            }
+            //计算旋转矩阵R并将结果填到表格中
+            function R_to_Martrix(R) {
+                let r_trs=document.getElementById("T_table").getElementsByTagName("tr");
+                for(let i=0;i<r_trs.length;i++){
+                    let tds=(r_trs[i]).getElementsByTagName('td');
+                    for(let j=0;j<tds.length-2;j++){//减2消去首末空白单元格
+                        tds[j+1].innerText=R[i][j].toFixed(3);
+                    }
+                }
+            }
+            this.check=function () {
+                let r_trs=document.getElementById("result_table").getElementsByTagName("tr");
+                let result=true;
+                for(let i=0;i<r_trs.length;i++){
+                    let tds=(r_trs[i]).getElementsByTagName('input');
+                    for(let j=0;j<tds.length;j++){
+                        if(Math.abs(parseFloat(tds[j].value)-this.T[i][j])<0.2){
+                            tds[j].style.backgroundColor='white'
+                            continue;
+                        }
+                        else {
+                            tds[j].style.backgroundColor='red';
+                            result=false;
+                        }
+                    }
+                }
+                if(!result)layer.msg("计算结果错误!",{icon: 2});
+                else layer.msg("计算结果正确，进入下一环节！",{icon: 1});
+            }
 
         }
-	}
-
+    }
 };
