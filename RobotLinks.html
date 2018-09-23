@@ -26,7 +26,7 @@
 </head>
 <body>
 <div class="main-div" style="width: 1500px;">
-    <h1 class="title"><b>坐标转换实验</b></h1>
+    <h1 class="title"><b>机器人连杆描述实验</b></h1>
     <div class="back" ><a href="index.html">←返回主目录</a>/<a href="Robotics.html">机器人目录</a></div>
     <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
     <div id="index_div">
@@ -48,9 +48,63 @@
                     <input type="radio" name="linkIndex" value="2">连杆2
                     <input type="radio" name="linkIndex" value="3">连杆3
                     <input type="radio" name="linkIndex" value="4">连杆4
-                    <input type="radio" name="linkIndex" value="4">连杆5
+                    <input type="radio" name="linkIndex" value="5">连杆5
                 </div>
             </div>
+            <div class="message_div">
+                <h4>连杆所在机构及尺寸</h4>
+                <img id="robotImg" src="assets/RobotLinks/120/img.jpg" style="width: 90%">
+                <h4>在机器人中的位置：第<span id="linkNumber">2</span>连杆</h4>
+            </div>
+            <div class="message_div">
+                <h4>填写连杆参数</h4>
+                <table style="width: 400px" id="d-hTable">
+                    <tr>
+                        <td>连杆编号</td>
+                        <td>a</td>
+                        <td>α</td>
+                        <td>d</td>
+                        <td>θ</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                        <td><input value="0"></td>
+                    </tr>
+                </table>
+                <button class="button" onclick="check(pos)" style="float: right;margin-top: 0.5em">提交结果</button>
+            </div>
+
         </div>
     </div>
 
@@ -67,9 +121,12 @@
     $(document).ready(function() {
         $('input[type=radio][name=linkIndex]').change(function() {
             let method=this.value;
-            linksVI.draw(method)
+            linksVI.changeLink(method);
         });
     });
+    function check() {
+        layer.msg("提交成功，进入下一环节！",{icon: 1});
+    }
 </script>
 </body>
 </html>

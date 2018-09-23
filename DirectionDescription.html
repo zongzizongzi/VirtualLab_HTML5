@@ -208,7 +208,7 @@
         ];
     let note_A='运动坐标系绕k=(kx,ky,kz)定义的轴旋转角度θ；sθ=sinθ,cθ=cosθ,Versθ=(1-cosθ);',
         note_E='运动坐标系绕其Z轴旋转角度α，后绕其Y轴旋转角度β，最后绕其Z轴旋转角度γ；sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推',
-        note_Q='四元数将轴_角所包含的信息归一化到一个统一的四维空间中，便于计算和插值.q=(kx*sin(θ/2), ky*sin(θ/2), kz*sin(θ/2)，cos(θ/2)) 。',
+        note_Q='四元数将轴_角所包含的信息归一化到一个统一的四维空间中，便于计算和插值。',//q=(kx*sin(θ/2), ky*sin(θ/2), kz*sin(θ/2)，cos(θ/2)) 。',
         note_R='运动坐标系绕固定坐标系X轴旋转角度γ，称为偏转(Yaw)；绕固定Y轴旋转角度β，称为俯仰(Pitch)；绕固定Z轴旋转角度α，称为回转(Roll);sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推';
     let f_trs=document.getElementById("formula_table").getElementsByTagName("tr");
     let r_trs=document.getElementById("result_table").getElementsByTagName("tr");
@@ -224,7 +224,6 @@
         for(let ele of rotElements){
             ele.style.display=ele.id==('rotate_'+method)?'block':'none'
         }
-
         //切换公式显示和注释
         let R0=[[1,0,0],
             [0,1,0],

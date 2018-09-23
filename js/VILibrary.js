@@ -11544,6 +11544,7 @@ VILibrary.VI = {
 				}
 				if(method!='Axis_Ang') R_to_AA(R);
                 this.R=R;
+                console.log(R);
                /* R=[
                 	[R[0][0],R[0][1],R[0][2],input[0]],
 					[R[1][0],R[1][1],R[1][2],input[1]],
@@ -11730,10 +11731,11 @@ VILibrary.VI = {
 				let T=RPY(trans);//计算齐次矩阵
                  R_to_AA(T);//旋转模型
                 R_to_Martrix(T);//填写矩阵
+				this.T=T;
                 //平移模型
-                let trans=''+input[3]+","+input[5]+","+(-input[4]);
+                let pos=''+input[3]+","+input[5]+","+(-input[4]);
                 if(!floatAxis) floatAxis=document.getElementById('axis__floating');
-                floatAxis.setAttribute("translation",trans);
+                floatAxis.setAttribute("translation",pos);
                 // let T=R.concat();
                 // T[0].push(input[3]);T[1].push(input[4]);T[2].push(input[5]);
                 // T.push([0,0,0,1]);
@@ -11795,7 +11797,6 @@ VILibrary.VI = {
                 if(!resultIsCorrect)layer.msg("计算结果错误!",{icon: 2});
                 else layer.msg("计算结果正确，进入下一环节！",{icon: 1});
             }
-
         }
     },
     RobotLinksVI:class RobotLinksVI extends TemplateVI {
@@ -11812,10 +11813,10 @@ VILibrary.VI = {
             ];
             this.draw = function (index){
                 if (draw3DFlag) {
-                    //此处向网页插入HTML代码
                     this.container.innerHTML = '<x3d style="width: 100%;height: 100%;"><scene>' +
-                        '<inline nameSpaceName="axis" mapDEFToID="true" url="assets/RobotLinks/link'+index+'.x3d"></inline>' +
+                        '<inline nameSpaceName="Link" mapDEFToID="true" url="assets/RobotLinks/robotLinks.x3d"></inline>' +
                         '</scene></x3d>';
+                    //此处向网页插入HTML代码
                 }
                 else {
 
@@ -11825,9 +11826,52 @@ VILibrary.VI = {
                     img.onload = function () {
                         _this.ctx.drawImage(img, 0, 0, _this.container.width, _this.container.height);
                     };
+                };
+            };
+            this.draw();
+            this.changeLink=function (index) {
+                let url="120/link2.x3d",linkNum=2;
+                switch (index){
+                    case '1':
+                        url="120/link2.x3d";
+                        linkNum=2;
+                        break;
+                    case '2':
+                        url="120/link4.x3d";
+                        linkNum=4;
+                        break;
+                    case '3':
+                        url="60/link1.x3d";
+                        linkNum=1;
+                        break;
+                    case '4':
+                        url="60/link3.x3d";
+                        linkNum=3;
+                        break;
+                    case '5':
+                        // url="60/link5.x3d";
+                        url="910/link2.x3d";
+                        linkNum=2;
+                        break;
+                    default:
+                        url="120/link2.x3d";
+                        linkNum=2;
                 }
+                if(index==3||index==4) {
+                	document.getElementById('robotImg').src='assets/RobotLinks/60/img.jpg';
+                	document.getElementById("Link__linkTrans").setAttribute("translation",'-3000,-800,-1000');
+                }
+                else if(index==5){
+                    document.getElementById('robotImg').src='assets/RobotLinks/910/img.jpg';
+                    document.getElementById("Link__linkTrans").setAttribute("translation",'0,0,0');
+				}
+                else  {
+                    document.getElementById('robotImg').src='assets/RobotLinks/120/img.jpg';
+                	document.getElementById("Link__linkTrans").setAttribute("translation",'0,0,0');
+                }
+                document.getElementById("Link__showLink").setAttribute("url",url);
+                document.getElementById("linkNumber").innerText=linkNum;
             }
-            this.draw(0);
         }
     }
 };

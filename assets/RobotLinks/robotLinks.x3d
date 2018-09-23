@@ -1,0 +1,15 @@
+<x3d id="" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Viewpoint position="652.37427 270.18229 628.80844" orientation="-0.30151 0.95324 -0.02045 0.81149"></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+
+        <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='1.0' shadowIntensity='0.0'></directionalLight>
+        <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='1.0' shadowIntensity='0.0'></directionalLight>
+        <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+        <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+        <transform id="linkTrans">
+            <inline id="showLink" url="120/link2.x3d"> </inline>
+        </transform>
+    </scene>
+</x3d>

@@ -547,6 +547,9 @@ html {
     font-size: 17px;
     font-family:"Times New Roman";
 }
+#d-hTable input{
+    width: 80%;
+}
 .linkInput{
     background-color: inherit;
     width: 90%;
