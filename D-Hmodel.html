@@ -7,11 +7,31 @@
     <link rel="stylesheet" href="css/main.css">
     <script type='text/javascript' src='x3dom/x3dom.js'> </script>
     <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+    <script>
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<3;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+            if(i!=3)document.getElementById("exm_video").pause();
+            else document.getElementById("exm_video").play();
+        }
+    </script>
 </head>
 <body>
 <div class="main-div" style="width: 1500px;">
     <div class="title"><b>D-H模型实验(原型机器人：ABB_IRB120)</b></div>
     <div class="back" ><a href="index.html">←返回主目录</a>/<a href="Robotics.html">机器人目录</a></div>
+    <div id="index_div_robotics">
+        <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button>
+    </div>
+    <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/baseTheoryExperiment/D_H_model.htm" ></embed></div>
+    <div id="index_2"><video id="demo" src="video/demo/机器人.mp4" controls></video></div>
     <div id="index_1" style="height: 800px">
         <div style="width: 60%;height: 100%;display: inline;float: left">
             <div id="robotX3d" style="width: 100%;height: 100%;">

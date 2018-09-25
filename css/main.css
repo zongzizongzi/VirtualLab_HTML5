@@ -490,6 +490,18 @@ html {
     cursor: pointer;
     margin: 0 auto;
 }
+#index_div_robotics .InstBtn{
+    font-size: 18px;
+    background: #aaddff ;
+    width: 33.333333%;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    color: #333;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-bottom: hidden;
+    cursor: pointer;
+    margin: 0 auto;
+}
 #index_2{//实验演示GIF
     margin: auto;
     display: none;
