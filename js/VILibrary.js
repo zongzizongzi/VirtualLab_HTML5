@@ -11477,6 +11477,66 @@ VILibrary.VI = {
             }
         }
 	},
+    DisassemblyVI:class DisassemblyVI extends RobotTemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas,draw3DFlag);
+            const _this = this;
+            // RobotTemplateVI.prototype.robotURL='assets/kuka_KR60HA_x3d/kuka_kr60.x3d';
+            // RobotTemplateVI.prototype.draw(draw3DFlag);
+            this.robotURL='assets/Disassembly/robot120.x3d';
+            this.draw(draw3DFlag);
+            this.name = 'Disassembly';
+			/*this.currentLen=[166,124,270,70,150,152,59,13];
+			 this.currentScal=[1,1,1,1,1,1,1,1];
+			 this.initLen=[166,124,270,70,150,152,59,13];*/
+            this.a_d=[815,850,145,820,170,350];
+            let dragFlag=false;
+            let downPos=[0,0,0];
+            window.setTimeout(function () {
+                let L0=document.getElementById('Robot__link0');
+                let marker="<Transform id='marker' scale='15 15 15' translation='300 0 0'><Shape><Appearance>"+
+                    "<Material diffuseColor='#FFD966'></Material>"+
+                    "</Appearance><Sphere></Sphere> </Shape> </Transform>";
+                $('#Robot__base').after(marker);
+                L0.addEventListener("click",function (event) {
+                    $('#marker').attr('translation', event.hitPnt);
+                })
+                L0.addEventListener('mousedown',function (event) {
+                    dragFlag=true;
+                    downPos=event.hitPnt;
+                })
+                L0.addEventListener('mouseup',function () {
+                    dragFlag=false;
+                });
+              /*  L0.addEventListener('mouseout',function () {
+				 dragFlag=false;
+				 })*/
+                L0.addEventListener('mousemove',function (event) {
+                    if(dragFlag){
+                    	let movePos=event.hitPnt;
+                    	let moveDis=math.add(movePos,math.multiply(-1,downPos));
+                        $('#Robot__link0').attr('translation')
+                        $('#Robot__link0').attr('translation', event.hitPnt)
+                    }
+                },false)
+
+            },2000)
+        }
+        static get cnName() {
+
+            return 'KUKA_kr60';
+        }
+
+        static get defaultWidth() {
+
+            return '550px';
+        }
+
+        static get defaultHeight() {
+
+            return '300px';
+        }
+    },
 	DirectionSystemVI:class DirectionSystemVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas, draw3DFlag);
