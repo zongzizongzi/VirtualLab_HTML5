@@ -568,7 +568,7 @@ class RobotTemplateVI extends TemplateVI {
 				 </x3d>*!/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
 				 document.getElementById("x3d120").innerHTML=my_html;*/
                 this.container.innerHTML='<x3d style="width: 100%;height: 100%;border:none"><scene>'+
-                    '<inline nameSpaceName="Robot"  mapDEFToID="true" url='+this.robotURL+'></inline>'+
+                    '<inline id="Robot" nameSpaceName="Robot"  mapDEFToID="true" url='+this.robotURL+'></inline>'+
                     '</scene></x3d>';
             }
             else {
@@ -11052,6 +11052,7 @@ VILibrary.VI = {
             this.currentScal=[1,1,1,1,1,1,1,1];
             this.initLen=[166,124,270,70,150,152,59,13];
             this.a_d=[290,270,70,302,72];
+
         }
         static get cnName() {
 
@@ -11490,7 +11491,21 @@ VILibrary.VI = {
 			 this.currentScal=[1,1,1,1,1,1,1,1];
 			 this.initLen=[166,124,270,70,150,152,59,13];*/
             this.a_d=[815,850,145,820,170,350];
-            let dragFlag=false;
+            this.changeRobot=function(method){
+            	switch (method){
+					case '1':this.robotURL='assets/Disassembly/robot120.x3d';
+						break;
+                    case '2':this.robotURL='assets/Disassembly/robot360.x3d';
+                        break;
+                    case '3':this.robotURL='assets/Disassembly/robot910.x3d';
+                        break;
+                    case '4':this.robotURL='assets/Disassembly/epson.x3d';
+                        break;
+					default:this.robotURL='assets/Disassembly/robot120.x3d';
+				}
+                $('#Robot').attr('url', this.robotURL);
+			}
+            /*let dragFlag=false;
             let downPos=[0,0,0];
             window.setTimeout(function () {
                 let L0=document.getElementById('Robot__link0');
@@ -11508,9 +11523,9 @@ VILibrary.VI = {
                 L0.addEventListener('mouseup',function () {
                     dragFlag=false;
                 });
-              /*  L0.addEventListener('mouseout',function () {
+              /!*  L0.addEventListener('mouseout',function () {
 				 dragFlag=false;
-				 })*/
+				 })*!/
                 L0.addEventListener('mousemove',function (event) {
                     if(dragFlag){
                     	let movePos=event.hitPnt;
@@ -11520,7 +11535,7 @@ VILibrary.VI = {
                     }
                 },false)
 
-            },2000)
+            },2000)*/
         }
         static get cnName() {
 

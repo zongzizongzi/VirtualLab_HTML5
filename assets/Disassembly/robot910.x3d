@@ -1,0 +1,63 @@
+<x3d id="910scX3d" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Viewpoint position="305.21113 400 1156.69868" orientation="-0.66577 0.69759 -0.26479 0.09602" zNear="547.48577" zFar="1979.03065" description=""></Viewpoint>
+
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+        <directionalLight id="directional" direction='0 -0.5 -0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <!--<directionalLight id="directional" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>-->
+        <directionalLight id="directional2"  direction='0 0.5 0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <!--<PointLight id='point' on='TRUE' intensity='1' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='0 0 200 '  attenuation='0 0 0' radius='50.0000'> </PointLight>-->
+        <!--<SpotLight id='spot' on ="TRUE" beamWidth='1.5' color='1 1 1' cutOffAngle='1.5' location='400 200 200' radius='200' >  </SpotLight>-->
+        <transform  translation="0,0,0">
+            <inline DEF="platform" url="../platform.x3d"> </inline>
+        </transform>
+        <transform  translation="0,0,0" >
+            <Transform>
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='0 0 1'/>
+                    </Appearance>
+                    <IndexedLineSet id='LineSet_index' coordIndex=''>
+                        <Coordinate id='LineSet_points' point=''/>
+                    </IndexedLineSet>
+                </Shape>
+            </Transform>
+            <Transform>
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='1 0 0'/>
+                    </Appearance>
+                    <PointSet>
+                        <Coordinate id='PointSet_points' point=''/>
+                    </PointSet>
+                </Shape>
+            </Transform>
+            <Transform translation="0,194,0">
+                <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                <transform>
+                    <inline url="../irb910sc_x3d/base.x3d"> </inline>
+                </transform>
+
+                <transform DEF="link0" id="link0" rotation="0,1,0,0">
+                    <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                    <transform>
+                        <inline url="../irb910sc_x3d/link1.x3d"> </inline>
+                    </transform>
+                    <transform translation="200,0,0" DEF="link1" id="link1" rotation="0,0,1,0">
+                        <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                        <transform>
+                            <inline url="../irb910sc_x3d/link2.x3d"> </inline>
+                        </transform>
+                        <transform translation="250,0,0" DEF="link2"  id="link2" rotation="0,0,1,0">
+                            <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform DEF="link3">
+                                <inline DEF="lastLink" url="../irb910sc_x3d/link3.x3d"> </inline>
+                            </transform>
+                        </transform>
+                    </transform>
+                </transform>
+            </Transform>
+        </transform>
+    </scene>
+</x3d>

@@ -1,0 +1,78 @@
+<x3d id="120X3d" style="width: 100%;height: 100%;">
+     <scene>
+         <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+         <Viewpoint position="150.59727 447.13675 1751.41311" orientation="-0.80979 0.47664 -0.34214 0.07007" zNear="513.41955" zFar="3456.26839" description=""></Viewpoint>
+         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+
+         <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+         <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+         <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+         <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+         <transform   ><!--translation="0,-500,0"-->
+             <inline DEF="platform" url="../platform.x3d"> </inline>
+             <transform def="base">
+                 <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                 <transform >
+                    <inline url="../irb120_x3d/base.x3d"> </inline>
+                 </transform>
+             </transform>
+             <transform DEF="link0" rotation="0,1,0,0" translation="0,166,0" >
+                 <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                 <transform >
+                        <inline url="../irb120_x3d/link1.x3d"> </inline>
+                 </transform>
+             </transform>
+             <transform DEF="link1" translation="0,290,0" mapDEFToID="true" rotation="0,0,1,0">
+                 <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'>
+                 </planeSensor>
+                 <transform >
+                    <inline url="../irb120_x3d/link2.x3d"> </inline>
+                </transform>
+             </transform>
+
+              <transform translation="0,560,0" DEF="link2"  mapDEFToID="true" rotation="0,0,1,0">
+                  <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                  <transform >
+                                    <inline url="../irb120_x3d/link3.x3d"> </inline>
+                  </transform>
+              </transform>
+             <transform translation="150,630,0" DEF="link3" mapDEFToID="true" rotation="1,0,0,0">
+                 <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                 <transform >
+                                        <inline url="../irb120_x3d/link4.x3d"> </inline>
+                 </transform>
+             </transform>
+             <transform translation="302,630,0" DEF="link4" mapDEFToID="true" rotation="0,0,-1,0">
+                 <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                 <transform >
+                                            <inline url="../irb120_x3d/link5.x3d"> </inline>
+                 </transform>
+             </transform>
+             <transform translation="361,630,0" DEF="link5" mapDEFToID="true" rotation="1,0,0,0">
+                 <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                 <transform >
+                                                <inline DEF="lastLink" url="../irb120_x3d/link6.x3d"> </inline>
+                 </transform>
+             </transform>
+         </transform>
+     </scene>
+</x3d>
+<!--<transform def="base">
+                    <inline url="../irb120_x3d/base.x3d"> </inline>
+                 </transform>
+                 <transform  >
+                     <transform DEF="link0"  rotation="0,1,0,0" translation="0,166,0">
+                        <inline url="../irb120_x3d/link1.x3d"> </inline>
+                     </transform>
+                     <transform>
+                            <transform DEF="link1" translation="0,290,0" mapDEFToID="true" rotation="0,0,1,0">
+                                <inline url="../irb120_x3d/link2.x3d"> </inline>
+                            </transform>
+                            <transform >
+                                 <transform translation="0,560,0" DEF="link2"  mapDEFToID="true" rotation="0,0,1,0">
+                                    <inline url="../irb120_x3d/link3.x3d"> </inline>
+                                 </transform>
+                                 <transform>
+                                     <transform translation="150,730,0" DEF="link3" mapDEFToID="true" rotation="1,0,0,0">
+                                        <inline url="../irb120_x3d/link4.x3d"> </inline>
+                                     </transform>-->

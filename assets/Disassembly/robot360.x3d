@@ -1,0 +1,87 @@
+<x3d id="120X3d" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <directionalLight id="directional" direction='0 -0.5 -0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <!--<directionalLight id="directional" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>-->
+        <directionalLight id="directional2"  direction='0 0.5 0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <Viewpoint position="203.95591 -496.13681 2334.10879" orientation="-0.53368 0.83938 -0.10306 0.09161" zNear="0.67077" zFar="6707.65515" description=""></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+        <transform>
+            <transform translation="0,-1200,0" scale="3,3,3">
+                <inline DEF="platform" url="../platform.x3d" scale="1.5,1,1.5"> </inline>
+            </transform>
+            <Transform translation="">
+                <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                <transform>
+                    <inline url="../irb360_x3d/base.x3d"> </inline>
+                </transform>
+                <transform  translation="0,-275,200">
+                    <transform DEF="link0_1">
+                        <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                        <transform>
+                            <inline url="../irb360_x3d/L1.x3d"> </inline>
+                        </transform>
+                        <transform translation="50,0,235" DEF="link0_2r"  rotation="1,0,0,2.0800204983301263" >
+                            <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform>
+                                <inline url="../irb360_x3d/L2(right).x3d"> </inline>
+                            </transform>
+                        </transform>
+                        <transform translation="-50,0,235" DEF="link0_2l"  rotation="1,0,0,2.0800204983301263" >
+                            <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform>
+                                <inline url="../irb360_x3d/L2(left).x3d"> </inline>
+                            </transform>
+                        </transform>
+                    </transform>
+                </transform>
+                <transform  translation="-173.20508075689,-275,-100" rotation="0,1,0,-2.0944">
+                    <transform DEF="link1_1">
+                        <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                        <transform>
+                            <inline url="../irb360_x3d/L1.x3d"> </inline>
+                        </transform>
+                        <transform translation="50,0,235" DEF="link1_2r" rotation="1,0,0,2.0800204983301263">
+                            <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform>
+                                <inline url="../irb360_x3d/L2(right).x3d"> </inline>
+                            </transform>
+                        </transform>
+                        <transform translation="-50,0,235" DEF="link1_2l"  rotation="1,0,0,2.0800204983301263" >
+                            <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform>
+                                <inline url="../irb360_x3d/L2(left).x3d"> </inline>
+                            </transform>
+                        </transform>
+                    </transform>
+                </transform>
+                <transform translation="173.20508075689,-275,-100"  rotation="0,1,0,2.0944" >
+                    <transform DEF="link2_1">
+                        <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                        <transform>
+                            <inline url="../irb360_x3d/L1.x3d"> </inline>
+                        </transform>
+                        <transform translation="50,0,235" DEF="link2_2r" rotation="1,0,0,2.0800204983301263">
+                            <planeSensor autoOffset='true' axisRotation='1,0,0,0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform>
+                                <inline url="../irb360_x3d/L2(right).x3d"> </inline>
+                            </transform>
+                        </transform>
+                        <transform translation="-50,0,235" DEF="link2_2l"  rotation="1,0,0,2.0800204983301263" >
+                            <planeSensor autoOffset='true' axisRotation='1,0,0,0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                            <transform>
+                                <inline url="../irb360_x3d/L2(left).x3d"> </inline>
+                            </transform>
+                        </transform>
+                    </transform>
+                </transform>
+                <transform DEF="plate" translation="0,-972.5,0">
+                    <planeSensor autoOffset='true' axisRotation='1 0 0 0'  onoutputchange='processTranslationGizmoEvent(event)'></planeSensor>
+                    <transform>
+                        <inline url="../irb360_x3d/plate.x3d" DEF="lastLink"></inline>
+                    </transform>
+                </transform>
+            </Transform>
+        </transform>
+    </scene>
+</x3d>

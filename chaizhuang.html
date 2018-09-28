@@ -35,15 +35,11 @@
     <div id="index_2"><video id="demo" src="video/demo/robotsOperation.mp4" controls></video></div>
     <div id="index_3"><video id="exm_video" src="" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div class="rowFlex-div" style="background: #aaddffb8">
-            <input type="radio" name="robotIndex" value="1" checked="checked">关节型机器人
-            <input type="radio" name="robotIndex" value="2">并联型机器人
-            <input type="radio" name="robotIndex" value="3">SCARA机器人
-            <input type="radio" name="robotIndex" value="4">直角坐标机器人
-        </div>
-        <div style="width: 100%;height: 100%;display: inline;float: left">
+        <div style="width: 80%;height: 100%;display: inline;float: left">
             <div id="robotX3d" style="width: 100%;height: 100%;">
             </div>
+        </div>
+        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
         </div>
     </div>
 
@@ -56,29 +52,20 @@
 <script src="js/communication.js"></script>
 <script>
     'use strict';
-    let disassemblyVI = new VILibrary.VI.DisassemblyVI($('#robotX3d'), true);
-//    let downPos=[0,0,0];
-    window.onload=function() {
-        $('input[type=radio][name=robotIndex]').change(function() {
-            let method=this.value;
-            disassemblyVI.changeRobot(method);
-        });
-    };
-    function processTranslationGizmoEvent(event)
-    {
-        var sensorToWorldMatrix, translationValue;
+    let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
+    let val=[0],ang;
+    let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
+    let s=[],indexI=0;
+    document.onload=function () {
+        let L0=document.getElementById("Robot__link0");
+        L0.addEventListener('click',function (eve) {
+            console.log(eve.hitPnt)
+        })
 
-        if (event.fieldName === 'translation_changed')
-        {
-            //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
-            sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
-
-            translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
-
-            //transform the affected sensor geometry
-            event.target.parentNode.getElementsByTagName('transform')[0].setFieldValue('translation', translationValue);
-        }
     }
+
+
+    
 
 </script>
 </body>
