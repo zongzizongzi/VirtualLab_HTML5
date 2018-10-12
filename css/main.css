@@ -27,7 +27,7 @@ h1, h2, h3, h4, h5, h6 {
 
 address, caption, cite, code, dfn, em, strong, th, var {
     font-style: normal;
-    font-weight: normal;
+    /*font-weight: normal;*/
 }
 
 a {
@@ -493,7 +493,7 @@ html {
 #index_div_robotics .InstBtn{
     font-size: 18px;
     background: #aaddff ;
-    width: 33.333333%;
+    width: 25%;
     padding-top: 7px;
     padding-bottom: 7px;
     color: #333;
