@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <title>Robotics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../stylesheets/stylesheet1.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../stylesheets/myStylesheet.css">
+</head>
+<body>
+<section class="page-header" >
+    <!--<h1 class="project-name">工业机器人认知与操作虚拟实验<br/><br/><br/></h1>-->
+    <img src="../img/Logo1.jpg" alt="">
+</section>
+<section class="main-content">
+    <div style="margin: auto;" id="pc_index">
+        <table id="stuList" align="center">
+            <tr>
+                <th>
+                姓名
+                </th>
+                <th>
+                    学号
+                </th>
+                <th>
+                    作业内容
+                </th>
+            </tr>
+        </table>
+    </div>
+    <div style="clear: both;height:80px;" id="footer">
+        <footer class="site-footer">
+            <!--<span class="site-footer-owner">Virtuallab is maintained by -->
+            <h>注：本网站基于HTML5与WebGL技术开发，请使用支持HTML5及WebGL的浏览器浏览。</h>
+            <a href="https://caniuse.com/">获取浏览器支持信息</a><br>
+            <a href="http://114.215.189.49:8000">旧版入口</a></span>
+        </footer>
+    </div>
+</section>
+<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript">
+    getData(dataDeal);
+
+    //进行数据的处理,并将其添加到表格中
+    function dataDeal(data) {
+        let dataLen = data.length;
+        let table = document.getElementById("showContent");
+        for(let i = 0 ; i < dataLen ; i++) {
+            //插入行
+            let tr = table.insertRow();
+            //为每行循环插入列
+            for (let j = 0 ; j < 4 ; j++) {
+                let td = tr.insertCell();
+                switch(j) {
+                    case 0 : {
+                        td.innerHTML = i + 1;
+                        break;
+                    }
+                    case 1 : {
+                        td.innerHTML = data[i].name;
+                        break;
+                    }
+                    case 2 : {
+                        td.innerHTML = data[i].studentId;
+                        break;
+                    }
+                    case 3 : {
+                        let params = "?name=" + data[i].name + "&studentId=" + data[i].studentId;
+                        let a = document.createElement('a');
+                        a.innerHTML = "详情";
+                        a.className = "tdDetail";
+                        a.setAttribute('href' , "./detail.html" + params);
+                        td.appendChild(a);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
+
