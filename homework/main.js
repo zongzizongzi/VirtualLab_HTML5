@@ -1,6 +1,32 @@
 /**
  * Created by admin on 2018/10/12.
  */
+/*function upLoadData() {
+
+}*/
+if(document.getElementById("submit")){
+    document.getElementById("submit").addEventListener("click" , function() {
+        if(!document.querySelector("#name").value){
+            alert("姓名不能为空，请添加姓名……");
+            return;
+        }
+        if(!document.querySelector("#studentId").value){
+            alert("学号不能为空，请添加学号……");
+            return;
+        }
+        let data = check(document.getElementById("form"));
+        data.push(document.getElementById("homework").innerText);
+        data.push(document.getElementsByClassName("title")[0].innerText);
+        let files = document.getElementById("annex").files;
+        for(let i = 0 ; i < files.length; i++){
+            data.push(files[i]);
+        }
+        submitData(data);
+    });
+
+}
+
+
 
 //用来获取表单中内容(除了文件）
 function check(form) {
@@ -16,7 +42,7 @@ function check(form) {
 //进行数据的提交
 function submitData(data) {
     let request = new XMLHttpRequest();
-    request.open("POST" , "http://localhost:9002/upload" , true);
+    request.open("POST" , "http://114.215.189.49:9002/upload" , true);
     let formDatas = formData(data);
     request.send(formDatas);
     request.onreadystatechange = function() {
@@ -83,3 +109,4 @@ function getParamValue(name) {
         return null;
     }
 }
+

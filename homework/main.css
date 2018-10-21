@@ -45,13 +45,16 @@ body{
 }
 .workContent .answerDiv #answer{
     width: 100%;
-    height: 200px;
+    height: 300px;
     overflow-y: scroll;
 }
 #submit{
     width: 70px;
 }
-#homework{
+.homeworkDiv{
     text-align: left;
+}
+#workType{
+    font-size: 150%;
 }
 

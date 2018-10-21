@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <title>作业详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../stylesheets/stylesheet1.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="../stylesheets/myStylesheet.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+<section class="page-header" >
+    <!--<h1 class="project-name">工业机器人认知与操作虚拟实验<br/><br/><br/></h1>-->
+    <img src="../img/Logo1.jpg" alt="">
+</section>
+<section class="main-content">
+    <div style="margin: auto;" id="pc_index">
+        <div class="baseInform">
+            <div class="nameDiv">
+                <label for="name">姓名：</label>
+                <input type="text" id="name" disabled="disabled">
+            </div>
+            <div class="studentIdDiv">
+                <label for="studentId">学号:</label>
+                <input type="text" id="studentId" disabled="disabled">
+            </div>
+        </div>
+        <table id="showContent" align="center">
+            <tr>
+                <th>
+                    序号
+                </th>
+                <th>
+                    实验名称
+                </th>
+                <th>
+                    作业内容
+                </th>
+                <th>
+                    作答内容
+                </th>
+                <th>
+                    附件
+                </th>
+            </tr>
+
+        </table>
+    </div>
+    <div style="clear: both;height:80px;" id="footer">
+        <footer class="site-footer">
+            <!--<span class="site-footer-owner">Virtuallab is maintained by -->
+            <h>注：本网站基于HTML5与WebGL技术开发，请使用支持HTML5及WebGL的浏览器浏览。</h>
+            <a href="https://caniuse.com/">获取浏览器支持信息</a><br>
+            <a href="http://114.215.189.49:8000">旧版入口</a></span>
+        </footer>
+    </div>
+</section>
+<script src="../js/jquery-3.1.1.min.js"></script>
+<script src="main.js"></script>
+<script>
+    let params = document.location.search;
+    getDetailData(params , dataDeal);
+
+    //进行数据的处理,并将其添加到表格中
+    function dataDeal(data) {
+        //添加姓名学号
+        document.getElementById('name').value= data[0].name;
+        document.getElementById('studentId').value= data[0].studentId;
+        //添加表格内容
+        let dataLen = data.length;
+        let table = document.getElementById("showContent");
+        for(let i = 0 ; i < dataLen ; i++) {
+            //插入行
+            let tr = table.insertRow();
+            //为每行循环插入列
+            for (let j = 0 ; j <= 4 ; j++) {
+                let td = tr.insertCell();
+                switch(j) {
+                    case 0 : {
+                        td.innerHTML = i + 1;
+                        break;
+                    }
+                    case 1: {
+                        td.innerHTML = data[i].type;
+                        break;
+                    }
+                    case 2 : {
+                        td.style.textAlign='left'
+                        td.innerHTML = data[i].homework;
+                        break;
+                    }
+                    case 3 : {
+                        td.innerHTML = data[i].answer;
+                        break;
+                    }
+                    case 4 : {
+                        //let params = "?name=" + data[i].name + "&studentId=" + data[i].studentId;
+                        if(data[i].filePath){
+                            let a = document.createElement('a');
+                            a.innerHTML = "查看附件";
+                            a.className = "tdDetail";
+                            a.download=data[i].name+"_"+data[i].studentId+"_"+data[i].filePath;
+                            if(data[i].filePath){
+                                a.setAttribute('href' , "./server/file/" + data[i].filePath);
+                            }
+                            td.appendChild(a);
+                        }
+                        else {td.innerHTML ='暂无附件'}
+                        break;
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -36,10 +36,8 @@
 .typeTitle{
     text-align: center;
 }
-#stuTable{
 
-}
-#stuList td{
+#showContent td{
     width: 200px;
     text-align: center;
 }

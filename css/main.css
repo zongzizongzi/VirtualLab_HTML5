@@ -619,7 +619,8 @@ html {
 .right_column{
     width:20%;
     font: normal 15px Calibri;
-    /*display: inline;*/
+    display: inline;
+    overflow: scroll;
     align-items: stretch;
     float: left;
     text-align: center;
