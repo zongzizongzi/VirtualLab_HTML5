@@ -21,10 +21,12 @@ body{
     flex-direction: row;
     justify-content: space-around;
     font-size: 20px;
-    margin-bottom: 5px;
+    padding: 20px 10px 10px 10px;
 }
 .baseInform input{
     width: 140px;
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
 }
 .baseInform .studentIdDiv{
     margin-left: 30px;
@@ -57,4 +59,19 @@ body{
 #workType{
     font-size: 150%;
 }
+#showContent td{
+    width: 200px;
+    text-align: center;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+#homework_td{
+    width: 300px;
+}
+
+
+
+
+
+
 

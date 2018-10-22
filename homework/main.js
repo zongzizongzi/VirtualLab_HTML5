@@ -42,7 +42,7 @@ function check(form) {
 //进行数据的提交
 function submitData(data) {
     let request = new XMLHttpRequest();
-    request.open("POST" , "http://114.215.189.49:9002/upload" , true);
+    request.open("POST" , "https://drvi.net:9002/upload" , true);
     let formDatas = formData(data);
     request.send(formDatas);
     request.onreadystatechange = function() {
@@ -68,7 +68,7 @@ function formData(data) {
 //进行数据的查找
 function getData(callback){
     let request = new XMLHttpRequest();
-    request.open("GET" , "http://114.215.189.49:9002/getContent" , true);
+    request.open("GET" , "https://drvi.net:9002/getContent" , true);
     request.send();
 
     request.onreadystatechange = function() {
@@ -84,7 +84,7 @@ function getData(callback){
 //获取详细信息
 function getDetailData(params , callback) {
     let request = new XMLHttpRequest();
-    request.open("GET" , "http://114.215.189.49:9002/getDetailContent" + params , true);
+    request.open("GET" , "https://drvi.net:9002/getDetailContent" + params , true);
     request.send();
 
     request.onreadystatechange = function() {

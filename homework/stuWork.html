@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>作业详情</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="../stylesheets/stylesheet1.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="../stylesheets/myStylesheet.css">
+    <link rel="stylesheet" type="text/css" href="../stylesheets/stylesheet1.css">
+    <link  rel="stylesheet" type="text/css" href="../stylesheets/myStylesheet.css">
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -16,6 +16,9 @@
 <section class="main-content">
     <div style="margin: auto;" id="pc_index">
         <div class="baseInform">
+            <div >
+                <a href="admin.html">←返回</a>
+            </div>
             <div class="nameDiv">
                 <label for="name">姓名：</label>
                 <input type="text" id="name" disabled="disabled">
@@ -33,7 +36,7 @@
                 <th>
                     实验名称
                 </th>
-                <th>
+                <th id="homework_td">
                     作业内容
                 </th>
                 <th>
@@ -99,7 +102,7 @@
                             let a = document.createElement('a');
                             a.innerHTML = "查看附件";
                             a.className = "tdDetail";
-                            a.download=data[i].name+"_"+data[i].studentId+"_"+data[i].filePath;
+                            a.download=data[i].filePath;
                             if(data[i].filePath){
                                 a.setAttribute('href' , "./server/file/" + data[i].filePath);
                             }
