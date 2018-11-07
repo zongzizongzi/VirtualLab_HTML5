@@ -9815,6 +9815,15 @@ VILibrary.VI = {
                     Range=[[30,470],[55,500],[0,300]];
                     OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];break;
                     break;
+				case 'yumi':
+					A=[0,0,30,30,40.5,40.5,27,0,27];
+                    D=[0,0,0,251.5,0,265,0,0,120];
+                    ALPHA=[0,0,-Math.PI/2,-Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,0];
+                    THETA=[0,0,Math.PI,0,Math.PI/2,Math.PI,Math.PI,0,-Math.PI/2];
+                    currentANG=[0,0,0,0,0,0,0,0,0];
+                    Range=[[-168.5,168.5],[-143.5,43.5],[-123.5,80],[-290,290],[-88,138],[-229,229],[-168.5,168.5]];
+                    OMEGA=[180,180,180,400,400,400,180];
+                    break;
 				case "a120":default:
 					A=[0,0,0,270,70,0,0,0];//不加tool最后一个为0
 					D=[290,0,0,0,302,0,0,72];//加tool最后一个为72
@@ -10124,11 +10133,11 @@ VILibrary.VI = {
             	let instructPos=input1.concat();
             	let lastPos=currentPOS.concat();
 				let diffPos=math.add(instructPos,math.multiply(-1,lastPos));
-                let t=Math.sqrt(Math.pow(diffPos[0],2)+Math.pow(diffPos[1],2)+Math.pow(diffPos[2],2))/v;
+                let t=Math.sqrt(Math.pow(diffPos[0],2)+Math.pow(diffPos[1],2)+Math.pow(diffPos[2],2))/v;//总时间
                 if(t==0){
                 	t=Math.max.apply(Math,math.abs(diffPos))/(240*Math.PI/180);//距离为0 ，按最大转速计算时间
 				}
-                let N=parseInt(t/INTERVAL)+1;
+                let N=parseInt(t/INTERVAL)+1;//步数
                 let Ept=SLERP(lastPos,instructPos,N);//四元数插补
 				let step=math.multiply(diffPos,1/N);
                 let maxStep=Math.max.apply(Math,math.abs(step));
@@ -10484,6 +10493,9 @@ VILibrary.VI = {
                 ]
                 return c;
             }
+            this.fk=function (i1,i2) {
+                kinematicsEquation(i1,i2);
+            }
             function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
                 theta.unshift(0);
@@ -10822,7 +10834,7 @@ VILibrary.VI = {
                         ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
                         nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
                     theta=[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]];
-                    let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//D-H模型中的theta与实际的转动惯量的差值（8->6）
+                    let diff=math.multiply(THETA.concat(),-1);diff.shift();diff.pop();//D-H模型中的theta与实际的转动量的差值（8->6）
                     for(let i=0;i<=7;i++){
                         if(i<4) theta[i][0]=Math.atan2(py,px)-Math.atan2(0,Math.sqrt(px*px+py*py));
                         else    theta[i][0]=Math.atan2(py,px)-Math.atan2(0,-Math.sqrt(px*px+py*py));
@@ -10830,7 +10842,7 @@ VILibrary.VI = {
                         let g=2*a[1]*Math.cos(theta[i][0])*px+2*a[1]*Math.sin(theta[i][0])*py+a[3]*a[3]+d[4]*d[4]+a[2]*a[2];
                         let k=(h-g)/(2*a[2]);
                         if(i<2||i>5) theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
-                        else        theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
+                        else theta[i][2]=Math.atan2(a[3],d[4])-Math.atan2(k,-Math.sqrt(Math.pow(a[3],2)+Math.pow(d[4],2)-Math.pow(k,2)));
                         let s23=((-a[3]-a[2]*Math.cos(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.sin(theta[i][2])-d[4]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
                         let c23=((-d[4]+a[2]*Math.sin(theta[i][2]))*pz+(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1])*(a[2]*Math.cos(theta[i][2])+a[3]))/(pz*pz+Math.pow(Math.cos(theta[i][0])*px+Math.sin(theta[i][0])*py-a[1],2));
                         theta[i][1]=Math.atan2(s23,c23)-theta[i][2];
@@ -10843,7 +10855,7 @@ VILibrary.VI = {
                         let c6=-ox*(Math.cos(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])-Math.sin(theta[i][0])*Math.cos(theta[i][3]))-oy*(Math.sin(theta[i][0])*Math.cos(theta[i][1]+theta[i][2])*Math.sin(theta[i][3])+Math.cos(theta[i][0])*Math.cos(theta[i][3]))+oz*Math.sin(theta[i][1]+theta[i][2])*Math.sin(theta[i][3]);
                         theta[i][5]=Math.atan2(s6,c6);
 
-                        //以上计算出的是D-H模型中的theta,与实际的转动惯量差一个theta（diff)的值
+                        //以上计算出的是D-H模型中的theta,与实际的转动量差一个theta（diff)的值
                         theta[i]=math.add(theta[i],diff);
                         let inRange=true;
                         for(let j=0;j<theta[i].length;j++){

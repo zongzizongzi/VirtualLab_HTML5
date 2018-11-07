@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/math/math.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script type='text/javascript' src='x3dom/x3dom.js'> </script>
+    <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+    <link rel="stylesheet" type="text/css" href="homework/main.css">
+    <title>YUMI</title>
+    <script>
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<4;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+        }
+    </script>
+</head>
+<body>
+<div class="main-div" style="width: 1500px;">
+    <div class="title"><b>机器人操作实验(型号：ABB_YUMI)</b></div>
+    <div class="back" ><a href="index.html">←返回主目录</a>/<a href="Robotics.html">机器人目录</a></div>
+    <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
+    <div id="index_div_robotics">
+        <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn" onclick="show(3)">课后训练</button>
+    </div>
+    <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/baseOperationExperiment/mulitijointRobot.htm" ></embed></div>
+    <div id="index_2"><video id="demo" src="video/demo/robotsOperation.mp4" controls></video></div>
+    <div id="index_1" style="height: 800px">
+        <div style="width: 80%;height: 100%;display: inline;float: left">
+            <div id="mainCanvas" style="width: 100%;height: 100%;">
+            </div>
+        </div>
+        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+            <div class="message_div" id="messageDiv">
+                <p>关节转角：</p><br>
+                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
+                    <input id="angInput0" type="range" max="168.5" min="-168.5" value="0" step="5" onchange="changeAng(0)">
+                </p>
+                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
+                    <input  id="angInput1" type="range" max="43.5" min="-143.5" value="0" step="5" onchange="changeAng(1)">
+                </p>
+                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
+                    <input id="angInput2" type="range" max="80" min="-123.5" value="0" step="5" onchange="changeAng(2)">
+                </p>
+                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
+                    <input id="angInput3" type="range" max="290" min="-290" value="0" step="5" onchange="changeAng(3)">
+                </p>
+                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
+                    <input id="angInput4" type="range" max="138" min="-88" value="30" step="1" onchange="changeAng(4)">
+                </p>
+                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
+                    <input id="angInput5" type="range" max="229" min="-229" value="0" step="5" onchange="changeAng(5)">
+                </p>
+                <p>Ang_7：<input id="angTxt6"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(6)">
+                    <input id="angInput6" type="range" max="168.5" min="-168.5" value="0" step="5" onchange="changeAng(6)">
+                </p>
+                <p id="tool" style="padding-top: 4px">Tool :
+                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
+                        <option value="0">tool0</option>
+                        <option value="1">tool1</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
+                </p>
+            </div>
+            <div class="message_div" id="resultDiv" onchange="changePos()">
+                <div style="width: 50%;display: inline;float: left">
+                    <p>末端坐标：</p><br>
+                    <p>P_X：<input id="posX" type="text" value="1317.22" class="robotPA"></p>
+                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
+                    <p>P_Z：<input id="posZ" type="text" value="1725" class="robotPA"></p>
+                </div>
+                <div style="width: 50%;display: inline;">
+                    <p>末端姿态：</p><br>
+                    <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
+                    <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
+                    <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
+                </div>
+            </div>
+            <div class="message_div" style="height: 22%;">
+                <p>设置示教点</p>
+                <textarea id="points" style="width: 90%;height: 60%;margin: 10px">
+                </textarea>
+                <div class="rowFlex-div">
+                    <button id="add" onclick="points(1)">添加</button>
+                    <button id="delete" onclick="points(2)">删除</button>
+                    <button id="clear" onclick="points(0)">清空</button>
+                </div>
+            </div>
+            <div class="message_div" style="height: 22%;">
+                <p>控制指令</p>
+                <textarea id="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <div class="rowFlex-div">
+                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="index_3">
+        <div class="wrapper">
+            <form action="#" id="form" method="post" enctype="multipart/form-data">
+                <div class="baseInform">
+                    <div class="nameDiv">
+                        <label for="name">姓名：</label>
+                        <input type="text" id="name" value="">
+                    </div>
+                    <div class="studentIdDiv">
+                        <label for="studentId">学号:</label>
+                        <input type="text" id="studentId" value="">
+                    </div>
+                </div>
+                <div class="workContent">
+                    <div class="homeworkDiv">
+                        <strong>练习题：</strong><p id="homework">
+                            (1) 点击Tool下拉框，点击“jiaju”选项，为机器人装载气动夹具，其控制信号为do1，示教机器人，控制其抓取XY平面上的红色方块,录制并上传操作过程视频。；<br>
+                            (2) 分析并列出KUKA_KR60HA机器人的D-H参数；
+                        </p>
+                    </div>
+                    <div class="answerDiv">
+                        <textarea name="" id="answer"></textarea>
+                    </div>
+                    <div class="annexDiv">
+                        <label for="annex">附件（.zip,.docx,.pdf,.mp4,rar格式）：</label>
+                        <input type="file" id="annex"  accept=".zip,.docx,.pdf,.mp4,rar">
+                    </div>
+                </div>
+                <div class="submit">
+                    <input type="button" value="提交" id="submit">
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="homework/main.js"></script>
+<script src="js/VILibrary.js"></script>
+<!--js简写方法-->
+<script src="js/jquery-3.1.1.min.js"></script>
+<!--弹出框-->
+<script src="js/layui/lay/dest/layui.all.js"></script>
+<script>
+    'use strict';
+    let robot60haVI = new VILibrary.VI.Robotkr60VI($('#mainCanvas'), true);
+   let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"yumi");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"k60");
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot60haVI.id, 1, 2);
+//    VILibrary.InnerObjects.bindDataLine(robot60haVI.id, instructionCompiling.id, 1, 2);
+
+    let val=[0],ang;
+    let s=[],
+        indexI=0;
+    let currentPOS=[1317.22,0,1725,-Math.PI,Math.PI/3,-Math.PI];
+    function changeAng(input) {
+        let currentAng=[0,0,0,0,Math.PI/6,0];
+        document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
+        for(let i=0;i<=6;i++){
+            currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
+        }
+        instructionCompiling.fk(currentAng,500);
+//        instructionCompiling.moveJ(currentAng,500);
+    }
+    function changeAngTxt(input) {
+        document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
+        changeAng(input);
+    }
+    function changePos() {
+//        kinematicsEquationVI.setData([0,0,0,0,0,0],3)
+        let x=parseFloat(document.getElementById("posX").value),
+            y=parseFloat(document.getElementById("posY").value),
+            z=parseFloat(document.getElementById("posZ").value),
+            gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
+            beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
+            alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
+        /*ca=Math.cos(alpha),sa=Math.sin(alpha),
+         cb=Math.cos(beta),sb=Math.sin(beta),
+         cy=Math.cos(gamma),sy=Math.sin(gamma);
+         let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
+         instructionCompiling.inverseKinematics(R);*/
+        let pos=[x,y,z,gamma,beta,alpha];
+        instructionCompiling.moveL(pos,100);
+    }
+    function Instructions() {
+        let points=document.getElementById("points").value.toString();
+        let cmd=document.getElementById("instrInput").value.toString();
+        instructionCompiling.toggleObserver(points,cmd);
+    }
+    function points(type) {
+        let turnPoints;
+        switch (type){
+            case 0:/*清空*/
+                s=[];
+                indexI=0;
+                /*----------------点集清空-------------------*/
+                document.getElementById("Robot__PointSet_points").setAttribute('point','');
+                /*-----------------------------------*/
+                break;
+            case 1:/*增加示教点*/
+                let x=parseFloat(document.getElementById("posX").value),
+                    y=parseFloat(document.getElementById("posY").value),
+                    z=parseFloat(document.getElementById("posZ").value),
+                    gamma=parseFloat(document.getElementById("eulerX").value),
+                    beta=parseFloat(document.getElementById("eulerY").value),
+                    alpha=parseFloat(document.getElementById("eulerZ").value);
+                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
+                    +beta+"°,"+alpha+"°];\n";
+                /*----------------点集增加点的坐标-------------------*/
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                /*-----------------------------------*/
+                indexI++;
+                break;
+            case 2:/*删除示教点*/
+                s.pop();
+                /*----------------点集删除最后一点的坐标-------------------*/
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+//                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
+                turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                /*-----------------------------------*/
+                indexI--;
+                break;
+            case -1:
+                /*s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],
+                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveC p1,p2,v400;\nmoveL p3,v400;\nmoveJ p0,v400;";
+                turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                indexI=4;*/
+                s=[
+                    "p0:[1550.41,0,1668.89,-180°,60°,-180°];\n",
+                    "p1:[1000,-1000,200,180°,0°,-180°];\n",
+                    "p2:[1000,-1000,40,180°,0°,-180°];\n",
+                    "p3:[1000,0,200,180°,0°,-180°];\n",
+                    "p4:[1000,0,40,180°,0°,180°];\n"
+                ];
+                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveJ p1,v400;\nmoveL p2,v400;\nset do1;\nmoveL p1,v400;\nmoveJ p3,v400;\nmoveL p4,v400;\nreset do1;\nmoveL p3,v400;\nmoveJ p0,v400;";
+
+                //------------------点集-------------------------
+                turnPoints=" 1550.41 1668.89 0 1000 200 1000 1000 40 1000 1000 40 0 1000 200 0";
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+        }
+        let str="";
+        for(let m=0;m<s.length;m++){
+            str= str + s[m] ;
+        }
+        document.getElementById("points").value=str;
+    }
+    function openTeachPendant() {
+        layer.open({
+            type: 2,
+            title: 'iframe父子操作',
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['800px' , '520px'],
+            content: 'teachPendant.html'
+        });
+
+    }
+
+</script>
+</body>
+</html>
