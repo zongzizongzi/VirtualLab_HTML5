@@ -41,25 +41,25 @@
             <div class="message_div" id="messageDiv">
                 <p>关节转角：</p><br>
                 <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
-                    <input id="angInput0" type="range" max="168.5" min="-168.5" value="0" step="5" onchange="changeAng(0)">
+                    <input id="angInput0" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(0)">
                 </p>
                 <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
-                    <input  id="angInput1" type="range" max="43.5" min="-143.5" value="0" step="5" onchange="changeAng(1)">
+                    <input  id="angInput1" type="range" max="90" min="-143.5" value="0" step="0.5" onchange="changeAng(1)">
                 </p>
                 <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
-                    <input id="angInput2" type="range" max="80" min="-123.5" value="0" step="5" onchange="changeAng(2)">
+                    <input id="angInput2" type="range" max="80" min="-123.5" value="0" step="0.5" onchange="changeAng(2)">
                 </p>
                 <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
-                    <input id="angInput3" type="range" max="290" min="-290" value="0" step="5" onchange="changeAng(3)">
+                    <input id="angInput3" type="range" max="290" min="-290" value="0" step="0.5" onchange="changeAng(3)">
                 </p>
-                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
-                    <input id="angInput4" type="range" max="138" min="-88" value="30" step="1" onchange="changeAng(4)">
+                <p>Ang_5：<input id="angTxt4"  type="text"value="0" style="width: 50px" onchange="changeAngTxt(4)">
+                    <input id="angInput4" type="range" max="138" min="-88" value="0" step="0.5" onchange="changeAng(4)">
                 </p>
                 <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
-                    <input id="angInput5" type="range" max="229" min="-229" value="0" step="5" onchange="changeAng(5)">
+                    <input id="angInput5" type="range" max="229" min="-229" value="0" step="0.5" onchange="changeAng(5)">
                 </p>
                 <p>Ang_7：<input id="angTxt6"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(6)">
-                    <input id="angInput6" type="range" max="168.5" min="-168.5" value="0" step="5" onchange="changeAng(6)">
+                    <input id="angInput6" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(6)">
                 </p>
                 <p id="tool" style="padding-top: 4px">Tool :
                     <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
@@ -157,8 +157,8 @@
     let s=[],
         indexI=0;
     let currentPOS=[1317.22,0,1725,-Math.PI,Math.PI/3,-Math.PI];
+    let currentAng=[0,0,0,0,Math.PI/6,0];
     function changeAng(input) {
-        let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
         for(let i=0;i<=6;i++){
             currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
@@ -167,7 +167,11 @@
 //        instructionCompiling.moveJ(currentAng,500);
     }
     function changeAngTxt(input) {
-        document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
+        val=document.getElementById("angTxt"+input).value;
+        document.getElementById("angInput"+input).value=val;
+        if(parseFloat(val)>document.getElementById("angInput"+input).max||parseFloat(val)<document.getElementById("angInput"+input).min){
+            alert('超出转角范围');
+        }
         changeAng(input);
     }
     function changePos() {

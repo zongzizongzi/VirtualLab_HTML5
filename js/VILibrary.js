@@ -9817,16 +9817,17 @@ VILibrary.VI = {
                     break;
 				case 'yumi':
 					A=[0,0,30,30,40.5,40.5,27,0,27];
-                    D=[0,0,0,251.5,0,265,0,0,120];
+                    D=[0,166,0,251.5,0,265,0,0,120];
                     ALPHA=[0,0,-Math.PI/2,-Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,0];
                     THETA=[0,0,Math.PI,0,Math.PI/2,Math.PI,Math.PI,0,-Math.PI/2];
                     currentANG=[0,0,0,0,0,0,0,0,0];
                     Range=[[-168.5,168.5],[-143.5,43.5],[-123.5,80],[-290,290],[-88,138],[-229,229],[-168.5,168.5]];
                     OMEGA=[180,180,180,400,400,400,180];
+                    targetANG=[0,0,0,0,0,0,0]
                     break;
 				case "a120":default:
 					A=[0,0,0,270,70,0,0,0];//不加tool最后一个为0
-					D=[290,0,0,0,302,0,0,72];//加tool最后一个为72
+					D=[290,0,0,0,302,0,0,72];//不加tool最后一个为72
 					ALPHA=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                 	THETA=[0,0,-Math.PI/2,0,0,0,0,Math.PI];
                 	currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
@@ -10493,8 +10494,9 @@ VILibrary.VI = {
                 ]
                 return c;
             }
-            this.fk=function (i1,i2) {
-                kinematicsEquation(i1,i2);
+            this.fk=function (i1) {
+                let a=kinematicsEquation(i1,false);
+                console.log(currentPOS)
             }
             function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
@@ -10626,6 +10628,7 @@ VILibrary.VI = {
                     }
                     // }
                     x=T[0][3];y=T[1][3];z=T[2][3];
+                    console.log(T)
                     for(let i=0;i<=3;i++){
                         for(let j=0;j<=3;j++){
                             T[i][j]= parseFloat((T[i][j]).toFixed(4));
