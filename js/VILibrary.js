@@ -9987,7 +9987,7 @@ VILibrary.VI = {
                     }
                 }
             }
-            //四元数方向插补
+            //四元数方向插补,计算输出每个插补点的方向欧拉角
             function SLERP(p0,p2,N) {
                 //计算始末点四元数和旋转角度thetaQ
                 let Ept=[];
@@ -10026,6 +10026,7 @@ VILibrary.VI = {
                     q3 = cosEx * cosEy * sinEz - sinEx * sinEy * cosEz;
                 return [q0,q1,q2,q3];
             }
+            //关节运动插补，各个关节匀速转动，同时到达目标位姿。input为目标点的关节变量，v为运动速度（每隔50ms输出一次插补点的位置和姿态，下同）
             this.moveJ=function(input,v){
             	moveType="J";
             	if(v<=0){
@@ -10128,6 +10129,7 @@ VILibrary.VI = {
 
 
 			}
+            //直线插补，以线速度v匀速到达末端位姿input1
             this.moveL=function (input1,v) {
                 moveType="L";
             	const INTERVAL=0.05;
@@ -10207,9 +10209,10 @@ VILibrary.VI = {
 				},INTERVAL*1000)
 
             }
-            this.moveC=function (input1,input2,input3) {
+            //圆弧插补，以线速度v沿圆弧轨迹到达末端位姿input2（由当前点、轨迹上的一点input1,目标点input2，三点确定圆弧）
+            this.moveC=function (input1,input2,v) {
                 moveType="C";
-            	let F=input3;
+            	let F=v;
                 const T=0.05;
                 let p1=input1.concat();
                 let p2=input2.concat();
@@ -10362,6 +10365,7 @@ VILibrary.VI = {
                     i++;
                 },T*1000);
             }
+            //切换工具时调用此函数，修改最末端的DH参数。input值对应的工具：0-无工具；1-普通夹具；2-跟实际机器人上一致的夹具；3-画笔。
             this.changeTool=function(input){
                 ToolFlag=input;
                 if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
@@ -10424,6 +10428,7 @@ VILibrary.VI = {
                 THETA=math.add(baseTHETA,THETA_add);
                 kinematicsEquation(currentANG);
                     }
+            //数字输出信号，用于抓紧、松开夹具。0松开，1夹紧。
             this.setIO=function (input) {
             	ToolDO=input;
             	if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
@@ -10498,6 +10503,7 @@ VILibrary.VI = {
                 let a=kinematicsEquation(i1,false);
                 console.log(currentPOS)
             }
+            //运动学正解
             function kinematicsEquation(input,flag) {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
                 theta.unshift(0);
@@ -10718,6 +10724,7 @@ VILibrary.VI = {
 				}
 
             }
+            //运动学反解
             function inverseKinematics(input) {
                 let a=A.concat();a.shift();//a[i-1]
                 let d=D.concat();//d[i]
