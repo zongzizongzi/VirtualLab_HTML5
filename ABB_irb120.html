@@ -9,6 +9,7 @@
     <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
     <link rel="stylesheet" type="text/css" href="homework/main.css">
     <script>
+        //切换目录项
         function show(i) {
             if(i>3||i<0) {alert("indexErr");return;}
             else {
@@ -17,6 +18,7 @@
                     else document.getElementById("index_"+j).style.display="none";
                 }
             }
+            //控制演示视频的播放、暂停
             if(i!=2)document.getElementById("demo").pause();
             else document.getElementById("demo").play();
         }
@@ -155,107 +157,7 @@
     let val=[0],ang;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
     let s=[],indexI=0;
-   /* if ("WebSocket" in window)
-    {
-        // 打开一个 web socket
-        var ws = new WebSocket("ws://127.0.0.1:3002");
-
-        ws.onopen = function()
-        {
-            // Web Socket 已连接上，使用 send() 方法发送数据
-            ws.send("发送数据");
-            console.log("数据发送中...");
-        };
-
-        ws.onmessage = function (evt)
-        {
-            var received_msg = evt.data;
-            console.log("已接收数据",received_msg);
-            if(received_msg=="go"){
-                Instructions();
-            }
-            else console.log(received_msg)
-        };
-
-        ws.onclose = function()
-        {
-            // 关闭 websocket
-            console.log("连接已关闭...");
-        };
-    }
-    else
-    {
-        // 浏览器不支持 WebSocket
-        alert("您的浏览器不支持 WebSocket!");
-    }*/
-   let wsServerAddr={
-       port:'3002',
-       host:'localhost',/*本地测试用*/
-//       host:'drvi.net'//wss连接必须用域名，不能用IP地址
-   }
-   let ws=new communcication(wsServerAddr);
-   let logStatus=false,logName='';
-   function submitInstructions() {
-       if(!logStatus){
-           var logLayer=layer.open({
-               title: '管理员登录 <sup>2</sup>',
-               maxmin: true,
-               shadeClose: true, //点击遮罩关闭层
-               content: '<form id="login" name="n&p">' +
-               '<p><label for="name" style="width: 60px;display:inline-block">用户名：</label><input type="text" name="name" ></p>' +
-               '<p><label for="password" style="width: 60px;display:inline-block">密码：</label><input type="password" name="password"></p>' +
-               '</form>',
-               btn:'提交',
-               yes: function(index, layero){
-                   let logData=$('#login').serialize();
-//
-                   $.ajax({
-                       url:'http://localhost:3003',
-                       type:"POST",
-                       data:logData,
-                       success: function(data){    //    alert后台返回的参数
-                           console.log(data.statusTxt);
-                           if(data.status=="success"){
-                               layer.close(logLayer);
-                               logStatus=true;
-                               logName=data.userName;
-                               loginSuccess();
-                           }
-                           else{alert(data.statusTxt);}
-
-                       },
-                       error:function (err) {
-                           alert("访问失败");
-                           console.log(err);
-                       }
-                   })
-                   /*ws.send(logData);
-                    let data=$('#myform').serialize();
-                    ws.send(data);*/
-               }
-           });
-       }
-       else {
-           loginSuccess();
-       }
-   }
-   function loginSuccess() {
-       let formData=$('#myform').serialize();
-       sendFormData();
-       layer.msg( '登录成功，数据传输中……')
-   }
-   function sendFormData() {
-       ws.connect();
-       setTimeout(function () {
-           if(ws.onOpen){
-               let formData=$('#myform').serialize()+"&name="+logName;
-               ws.send(formData);
-           }
-           else {
-               alert('远程服务器未连接,请稍后重试')
-           }
-       },500);
-   }
+//    改变关节变量（滑动条）
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -264,10 +166,12 @@
         }
         instructionCompiling.moveJ(currentAng,500);
     }
+    //    改变关节变量（输入框）
     function changeAngTxt(input) {
         document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
         changeAng(input);
     }
+    //改变末端位姿
     function changePos() {
         let x=parseFloat(document.getElementById("posX").value),
             y=parseFloat(document.getElementById("posY").value),
@@ -278,11 +182,13 @@
             let pos=[x,y,z,gamma,beta,alpha];
         instructionCompiling.moveL(pos,100);
     }
+    //提交指令
     function Instructions() {
         let points=document.getElementById("points").value.toString();
         let cmd=document.getElementById("instrInput").value.toString();
         instructionCompiling.toggleObserver(points,cmd);
     }
+    //增加、删除、清空示教点
     function changePoints(type) {
         let turnPoints;
         switch (type){
@@ -359,7 +265,7 @@
         }
         document.getElementById("points").value=str;
     }
-    function openTeachPendant() {
+    /*function openTeachPendant() {
         layer.open({
             type: 2,
             title: 'iframe父子操作',
@@ -369,7 +275,7 @@
             area : ['800px' , '520px'],
             content: 'teachPendant.html'
         });
-    }
+    }*/
 
 </script>
 </body>

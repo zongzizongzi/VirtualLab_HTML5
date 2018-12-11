@@ -146,11 +146,11 @@
 <script src="js/layui/lay/dest/layui.all.js"></script>
 <script>
     'use strict';
-    let robot60haVI = new VILibrary.VI.Robotkr60VI($('#mainCanvas'), true);
+    let robot14000VI = new VILibrary.VI.Robot14000VI($('#mainCanvas'), true);
    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"yumi");
-    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"k60");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"14000");
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
-    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot60haVI.id, 1, 2);
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot14000VI.id, 1, 2);
 //    VILibrary.InnerObjects.bindDataLine(robot60haVI.id, instructionCompiling.id, 1, 2);
 
     let val=[0],ang;

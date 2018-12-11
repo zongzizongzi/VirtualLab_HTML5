@@ -11236,6 +11236,36 @@ VILibrary.VI = {
             return '300px';
         }
     },
+    Robot14000VI:class Robot14000VI extends RobotTemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas,draw3DFlag);
+            const _this = this;
+            // RobotTemplateVI.prototype.robotURL='assets/kuka_KR60HA_x3d/kuka_kr60.x3d';
+            // RobotTemplateVI.prototype.draw(draw3DFlag);
+            this.robotURL='assets/irb14000/irb14000.x3d';
+            this.draw(draw3DFlag);
+            this.name = 'YUMI';
+
+			/*this.currentLen=[166,124,270,70,150,152,59,13];
+			 this.currentScal=[1,1,1,1,1,1,1,1];
+			 this.initLen=[166,124,270,70,150,152,59,13];*/
+            this.a_d=[815,850,145,820,170,350];
+        }
+        static get cnName() {
+
+            return 'KUKA_kr60';
+        }
+
+        static get defaultWidth() {
+
+            return '550px';
+        }
+
+        static get defaultHeight() {
+
+            return '300px';
+        }
+    },
 	//机器人工具
     ToolVI:class ToolVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag,robNum) {
