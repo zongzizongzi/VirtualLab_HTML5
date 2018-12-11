@@ -209,7 +209,7 @@ VILibrary.InnerObjects = {
 			}
 		}
 	},
-	
+	//更新数据
 	dataUpdater: function (dataLine) {
 		
 		if (!dataLine) {
@@ -373,7 +373,7 @@ VILibrary.InnerObjects = {
 	existingVIArray: [],
 	dataLineArray: []
 };
-
+//总的模板类
 class TemplateVI {
 	
 	constructor(VICanvas) {
@@ -516,7 +516,7 @@ class TemplateVI {
 }
 //因ES6定义Class内只有静态方法没有静态属性，只能在Class外定义
 TemplateVI.logCount = 0;
-
+//机器人X3DOM模块的模板类
 class RobotTemplateVI extends TemplateVI {
     constructor (VICanvas,draw3DFlag){
         super(VICanvas);
@@ -538,6 +538,7 @@ class RobotTemplateVI extends TemplateVI {
                 return;
             }
         }
+        //关节转角控制各个连杆模型转动
         this.jiontsControl=function(TargetANG) {
             let rotat="0,0,0,0";
 			for(let i=0;i<=5;i++){
@@ -556,6 +557,7 @@ class RobotTemplateVI extends TemplateVI {
 				document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
 			}
         }
+        //向页面中插入X3DOM模型
         this.draw=function () {
             if (draw3DFlag) {
                 //此处向网页插入HTML代码
@@ -581,6 +583,7 @@ class RobotTemplateVI extends TemplateVI {
                 };
             }
         }
+        //DH模型实验改变连杆长度
         this.changeLength=function(lenNum){
 			this.currentLen[lenNum]=parseInt(document.getElementById("L"+lenNum).value);
             if(isNaN(this.currentLen[lenNum])||this.currentLen[lenNum]<=0){
@@ -9754,6 +9757,7 @@ VILibrary.VI = {
             return '300px';
         }
     },
+    //机器人算法脚本的集合
     Instruction_1VI:class Instruction_1VI extends TemplateVI {
         constructor(VICanvas, draw3DFlag,robNumber) {
             super(VICanvas);
@@ -10210,9 +10214,9 @@ VILibrary.VI = {
 
             }
             //圆弧插补，以线速度v沿圆弧轨迹到达末端位姿input2（由当前点、轨迹上的一点input1,目标点input2，三点确定圆弧）
-            this.moveC=function (input1,input2,v) {
+            this.moveC=function (input1,input2,input3) {
                 moveType="C";
-            	let F=v;
+            	let F=input3;
                 const T=0.05;
                 let p1=input1.concat();
                 let p2=input2.concat();
@@ -11131,7 +11135,7 @@ VILibrary.VI = {
             this.jiontsControl=function(TargetANG){
                 let rotat="0,0,0,0";
 				for(let i=0;i<=3;i++){
-                        if(i==2) {
+                        if(i==2) {//移动轴
                             let translation="250,"+TargetANG[i]+",0"
                             document.getElementById("Robot__link"+i).setAttribute('translation',translation);
                         }
@@ -11141,11 +11145,7 @@ VILibrary.VI = {
                             document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
                         }
                     }
-                // CurrentANG=TargetANG;
             }
-			/*this.currentLen=[166,124,270,70,150,152,59,13];
-			 this.currentScal=[1,1,1,1,1,1,1,1];
-			 this.initLen=[166,124,270,70,150,152,59,13];*/
             this.a_d=[815,850,145,820,170,350];
         }
         static get cnName() {
@@ -11183,12 +11183,7 @@ VILibrary.VI = {
                     }
 				let trans=(TargetANG[16]).toFixed(2)+","+TargetANG[17].toFixed(2)+","+(TargetANG[15]).toFixed(2);
 				document.getElementById("Robot__plate").setAttribute('translation',trans);
-                // CurrentANG=TargetANG;
             }
-			/*this.currentLen=[166,124,270,70,150,152,59,13];
-			 this.currentScal=[1,1,1,1,1,1,1,1];
-			 this.initLen=[166,124,270,70,150,152,59,13];*/
-            // this.a_d=[815,850,145,820,170,350];
         }
         static get cnName() {
 
@@ -11241,6 +11236,7 @@ VILibrary.VI = {
             return '300px';
         }
     },
+	//机器人工具
     ToolVI:class ToolVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag,robNum) {
             super(VICanvas, draw3DFlag,robNum);
@@ -11249,98 +11245,9 @@ VILibrary.VI = {
             let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40',qijiaTrans="13,0,0",qijiaRotate="1,0,0,-0.785398163";
             let gongjianTrans1='461.395,0,285.5',gongjianTrans2='461.395,0,225.5',gongjianTrans3='460,0,165.5';
             let gongjianTrans4='401.395,0,285.609',gongjianTrans5='401.395,0,225.609',gongjianTrans6='401.395,0,165.609';
-            /*function draw() {
-                switch(robNum){
-                    case "k60":
-                        jiajuScal="2,2,2";
-                        jiajuTrans="15,0,0"
-                        break;
-                    case "a910":
-                        jiajuRotate='0,0,1,-1.5707963';
-                        jiajuTrans="0,65,0";
-                        boxTrans='300,40,-300';
-                        break;
-                    case "a360":
-                        jiajuRotate='0,0,1,-1.5707963';
-                        jiajuTrans="0,5,0";
-                        boxTrans='250,-1180,-250';
-                        break;
-                    case "epson":
-                        jiajuRotate='0,1,0,-1.5707963';
-                        jiajuRotate2='1,0,0,3.1415926';
-                        // jiajuRotate="0.45749571099781405,-0.7624928516630234,-0.45749571099781405,2.2834529548131237"
-                        // jiajuRotate="0.5144957554275265,-0.6859943405700353,-0.5144957554275265,1.9390642202315367"
-                        jiajuTrans="98.5,125,58.5";
-                        boxTrans='400,20,-400'
-                        break;
-                    case "a120":default:break;
-                }
-                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
-                    "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
-                    "<Transform rotation="+jiajuRotate2+">"+
-                    "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
-                    "<inline url='../tool/jiajuL.x3d' > </inline>" +
-                    "</Transform>" +
-                    "<Transform DEF='jiajuR' translation='0 0 -10' nameSpaceName id='Robot__jiajuR'>" +
-                    "<inline url='../tool/jiajuR.x3d'> </inline>" +
-                    "</Transform>" +
-                    "<inline url='../tool/jiaju.x3d'> </inline>" +
-                    "</Transform>" +
-                    "</Transform>" +
-                    "<Transform translation="+qijiaTrans+" scale="+jiajuScal+" rotation="+qijiaRotate+">" +
-                    "<Transform rotation="+jiajuRotate2+">"+
-                    "<Transform DEF='qijiaL' translation='0 0 -20' nameSpaceName id='Robot__qijiaL'>" +
-                    "<inline url='../qijia/jiajuL.x3d' > </inline>" +
-                    "</Transform>" +
-                    "<Transform DEF='qijiaR' translation='0 0 -20' nameSpaceName id='Robot__qijiaR'>" +
-                    "<inline url='../qijia/jiajuR.x3d' nameSpaceName='QijiaR' mapDEFToID='true'> </inline>" +
-                    "</Transform>" +
-                    "<inline url='../qijia/jiajuBase.x3d'> </inline>" +
-                    "</Transform>" +
-                    "</Transform>" +
-                    "<Transform translation="+qijiaTrans+" scale="+jiajuScal+" rotation="+qijiaRotate+">" +
-                    "<Transform rotation="+jiajuRotate2+">"+
-                    "<inline url='../huabi/huabi.x3d'> </inline>" +
-                    "</Transform>" +
-                    "</Transform>" +
-                    "</switch>";
-                $("#Robot__lastLink").after(toolSwitch);
-                var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
-                    "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
-                    "<box size='40,40,40'></box>" +
-                    "</shape></transform>";
-                var gongjian1="<transform DEF='gongjian1' translation="+gongjianTrans1+" nameSpaceName id='Robot__gongjian1' render='true'>" +
-                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
-                    "</transform>";
-                var gongjian2="<transform DEF='gongjian2' translation="+gongjianTrans2+" nameSpaceName id='Robot__gongjian2' render='true'>" +
-                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
-                    "</transform>";
-                var gongjian3="<transform DEF='gongjian3' translation="+gongjianTrans3+" nameSpaceName id='Robot__gongjian3' render='true'>" +
-                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
-                    "</transform>";
-                var gongjian4="<transform DEF='gongjian4' translation="+gongjianTrans4+" nameSpaceName id='Robot__gongjian4' render='true'>" +
-                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
-                    "</transform>";
-                var gongjian5="<transform DEF='gongjian5' translation="+gongjianTrans5+" nameSpaceName id='Robot__gongjian5' render='true'>" +
-                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
-                    "</transform>";
-                var gongjian6="<transform DEF='gongjian6' translation="+gongjianTrans6+" nameSpaceName id='Robot__gongjian6' render='true'>" +
-                    "<inline url='../gongjian/gongjian.x3d'></inline>" +
-                    "</transform>";
-                $("#Robot__platform").after(box);
-                $("#Robot__platform").after(gongjian1);
-                $("#Robot__platform").after(gongjian2);
-                $("#Robot__platform").after(gongjian3);
-                $("#Robot__platform").after(gongjian4);
-                $("#Robot__platform").after(gongjian5);
-                $("#Robot__platform").after(gongjian6);
-                haveTool=true;
-
-
-            }*/
-
+            //X3DOM场景中插入工具
             function draw() {
-            	switch(robNum){
+            	switch(robNum){//根据不同的机器人调整夹具及立方体的显示比例和位置
 					case "k60":
                         jiajuScal="2,2,2";
                         jiajuTrans="15,0,0"
@@ -11453,6 +11360,7 @@ VILibrary.VI = {
             	toolSwitch(input[0]);
             	toolDo(input[1]);
             }
+            //切换工具
             function toolSwitch(input){
                 if(!haveTool)draw();
                 document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
@@ -11482,6 +11390,7 @@ VILibrary.VI = {
                 }
 
             }
+            //控制工具的数字信号
             function toolDo(input) {
                 if(input){
                     document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,0');
@@ -11500,6 +11409,7 @@ VILibrary.VI = {
             }
         }
 	},
+    //机器人拆装实验
     DisassemblyVI:class DisassemblyVI extends RobotTemplateVI {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas,draw3DFlag);
@@ -11513,6 +11423,7 @@ VILibrary.VI = {
 			 this.currentScal=[1,1,1,1,1,1,1,1];
 			 this.initLen=[166,124,270,70,150,152,59,13];*/
             this.a_d=[815,850,145,820,170,350];
+            //切换显示的机器人
             this.changeRobot=function(method){
             	switch (method){
 					case '1':this.robotURL='assets/Disassembly/robot120.x3d';
@@ -11574,6 +11485,7 @@ VILibrary.VI = {
             return '300px';
         }
     },
+	//方位描述实验
 	DirectionSystemVI:class DirectionSystemVI extends TemplateVI{
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas, draw3DFlag);
@@ -11785,6 +11697,7 @@ VILibrary.VI = {
 
         }
 	},
+	//坐标系转换实验
     CoordSystemVI:class CoordSystemVI extends TemplateVI {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas, draw3DFlag);
