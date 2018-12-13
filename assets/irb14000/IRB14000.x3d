@@ -1,0 +1,53 @@
+<x3d id="120X3d" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Viewpoint position="255.44244 300.75453 1203.73790" orientation="0.31015 0.93461 -0.17408 0.22399" zNear="75.95875" zFar="2823.95809" description=""></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+
+        <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
+        <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
+        <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
+        <transform>
+            <Transform def="line">
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='0 0 1'/>
+                    </Appearance>
+                    <IndexedLineSet id='LineSet_index' coordIndex=''>
+                        <Coordinate id='LineSet_points' point=''/>
+                    </IndexedLineSet>
+                </Shape>
+            </Transform>
+            <Transform def="points">
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='1 0 0'/>
+                    </Appearance>
+                    <PointSet>
+                        <Coordinate id='PointSet_points' point=''/>
+                    </PointSet>
+                </Shape>
+            </Transform>
+            <inline DEF="platform" url="../platform.x3d" scale="1.5,1,1.5"> </inline>
+            <Transform translation="">
+                <inline url="base.x3d"> </inline>
+                <!--<transform  translation="71.48,413.51,51.11" rotation="0.3483,0.9370,-0.0268,1.8671">-->
+                <transform DEF="link0"  translation="71.48,413.51,51.11" rotation="0.7293,-0.3912,-0.5613,1.1873">
+                    <inline url="L1.x3d"> </inline>
+                    <transform DEF="link1"  translation="-30,103.2,0" rotation="0,0,1,0">
+                        <inline url="L2.x3d"> </inline>
+                        <transform DEF="link2"  translation="30,0,0" rotation="0,1,0,0">
+                            <inline url="L3.x3d"> </inline>
+                            <transform DEF="link3"  translation="40.5,251.5,0" rotation="0,0,1,0">
+                                <inline url="L4.x3d"> </inline>
+
+                            </transform>
+                        </transform>
+                    </transform>
+                </transform>
+
+            </Transform>
+        </transform>
+    </scene>
+</x3d>
