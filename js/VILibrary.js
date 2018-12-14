@@ -11245,11 +11245,26 @@ VILibrary.VI = {
             this.robotURL='assets/irb14000/irb14000.x3d';
             this.draw(draw3DFlag);
             this.name = 'YUMI';
-
-			/*this.currentLen=[166,124,270,70,150,152,59,13];
-			 this.currentScal=[1,1,1,1,1,1,1,1];
-			 this.initLen=[166,124,270,70,150,152,59,13];*/
-            this.a_d=[815,850,145,820,170,350];
+            //关节转角控制各个连杆模型转动
+            this.jiontsControl=function(TargetANG) {
+                let rotat="0,0,0,0";
+                let len=TargetANG.length;
+                for(let i=0;i<len;i++){
+                    switch (i){
+                        case 1:case 2:case 4:
+                        rotat="0,0,-1,"+TargetANG[i];
+                        break;
+                        case 0:
+                            rotat="0,1,0,"+TargetANG[i];
+                            break;
+                        case 3:case 5:
+                        rotat="1,0,0,"+TargetANG[i];
+                        break;
+                        default:alert("输入转角错误");return;
+                    }
+                    document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
+                }
+            }
         }
         static get cnName() {
 

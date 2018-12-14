@@ -1,8 +1,7 @@
 <x3d id="120X3d" style="width: 100%;height: 100%;">
     <scene>
         <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
-        <Viewpoint position="255.44244 300.75453 1203.73790" orientation="0.31015 0.93461 -0.17408 0.22399" zNear="75.95875" zFar="2823.95809" description=""></Viewpoint>
-        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+        <Viewpoint position="1312.88102 616.21377 61.32418" orientation="-0.07482 0.99138 0.10759 1.47379" zNear="75.95875" zFar="2823.95809" description=""></Viewpoint><navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
 
         <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
         <directionalLight id="directional2"  direction='0 1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>
@@ -30,23 +29,58 @@
                 </Shape>
             </Transform>
             <inline DEF="platform" url="../platform.x3d" scale="1.5,1,1.5"> </inline>
-            <Transform translation="">
+            <Transform translation="" rotation="0,1,0,1.57">
                 <inline url="base.x3d"> </inline>
-                <!--<transform  translation="71.48,413.51,51.11" rotation="0.3483,0.9370,-0.0268,1.8671">-->
-                <transform DEF="link0"  translation="71.48,413.51,51.11" rotation="0.7293,-0.3912,-0.5613,1.1873">
-                    <inline url="L1.x3d"> </inline>
-                    <transform DEF="link1"  translation="-30,103.2,0" rotation="0,0,1,0">
-                        <inline url="L2.x3d"> </inline>
-                        <transform DEF="link2"  translation="30,0,0" rotation="0,1,0,0">
-                            <inline url="L3.x3d"> </inline>
-                            <transform DEF="link3"  translation="40.5,251.5,0" rotation="0,0,1,0">
-                                <inline url="L4.x3d"> </inline>
+                <!--<transform  translation="71.48,413.51,51.11" rotation="0.3483,0.9370,-0.0268,0">
+                &lt;!&ndash;<transform translation="71.48,413.51,51.11" rotation="0.7293,-0.3912,-0.5613,1.1873">&ndash;&gt;
+                    <transform DEF="link0"  >
+                        <inline url="L1.x3d"> </inline>
+                        <transform DEF="link1"  translation="0,103.2,30" rotation="0,0,1,0">
+                            <inline url="L2.x3d"> </inline>
+                            &lt;!&ndash;<transform DEF="link2"  translation="0,30,0" rotation="0,1,0,0">
+                                <inline url="L3.x3d"> </inline>
+                                <transform DEF="link3"  translation="0,40.5,251.5" rotation="0,0,1,0">
+                                    <inline url="L4.x3d"> </inline>
+                                    <transform DEF="link4"  translation="0,0,40.5" rotation="0,0,1,0">
+                                        <inline url="L5.x3d"> </inline>
+                                        <transform DEF="link5"  translation="0,265,-27" rotation="0,0,1,0">
+                                            <inline url="L6.x3d"> </inline>
+                                            <transform DEF="link6"  translation="0,0,27" rotation="0,0,1,0">
+                                                <inline url="L7.x3d"> </inline>
 
+                                            </transform>
+                                        </transform>
+                                    </transform>
+                                </transform>
+                            </transform>&ndash;&gt;
+                        </transform>
+                    </transform>
+
+                </transform>-->
+                <transform translation="71.48,413.51,51.11" rotation="0.0736,-0.8211,-0.5659,2.1495">
+                    <transform DEF="link0"   rotation="0,1,0,0">
+                        <inline url="L1.x3d"> </inline>
+                        <transform DEF="link1"  translation="-30,103.2,0" rotation="0,0,1,0">
+                            <inline url="L2.x3d"> </inline>
+                            <transform DEF="link2"  translation="30,0,0" rotation="0,1,0,0">
+                                <inline url="L3.x3d"> </inline>
+                                <transform DEF="link3"  translation="40.5,251.5,0" rotation="0,0,1,0">
+                                    <inline url="L4.x3d"> </inline>
+                                    <transform DEF="link4"  translation="0,40.5,0" rotation="0,0,1,0">
+                                        <inline url="L5.x3d"> </inline>
+                                        <transform DEF="link5"  translation="265,-27,0" rotation="0,0,1,0">
+                                            <inline url="L6.x3d"> </inline>
+                                            <transform DEF="link6"  translation="0,27,0" rotation="0,0,1,0">
+                                                <inline url="L7.x3d"> </inline>
+                                            </transform>
+                                        </transform>
+                                    </transform>
+                                </transform>
                             </transform>
                         </transform>
                     </transform>
-                </transform>
 
+                </transform>
             </Transform>
         </transform>
     </scene>

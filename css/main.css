@@ -647,6 +647,10 @@ html {
     flex-grow: 1;
     align-items: stretch;
 }
+.arm_choose{
+    width: 20px;
+    height: 20px;
+}
 
 
 
