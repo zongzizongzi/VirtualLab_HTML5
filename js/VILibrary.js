@@ -11249,9 +11249,11 @@ VILibrary.VI = {
             this.jiontsControl=function(TargetANG) {
                 let rotat="0,0,0,0";
                 let len=TargetANG.length;
+                let rot;
                 for(let i=0;i<len;i++){
-                    switch (i){
+                    /*switch (i){
                         case 1:case 2:case 4:
+                        document.getElementById("Robot__link"+i).
                         rotat="0,0,-1,"+TargetANG[i];
                         break;
                         case 0:
@@ -11261,8 +11263,9 @@ VILibrary.VI = {
                         rotat="1,0,0,"+TargetANG[i];
                         break;
                         default:alert("输入转角错误");return;
-                    }
-                    document.getElementById("Robot__link"+i).setAttribute('rotation',rotat);
+                    }*/
+                    rot=document.getElementById("Robot__link"+i).getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+TargetANG[i];
+                    document.getElementById("Robot__link"+i).setAttribute('rotation',rot);
                 }
             }
         }
