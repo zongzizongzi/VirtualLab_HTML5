@@ -60,18 +60,18 @@
                 <transform translation="71.48,413.51,51.11" rotation="0.0736,-0.8211,-0.5659,2.1495">
                     <transform DEF="link0"   rotation="0,1,0,0">
                         <inline url="L1.x3d"> </inline>
-                        <transform DEF="link1"  translation="-30,103.2,0" rotation="0,0,-1,0">
+                        <transform DEF="link1"  translation="-30,103.2,0" rotation="0,0,1,0">
                             <inline url="L2.x3d"> </inline>
                             <transform DEF="link2"  translation="30,0,0" rotation="0,1,0,0">
                                 <inline url="L3.x3d"> </inline>
-                                <transform DEF="link3"  translation="40.5,251.5,0" rotation="0,0,-1,0">
+                                <transform DEF="link3"  translation="40.5,251.5,0" rotation="0,0,1,0">
                                     <inline url="L4.x3d"> </inline>
                                     <transform DEF="link4"  translation="0,40.5,0" rotation="1,0,0,0">
                                         <inline url="L5.x3d"> </inline>
-                                        <transform DEF="link5"  translation="265,-27,0" rotation="0,0,-1,0">
+                                        <transform DEF="link5"  translation="265,-27,0" rotation="0,0,1,0">
                                             <inline url="L6.x3d"> </inline>
                                             <transform DEF="link6"  translation="0,27,0" rotation="1,0,0,0">
-                                                <inline url="L7.x3d"> </inline>
+                                                <inline url="L7.x3d" DEF="lastLink"> </inline>
                                             </transform>
                                         </transform>
                                     </transform>
