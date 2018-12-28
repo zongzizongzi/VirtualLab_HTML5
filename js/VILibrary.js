@@ -10860,10 +10860,10 @@ VILibrary.VI = {
 					if(inRange)resultAng=theta.concat();
                 }
                 else if(robNumber=="a14000"){
-                    let T0_s=math.inv(T_BASE);//math.inv()矩阵求逆
+                    let T0_s=math.inv(T_BASE,);//math.inv()矩阵求逆
                     let Tt_6=[[1,0,0,-a[8]],[0,1,0,0],[0,0,1,-d[8]],[0,0,0,1]];
                     let T=math.multiply(math.multiply(T0_s,R),Tt_6);
-                    yumiIK(T);
+                    yumiIK(T,input);
                 }
 				else {
                     let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
@@ -10948,10 +10948,10 @@ VILibrary.VI = {
                         return minAng;
                 }
             }
-            function yumiIK(input) {
-            	let T=input.concat();//位姿矩阵
+            function yumiIK(input1,input2) {
+            	let T=input1.concat();//位姿矩阵
+				let target_pos=input2.concat();
             	let theta=currentANG.concat();
-            	theta=[Math.PI/6,0,0,0,0,0,0]
             	theta.push(0);theta.unshift(0);
                 /*DH参数*/
                 let alpha=ALPHA.concat();
@@ -11001,7 +11001,7 @@ VILibrary.VI = {
 				let J=math.transpose(J_t);//math.transpose矩阵转置
 				let J_plus=math.multiply(J_t,math.inv(math.multiply(J,J_t)));//J的广义逆矩阵
 
-				/*计算广义速度*/
+				/*/!*计算广义速度*!/
                 let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
                     ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
                     nz=T[2][0],oz=T[2][1],az=T[2][2],pz=T[2][3];
@@ -11016,18 +11016,32 @@ VILibrary.VI = {
 					[0,0,0,nx,ny,nz],
                     [0,0,0,ox,oy,oz],
                     [0,0,0,ax,ay,az]
-				];
+				];*/
 				let phi=math.transpose([1,1,1,1,1,1,1]);
+                let v=math.transpose(math.add(target_pos,math.multiply(-1,currentPOS)));
+                /*let phi=[[1],[1],[1],[1],[1],[1],[1]];
+                let v=[
+                    [target_pos[0]-currentPOS[0]],
+                    [target_pos[1]-currentPOS[1]],
+                    [target_pos[2]-currentPOS[2]],
+                    [target_pos[3]-currentPOS[3]],
+                    [target_pos[4]-currentPOS[4]],
+                    [target_pos[5]-currentPOS[5]],
+				];*/
+
 				let I=[
-					[1,0,0,0,0,0,0],
+                    [1,0,0,0,0,0,0],
                     [0,1,0,0,0,0,0],
                     [0,0,1,0,0,0,0],
                     [0,0,0,1,0,0,0],
                     [0,0,0,0,1,0,0],
                     [0,0,0,0,0,1,0],
-                    [0,0,0,0,0,0,1],
-				]
-				let dr=math.multiply(J_plus,V)+(I-J_plus*J)
+                    [0,0,0,0,0,0,1]
+                ];
+				let qs=math.multiply(J_plus,v),qn=math.multiply(math.add(I,math.multiply(-1,math.multiply(J_plus,J))),phi);
+				let dr=math.add(qs,qn);
+                dr.push(0);dr.unshift(0);
+				theta=math.add(theta,dr);
             }
         }
         static get cnName() {
