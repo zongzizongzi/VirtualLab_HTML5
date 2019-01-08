@@ -9820,7 +9820,7 @@ VILibrary.VI = {
                     Range=[[30,470],[55,500],[0,300]];
                     OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];break;
                     break;
-				case 'a14000':
+				case 'a14000L':case 'a14000R':
 					A=[0,0,30,30,40.5,40.5,27,27,0];
                     D=[0,103.2,0,251.5,0,265,0,36,0];
                     ALPHA=[0,0,-Math.PI/2,-Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,0];
@@ -9830,12 +9830,22 @@ VILibrary.VI = {
                     Range=[[-168.5,168.5],[-143.5,43.5],[-168.5,168.5],[-123.5,80],[-290,290],[-88,138],[-229,229]];
                     OMEGA=[180,180,180,180,400,400,400];
                     targetANG=[0,0,0,0,0,0,0];
-                    T_BASE=[
-                        [0.5714,0.1066,0.8138,51.11],
-                        [-0.6190,0.7071,0.3420,71.48],
-                        [-0.5389,-0.6991,0.4699,413.51],
-                        [0,0,0,1]
-                    ];
+                    if(robNumber=='a14000L') {
+                        T_BASE=[
+                            [0.5714,0.1066,0.8138,51.11],
+                            [-0.6190,0.7071,0.3420,71.48],
+                            [-0.5389,-0.6991,0.4699,413.51],
+                            [0,0,0,1]
+                        ];
+					}
+					else{
+                        T_BASE=[
+                            [-0.2912,-0.9082,0.3006,51.11001],
+                            [0.8841,-0.1354,0.4473,-71.4800],
+                            [-0.3655,0.3960,0.8424,413.5100],
+                            [0,0,0,1]
+                        ];
+					}
                     break;
 				case "a120":default:
 					A=[0,0,0,270,70,0,0,0];//不加tool最后一个为0
@@ -10614,7 +10624,7 @@ VILibrary.VI = {
                     theta=math.add(theta,THETA);//实际角度→计算角度
                     for(let i=0;i<len;i++)
                     {
-                    	if(i==0&&robNumber=='a14000'){
+                    	if(i==0&&(robNumber=='a14000L'||robNumber=='a14000R')){
                     		t[0]=T_BASE.concat();
 						}
 						else{
@@ -10686,6 +10696,7 @@ VILibrary.VI = {
                     for(let i=0;i<targetANG.length;i++){
                         let a;
                         if(robNumber=="a910"&&i==2||robNumber=="epson")a=(targetANG[i]).toFixed(2);
+                        else if((robNumber=='a14000L'||robNumber=='a14000R')&&(i==1||i==3||i==5))a=-(targetANG[i]*180/Math.PI).toFixed(2);
                         else a=(targetANG[i]*180/Math.PI).toFixed(2);
                         document.getElementById("angInput"+(i)).value=a;
                         document.getElementById("angTxt"+(i)).value=a;
@@ -10856,7 +10867,7 @@ VILibrary.VI = {
 					}
 					if(inRange)resultAng=theta.concat();
                 }
-                else if(robNumber=="a14000"){
+                else if(robNumber=='a14000L'||robNumber=='a14000R'){
                     let T0_s=math.inv(T_BASE,);//math.inv()矩阵求逆
                     let Tt_6=[[1,0,0,-a[7]],[0,1,0,0],[0,0,1,-d[8]],[0,0,0,1]];
                     let T=math.multiply(math.multiply(T0_s,R),Tt_6);//目标位姿的T,去掉基座和工具
