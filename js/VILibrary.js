@@ -9764,6 +9764,7 @@ VILibrary.VI = {
             const _this = this;
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
+            let currentPOS;
             let targetANG2;//专为IRB360提供
             let pPos=[];
             let instrIndex,
@@ -9772,6 +9773,7 @@ VILibrary.VI = {
 				Range,OMEGA,
 				T_BASE,//基座矩阵，除YUMI外，基座矩阵都包含在D_H参数里
 				A,D,ALPHA,THETA;//D-H参数
+			let Pre='';//前缀，区分双臂的左右臂
 
 			let ToolFlag=0,//加载工具标志
 				ToolDO=false,
@@ -9837,14 +9839,16 @@ VILibrary.VI = {
                             [-0.5389,-0.6991,0.4699,413.51],
                             [0,0,0,1]
                         ];
+                        Pre='L_';
 					}
 					else{
                         T_BASE=[
-                            [-0.2912,-0.9082,0.3006,51.11001],
-                            [0.8841,-0.1354,0.4473,-71.4800],
-                            [-0.3655,0.3960,0.8424,413.5100],
-                            [0,0,0,1]
-                        ];
+                            [0.5714,-0.1064,0.8138,51.1100],
+							[0.6190,0.7070,-0.3421,-71.4800],
+                            [-0.5389,0.6992,0.4698,413.5100],
+							[0,0,0,1.0000]
+					];
+                        Pre="R_";
 					}
                     break;
 				case "a120":default:
@@ -9859,9 +9863,9 @@ VILibrary.VI = {
             }
             const baseA=A,baseD=D,baseTHETA=THETA;
 			if(robNumber!="epson")Range=math.multiply(Range,Math.PI/180);
-            this.getData=function (dataType) {
-            	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;
-            	else if(dataType==2)return [ToolFlag,ToolDO];
+            this.getData=function (dataType) {//根据dataType区分发送数据给谁
+            	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;//发送数据给robot的X3DOM模型，所发送的数据为关节变量
+            	else if(dataType==2)return [ToolFlag,ToolDO];//发送数据给TOOL，所发送的数据为[是否安装tool，夹具状态]
             }
             this.setData=function (input) {
                 let a_D=input.concat();
@@ -10088,9 +10092,9 @@ VILibrary.VI = {
 				}
 				else {
                     let dAng=math.multiply(Diff,1/maxDiff);//单位变化量
-                    let x=parseFloat(document.getElementById("posX").value),
-                        y=parseFloat(document.getElementById("posY").value),
-                        z=parseFloat(document.getElementById("posZ").value);
+                    let x=parseFloat(document.getElementById(Pre+"posX").value),
+                        y=parseFloat(document.getElementById(Pre+"posY").value),
+                        z=parseFloat(document.getElementById(Pre+"posZ").value);
                     let ANG1=math.add(currentANG,dAng),
 						T=kinematicsEquation(ANG1,true),
 						x1=T[0],y1=T[1],z1=T[2],
@@ -10481,11 +10485,11 @@ VILibrary.VI = {
                         default:
                             break;
                     }
-					document.getElementById("setDO").innerText='1';
+					document.getElementById(Pre+"setDO").innerText='1';
 				}
 				else {
             		LoadFlag=false;
-                    document.getElementById("setDO").innerText='0';
+                    document.getElementById(Pre+"setDO").innerText='0';
 				}
                 if(executiveFlag){
                     instrIndex++;
@@ -10684,12 +10688,12 @@ VILibrary.VI = {
                     let pos=[x,y,z,EulerX,EulerY,EulerZ];
                     return pos;//若仅用于计算目标点，不再执行后面代码
                 }
-                document.getElementById("posX").value=x.toFixed(2);
-                document.getElementById("posY").value=y.toFixed(2);
-                document.getElementById("posZ").value=z.toFixed(2);
-                document.getElementById("eulerX").value=(EulerX*180/Math.PI).toFixed(2);
-                document.getElementById("eulerY").value=(EulerY*180/Math.PI).toFixed(2);
-                document.getElementById("eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
+                document.getElementById(Pre+"posX").value=x.toFixed(2);
+                document.getElementById(Pre+"posY").value=y.toFixed(2);
+                document.getElementById(Pre+"posZ").value=z.toFixed(2);
+                document.getElementById(Pre+"eulerX").value=(EulerX*180/Math.PI).toFixed(2);
+                document.getElementById(Pre+"eulerY").value=(EulerY*180/Math.PI).toFixed(2);
+                document.getElementById(Pre+"eulerZ").value=(EulerZ*180/Math.PI).toFixed(2);
                 currentPOS=[x,y,z,EulerX,EulerY,EulerZ];
                 currentANG=targetANG.concat();
                 if(executiveFlag||(moveType!='J')){
@@ -10698,8 +10702,8 @@ VILibrary.VI = {
                         if(robNumber=="a910"&&i==2||robNumber=="epson")a=(targetANG[i]).toFixed(2);
                         else if((robNumber=='a14000L'||robNumber=='a14000R')&&(i==1||i==3||i==5))a=-(targetANG[i]*180/Math.PI).toFixed(2);
                         else a=(targetANG[i]*180/Math.PI).toFixed(2);
-                        document.getElementById("angInput"+(i)).value=a;
-                        document.getElementById("angTxt"+(i)).value=a;
+                        document.getElementById(Pre+"angInput"+(i)).value=a;
+                        document.getElementById(Pre+"angTxt"+(i)).value=a;
                     }
 				}
                 if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
@@ -11013,7 +11017,7 @@ VILibrary.VI = {
                 let err=math.add(target_pos,math.multiply(-1,current_pos));
                 let err_max=Math.max.apply(Math,err);
                 let err_min=Math.min.apply(Math,err);
-                let max_times=200;
+                let max_times=1000;
                 let times;
                 for(times=0;times<=max_times;times++){
                 	/*实际角度->计算角度*/
@@ -11201,9 +11205,9 @@ VILibrary.VI = {
                     T=math.multiply(t[i],T)
                 }
                 // console.log("T",T,"theta",theta);
-                document.getElementById("posX").value=(T[0][3]).toFixed(1);
-                document.getElementById("posY").value=(T[1][3]).toFixed(1);
-                document.getElementById("posZ").value=(T[2][3]).toFixed(1);
+                document.getElementById(Pre+"posX").value=(T[0][3]).toFixed(1);
+                document.getElementById(Pre+"posY").value=(T[1][3]).toFixed(1);
+                document.getElementById(Pre+"posZ").value=(T[2][3]).toFixed(1);
                 for(let i=0;i<=3;i++){
                     for(let j=0;j<=3;j++){
                         T[i][j]= (T[i][j]).toFixed(4);
@@ -11234,9 +11238,9 @@ VILibrary.VI = {
                 // let EulerZ=alpha;
                 // let EulerY=beta;
                 // let EulerX=gamma;
-                document.getElementById("eulerX").value=EulerX.toFixed(1);
-                document.getElementById("eulerY").value=EulerY.toFixed(1);
-                document.getElementById("eulerZ").value=EulerZ.toFixed(1);
+                document.getElementById(Pre+"eulerX").value=EulerX.toFixed(1);
+                document.getElementById(Pre+"eulerY").value=EulerY.toFixed(1);
+                document.getElementById(Pre+"eulerZ").value=EulerZ.toFixed(1);
 
             }
 
@@ -11435,26 +11439,21 @@ VILibrary.VI = {
             this.draw(draw3DFlag);
             this.name = 'YUMI';
             //关节转角控制各个连杆模型转动
-            this.jiontsControl=function(TargetANG) {
+            this.setData = function (input,inputType){
+                if(Array.isArray(input)) {let targetANG=input.concat(); _this.jiontsControl(targetANG,inputType)}
+                else {
+                    console.log('RobotVI: Input value error');
+                    return;
+                }
+            }
+            this.jiontsControl=function(TargetANG,inputType) {
                 let rotat="0,0,0,0";
                 let len=TargetANG.length;
                 let rot;
+                let suffix=inputType==1?"_L":"_R";//根据inputType确定左右臂后缀
                 for(let i=0;i<len;i++){
-                    /*switch (i){
-                        case 1:case 2:case 4:
-                        document.getElementById("Robot__link"+i).
-                        rotat="0,0,-1,"+TargetANG[i];
-                        break;
-                        case 0:
-                            rotat="0,1,0,"+TargetANG[i];
-                            break;
-                        case 3:case 5:
-                        rotat="1,0,0,"+TargetANG[i];
-                        break;
-                        default:alert("输入转角错误");return;
-                    }*/
-                    rot=document.getElementById("Robot__link"+i).getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+TargetANG[i];
-                    document.getElementById("Robot__link"+i).setAttribute('rotation',rot);
+                    rot=document.getElementById("Robot__link"+i+suffix).getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+TargetANG[i];
+                    document.getElementById("Robot__link"+i+suffix).setAttribute('rotation',rot);
                 }
             }
         }

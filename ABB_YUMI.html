@@ -70,7 +70,7 @@
                 <div style="width: 50%;display: inline;float: left">
                     <p>末端坐标：</p><br>
                     <p>P_X：<input id="R_posX" type="text" value="567.8" class="robotPA"></p>
-                    <p>P_Y：<input id="R_posY" type="text" value="-4.73" class="robotPA"></p>
+                    <p>P_Y：<input id="R_posY" type="text" value="4.73" class="robotPA"></p>
                     <p>P_Z：<input id="R_posZ" type="text" value="415.13" class="robotPA"></p>
                 </div>
                 <div style="width: 50%;display: inline;">
@@ -107,7 +107,7 @@
                 <p>ROB_L 关节转角：
                 </p>
                 <br>
-                <p >Ang_1：<input id="L_angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0,L,'L')">
+                <p >Ang_1：<input id="L_angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0,'L')">
                     <input id="L_angInput0" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(0,'L')">
                 </p>
                 <p>Ang_2：<input id="L_angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1,'L')">
@@ -220,14 +220,10 @@
     let R_instructionCompiling= new VILibrary.VI.Instruction_1VI($('#R_messageDiv'), true,"a14000R");
     let L_tool=new VILibrary.VI.ToolVI($('#L_tool'),true,"14000");
     let R_tool=new VILibrary.VI.ToolVI($('#R_tool'),true,"14000");
-    VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, L_tool.id, 2, 1);
-    VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, robot14000VI.id, 1, 2);
-    VILibrary.InnerObjects.bindDataLine(R_instructionCompiling.id, robot14000VI.id, 1, 2);
-//    VILibrary.InnerObjects.bindDataLine(robot60haVI.id, instructionCompiling.id, 1, 2);
+    VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, L_tool.id, 2, 1);//sourceId, targetId, sourceOutputType, targetInputType；sourceOutputType=2，输出tool数据
+    VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, robot14000VI.id, 1, 1);//sourceOutputType=1，输出robot数据;targetInputType=1,控制机器人左臂
+    VILibrary.InnerObjects.bindDataLine(R_instructionCompiling.id, robot14000VI.id, 1, 2);//sourceOutputType=1，输出robot数据;targetInputType=2,控制机器人右臂
 
-    let val=[0],ang;
-    let s=[],
-        indexI=0;
     let currentAng=[0,0,0,0,0,0,0];
     function changeAng(input,rob) {
        /* let a=[
@@ -261,7 +257,7 @@
 //        instructionCompiling.fk([0,0,0,0,0,0,0],500);
     }
     function changeAngTxt(input,rob) {
-        val=document.getElementById(rob+"_angTxt"+input).value;
+        let val=document.getElementById(rob+"_angTxt"+input).value;
         document.getElementById(rob+"_angInput"+input).value=val;
         if(parseFloat(val)>document.getElementById(rob+"_angInput"+input).max||parseFloat(val)<document.getElementById(rob+"_angInput"+input).min){
             alert('超出转角范围');
@@ -286,9 +282,9 @@
 //       instructionCompiling.fk(pos);
         switch (rob){
             case "R":
-                R_instructionCompiling.moveL(currentAng,500); break;
+                R_instructionCompiling.moveL(pos,500); break;
             case "L":default:
-                L_instructionCompiling.moveL(currentAng,500);
+                L_instructionCompiling.moveL(pos,500);
         }
     }
     function Instructions(rob) {
@@ -302,12 +298,21 @@
         }
 
     }
+
+    let s=[[],[]],
+        indexI=[0,0];
     function points(type,rob) {
         let turnPoints;
+        let robI=0;
+        switch (rob){
+            case "L":robI=0;break;
+            case 'R':robI=1;break;
+            default:console.log('armIndex Error')
+        }
         switch (type){
             case 0:/*清空*/
-                s=[];
-                indexI=0;
+                s[robI]=[];
+                indexI[robI]=0;
                 /*----------------点集清空-------------------*/
                 document.getElementById(rob+"_Robot__PointSet_points").setAttribute('point','');
                 /*-----------------------------------*/
@@ -319,32 +324,33 @@
                     gamma=parseFloat(document.getElementById(rob+"_eulerX").value),
                     beta=parseFloat(document.getElementById(rob+"_eulerY").value),
                     alpha=parseFloat(document.getElementById(rob+"_eulerZ").value);
-                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
+                let si="p"+indexI[robI]+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
-                indexI++;
+                s[robI].push(si);
+                indexI[robI]++;
                 break;
             case 2:/*删除示教点*/
-                s.pop();
+                s[robI].pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
 //                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
-                indexI--;
+                indexI[robI]--;
                 break;
             case -1:
                 /*s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],
                 document.getElementById("instrInput").value="moveJ p0,v400;\nmoveC p1,p2,v400;\nmoveL p3,v400;\nmoveJ p0,v400;";
                 turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
-                indexI=4;*/
-                s=[
+                indexI[robI]=4;*/
+                s[robI]=[
                     "p0:[1550.41,0,1668.89,-180°,60°,-180°];\n",
                     "p1:[1000,-1000,200,180°,0°,-180°];\n",
                     "p2:[1000,-1000,40,180°,0°,-180°];\n",
@@ -358,8 +364,8 @@
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
         }
         let str="";
-        for(let m=0;m<s.length;m++){
-            str= str + s[m] ;
+        for(let m=0;m<s[robI].length;m++){
+            str= str + s[robI][m] ;
         }
         document.getElementById(rob+"_points").value=str;
     }
