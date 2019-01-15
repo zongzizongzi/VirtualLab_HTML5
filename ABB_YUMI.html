@@ -94,7 +94,7 @@
                 <p>控制指令</p>
                 <textarea id="R_instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
                 <div class="rowFlex-div">
-                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions('R')">提交</button>
+                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
             </div>
         </div>
@@ -164,7 +164,7 @@
                 <p>控制指令</p>
                 <textarea id="L_instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
                 <div class="rowFlex-div">
-                    <button  onclick="points(-1,'L') ">示例程序</button><button   onclick="Instructions('L')">提交</button>
+                    <button  onclick="points(-1,'L') ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
             </div>
         </div>
@@ -288,15 +288,20 @@
         }
     }
     function Instructions(rob) {
-        let points=document.getElementById(rob+"_points").value.toString();
+        /*         let points=document.getElementById(rob+"_points").value.toString();
         let cmd=document.getElementById(rob+"_instrInput").value.toString();
         switch (rob){
-            case "R":
+       case "R":
                 R_instructionCompiling.toggleObserver(points,cmd); break;
             case "L":default:
                 L_instructionCompiling.toggleObserver(points,cmd);
-        }
-
+        }*/
+        let points=document.getElementById("L_points").value.toString();
+        let cmd=document.getElementById("L_instrInput").value.toString();
+        L_instructionCompiling.toggleObserver(points,cmd);
+        points=document.getElementById("R_points").value.toString();
+        cmd=document.getElementById("R_instrInput").value.toString();
+        R_instructionCompiling.toggleObserver(points,cmd);
     }
 
     let s=[[],[]],

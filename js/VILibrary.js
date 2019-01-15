@@ -9840,6 +9840,7 @@ VILibrary.VI = {
                             [-0.5389,-0.6991,0.4699,413.51],
                             [0,0,0,1]
                         ];
+                        currentPOS=[567.86, -4.75, 415.18, -2.22756, 0.4892, -2.743832]
                         Pre='L_';
                         Suf='_L'
 					}
@@ -9850,6 +9851,7 @@ VILibrary.VI = {
                             [-0.5389,0.6992,0.4698,413.5100],
 							[0,0,0,1.0000]
 					];
+                        currentPOS=[567.86,4.71,415.14,2.2274,0.4890,2.74366]
                         Pre="R_";
                         Suf="_R"
 					}
@@ -11132,7 +11134,8 @@ VILibrary.VI = {
 
                 }
                 if(times>max_times){
-                    alert('max times');
+                    let msg=robNumber=="a14000L"?"ROB_left":"ROB_right"
+                    alert(msg+'error');
                     return 0;
                 }
                 else{
