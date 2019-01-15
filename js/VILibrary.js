@@ -9774,6 +9774,7 @@ VILibrary.VI = {
 				T_BASE,//基座矩阵，除YUMI外，基座矩阵都包含在D_H参数里
 				A,D,ALPHA,THETA;//D-H参数
 			let Pre='';//前缀，区分双臂的左右臂
+			let Suf='';//前缀，区分双臂的左右臂
 
 			let ToolFlag=0,//加载工具标志
 				ToolDO=false,
@@ -9840,6 +9841,7 @@ VILibrary.VI = {
                             [0,0,0,1]
                         ];
                         Pre='L_';
+                        Suf='_L'
 					}
 					else{
                         T_BASE=[
@@ -9849,6 +9851,7 @@ VILibrary.VI = {
 							[0,0,0,1.0000]
 					];
                         Pre="R_";
+                        Suf="_R"
 					}
                     break;
 				case "a120":default:
@@ -9926,8 +9929,8 @@ VILibrary.VI = {
 					let points="";
 					if(robNumber=="a360")points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
                     else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
-                    document.getElementById("Robot__LineSet_points").setAttribute('point',points);
-                    document.getElementById("Robot__LineSet_index").setAttribute('coordIndex','0');
+                    document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',points);
+                    document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex','0');
                     _this.instrCompiling(); //逐条指令解析
             };
             function errInfo() {
@@ -10707,14 +10710,14 @@ VILibrary.VI = {
                     }
 				}
                 if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
-                    let point=document.getElementById("Robot__LineSet_points").getAttribute('point');
+                    let point=document.getElementById("Robot__LineSet_points"+Suf).getAttribute('point');
                     if(robNumber=="a360")point+=" "+y+" "+z+" "+x;
                     else point+=" "+x+" "+z+" "+(-y);
-                    document.getElementById("Robot__LineSet_points").setAttribute('point',point);
-					let point_Index=document.getElementById("Robot__LineSet_index").getAttribute('coordIndex');
+                    document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',point);
+					let point_Index=document.getElementById("Robot__LineSet_index"+Suf).getAttribute('coordIndex');
 					let last_Index=parseInt(point_Index.match(/\d+$/))+1;
                     point_Index=point_Index+' '+last_Index;
-                    document.getElementById("Robot__LineSet_index").setAttribute('coordIndex',point_Index);
+                    document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex',point_Index);
 				}
 				//若夹持工件，工件坐标与末端坐标保持一致
 				if(LoadFlag&&(!flag)){
@@ -11015,9 +11018,11 @@ VILibrary.VI = {
                 let a=A.concat();
                 let d=D.concat();
                 let err=math.add(target_pos,math.multiply(-1,current_pos));
-                let err_max=Math.max.apply(Math,err);
-                let err_min=Math.min.apply(Math,err);
-                let max_times=1000;
+                let norm=math.norm(err);
+                let err_max=Math.max.apply(null,err);
+                let err_min=Math.max.apply(null,err);
+                if(norm<=0.5)return theta;
+                let max_times=10000;
                 let times;
                 for(times=0;times<=max_times;times++){
                 	/*实际角度->计算角度*/
@@ -11070,7 +11075,7 @@ VILibrary.VI = {
                     let J=math.transpose(JT);//math.transpose矩阵转置
 					J=math.multiply(R,J);//将基于末端的雅各比矩阵转换为基于基坐标系的雅各比
                     let J_plus=math.multiply(JT,math.inv(math.multiply(J,JT)));//J的广义逆矩阵
-                    let dt=0.05;
+                    let dt=1;
                     let v=math.transpose(math.add(target_pos,math.multiply(-1,current_pos)));
                     v=math.multiply(v,1/dt);
                     let k=-0.14;let dH=[];
@@ -11099,22 +11104,36 @@ VILibrary.VI = {
                     // dr.push(0);dr.unshift(0);
                     theta=math.add(theta,math.multiply(dr,dt));
                     current_pos=kinematicsEquation(theta,true);
-                    let ttt=pos2T_without_basetool(current_pos);
-                    current_pos=T2pos(ttt);
+                    currentT=pos2T_without_basetool(current_pos);
+                    current_pos=T2pos(currentT);
                     let err=math.add(target_pos,math.multiply(-1,current_pos));
-                    err_max=Math.max.apply(Math,err);
-                    err_min=Math.min.apply(Math,err);
-
-                    if(err_max>1||err_min<-1){
+                    norm=math.norm(err);
+                    err_max=Math.max.apply(null,err);
+                    err_min=Math.min.apply(null,err);
+                    if(norm>1){/*err_max>1||err_min<-1*/
                         continue;
 					}
-					else break;
+					else{
+                        let outOfRange=false;
+                        for(let i=0;i<theta.length;i++){
+                            let n=theta[i]/(Math.PI*2);
+                            if(Math.abs(n)>1)theta[i]-=Math.round(n)*Math.PI*2;
+                            if(theta[i]>Range[i][1])theta[i]-=Math.PI*2;
+                            if(theta[i]<Range[i][0])theta[i]+=Math.PI*2;
+                            if(theta[i]>Range[i][1]){outOfRange=true;break;}
+                        }
+                        if(outOfRange)continue
+						else  break;
+					}
                 }
                 if(times>max_times){
                     alert('max times');
                     return 0;
                 }
-                else return theta;
+                else{
+                    return theta;
+				}
+
             }
         }
         static get cnName() {

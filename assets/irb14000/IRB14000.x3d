@@ -8,13 +8,13 @@
         <PointLight id='point' on='TRUE' intensity='0.9000' ambientIntensity='0.0000' color='0.0 0.6 0.0' location='2 10 0.5 '  attenuation='0 0 0' radius='5.0000'> </PointLight>
         <SpotLight id='spot' on ="TRUE" beamWidth='0.9' color='0 0 1' cutOffAngle='0.78' location='0 0 12' radius='22'></SpotLight>
         <transform>
-            <Transform def="line">
+            <Transform def="line_L">
                 <Shape>
                     <Appearance>
                         <Material emissiveColor='0 0 1'/>
                     </Appearance>
-                    <IndexedLineSet id='LineSet_index' coordIndex=''>
-                        <Coordinate id='LineSet_points' point=''/>
+                    <IndexedLineSet id='LineSet_index_L' coordIndex=''>
+                        <Coordinate id='LineSet_points_L' point=''/>
                     </IndexedLineSet>
                 </Shape>
             </Transform>
@@ -24,7 +24,27 @@
                         <Material emissiveColor='1 0 0'/>
                     </Appearance>
                     <PointSet>
-                        <Coordinate id='PointSet_points' point=''/>
+                        <Coordinate id='PointSet_points_L' point=''/>
+                    </PointSet>
+                </Shape>
+            </Transform>
+            <Transform def="line_L">
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='0 0 1'/>
+                    </Appearance>
+                    <IndexedLineSet id='LineSet_index_R' coordIndex=''>
+                        <Coordinate id='LineSet_points_R' point=''/>
+                    </IndexedLineSet>
+                </Shape>
+            </Transform>
+            <Transform def="points">
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='1 0 0'/>
+                    </Appearance>
+                    <PointSet>
+                        <Coordinate id='PointSet_points_R' point=''/>
                     </PointSet>
                 </Shape>
             </Transform>
@@ -60,7 +80,7 @@
 
                 </transform>-->
                 <!--Robotstudio中轴3=-90，轴6=-90时候的方向-->
-                <transform DEF="arm_left" translation="71.48,413.51,51.11" rotation="0.0736,-0.8211,-0.5659,2.1495">
+                <transform DEF="arm_left" translation="71.48,413.51,51.11" rotation="0.0736,-0.8211,-0.5659,2.2495">
                     <transform DEF="link0_L"   rotation="0,1,0,0">
                         <inline url="L1.x3d"> </inline>
                         <transform DEF="link1_L"  translation="-30,103.2,0" rotation="0,0,1,0">
@@ -106,7 +126,6 @@
                             </transform>
                         </transform>
                     </transform>
-
                 </transform>
             </Transform>
         </transform>
