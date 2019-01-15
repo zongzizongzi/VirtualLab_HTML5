@@ -10875,7 +10875,7 @@ VILibrary.VI = {
 					if(inRange)resultAng=theta.concat();
                 }
                 else if(robNumber=='a14000L'||robNumber=='a14000R'){
-                    let T0_s=math.inv(T_BASE,);//math.inv()矩阵求逆
+                    /*let T0_s=math.inv(T_BASE,);//math.inv()矩阵求逆
                     let Tt_6=[[1,0,0,-a[7]],[0,1,0,0],[0,0,1,-d[8]],[0,0,0,1]];
                     let T=math.multiply(math.multiply(T0_s,R),Tt_6);//目标位姿的T,去掉基座和工具
                     let x=currentPOS[0],
@@ -10889,7 +10889,8 @@ VILibrary.VI = {
                         cy=Math.cos(gamma),sy=Math.sin(gamma);
                     let R0=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
                     let T0=math.multiply(math.multiply(T0_s,R0),Tt_6);//当前位姿的T0,去掉基座和工具
-                    resultAng[0]=yumiIK(T,T0);
+                    resultAng[0]=yumiIK(T,T0);*/
+                    resultAng[0]=yumiIK(input);
                 }
 				else {
                     let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
@@ -11009,26 +11010,29 @@ VILibrary.VI = {
                 let T0=math.multiply(math.multiply(T0_s,R0),Tt_6);//当前位姿的T0,去掉基座和工具
 				return T0;
 			}
-            function yumiIK(targetT,currentT) {
-				let target_pos=T2pos(targetT);
-				let current_pos=T2pos(currentT);
+            /*function yumiIK(targetT,currentT) {
+                let target_pos=T2pos(targetT);
+                let current_pos=T2pos(currentT);*/
+            function yumiIK(targetP) {
+                let target_pos=T2pos(pos2T_without_basetool(targetP));
+                let current_pos;
             	let theta=currentANG.concat();
                 /*DH参数*/
                 let alpha=ALPHA.concat();
                 let a=A.concat();
                 let d=D.concat();
-                let err=math.add(target_pos,math.multiply(-1,current_pos));
+                /*let err=math.add(target_pos,math.multiply(-1,current_pos));
                 let norm=math.norm(err);
                 let err_max=Math.max.apply(null,err);
                 let err_min=Math.max.apply(null,err);
-                if(norm<=0.5)return theta;
+                if(norm<=1)return theta;*/
                 let max_times=10000;
                 let times;
                 for(times=0;times<=max_times;times++){
                 	/*实际角度->计算角度*/
 					theta.push(0);theta.unshift(0);
                     theta=math.add(theta,THETA);
-                    let t=[];
+                    let t=[];let currentT=[];
                     for(let i=1;i<alpha.length-1;i++){
                         t[i-1]=[
                             [math.cos(theta[i]),
@@ -11051,7 +11055,40 @@ VILibrary.VI = {
                     };
                     let Tn=[];//Tn[i]表示T：n~7
                     let JT=[];//机器人TJ的转置(TJ为微分变换法得到的基于末端的雅各比矩阵,见P59~61)
-					let R=[
+                    for(let i=6;i>=0;i--) {
+                        if (i == 6) Tn[6] = t[6];
+                        else {
+                            Tn[i] = math.multiply(t[i], Tn[i + 1]);
+                        }
+                        if (i) {
+                        let n = [Tn[i][0][0], Tn[i][1][0], Tn[i][2][0]];
+                        let o = [Tn[i][0][1], Tn[i][1][1], Tn[i][2][1]];
+                        let a = [Tn[i][0][2], Tn[i][1][2], Tn[i][2][2]];
+                        let p = [Tn[i][0][3], Tn[i][1][3], Tn[i][2][3]];
+                        JT[i] = [crossProduct(p, n)[2], crossProduct(p, o)[2], crossProduct(p, a)[2], n[2], o[2], a[2]];
+                        }
+						else currentT=Tn[i]
+                    }
+					/*还原至实际角度*/
+                    theta=math.add(theta,math.multiply(-1,THETA));
+                    theta.pop();theta.shift();
+                    /*--------------*/
+                    current_pos=T2pos(currentT);
+                    /*计算误差是否在允许范围内*/
+                    let err=math.add(target_pos,math.multiply(-1,current_pos));
+                    norm=math.norm(err);
+                    if(norm<1){
+                        let outOfRange=false;
+                        for(let i=0;i<theta.length;i++){
+                            let n=theta[i]/(Math.PI*2);
+                            if(Math.abs(n)>1)theta[i]-=Math.round(n)*Math.PI*2;
+                            if(theta[i]>Range[i][1])theta[i]-=Math.PI*2;
+                            if(theta[i]<Range[i][0])theta[i]+=Math.PI*2;
+                            if(theta[i]>Range[i][1]){outOfRange=true;break;}
+                        }
+                        if(!outOfRange)break;
+                    }
+                    let R=[
                         [currentT[0][0],currentT[0][1],currentT[0][2],0,0,0],
                         [currentT[1][0],currentT[1][1],currentT[1][2],0,0,0],
                         [currentT[2][0],currentT[2][1],currentT[2][2],0,0,0],
@@ -11059,17 +11096,6 @@ VILibrary.VI = {
                         [0,0,0,currentT[1][0],currentT[1][1],currentT[1][2]],
                         [0,0,0,currentT[2][0],currentT[2][1],currentT[2][2]],
                     ];
-                    for(let i=6;i>0;i--){
-                        if(i==6)Tn[6]=t[6];
-                        else {
-                            Tn[i]=math.multiply(t[i],Tn[i+1]);
-                        }
-						let n=[Tn[i][0][0],Tn[i][1][0],Tn[i][2][0]];
-						let o=[Tn[i][0][1],Tn[i][1][1],Tn[i][2][1]];
-						let a=[Tn[i][0][2],Tn[i][1][2],Tn[i][2][2]];
-						let p=[Tn[i][0][3],Tn[i][1][3],Tn[i][2][3]];
-						JT[i]=[crossProduct(p,n)[2],crossProduct(p,o)[2],crossProduct(p,a)[2],n[2],o[2],a[2]];
-                    }
                     JT[7]=[0,0,0,0,0,1];
                     JT.shift();
                     let J=math.transpose(JT);//math.transpose矩阵转置
@@ -11079,9 +11105,6 @@ VILibrary.VI = {
                     let v=math.transpose(math.add(target_pos,math.multiply(-1,current_pos)));
                     v=math.multiply(v,1/dt);
                     let k=-0.14;let dH=[];
-                    /*还原至实际角度*/
-                    theta=math.add(theta,math.multiply(-1,THETA));
-                    theta.pop();theta.shift();
                     for(let i=0;i<=6;i++){
                     	let qm=Range[i][1],
 							qn=Range[i][0],
@@ -11103,28 +11126,10 @@ VILibrary.VI = {
                     let dr=math.add(qs,qn);
                     // dr.push(0);dr.unshift(0);
                     theta=math.add(theta,math.multiply(dr,dt));
-                    current_pos=kinematicsEquation(theta,true);
+                   /* current_pos=kinematicsEquation(theta,true);
                     currentT=pos2T_without_basetool(current_pos);
-                    current_pos=T2pos(currentT);
-                    let err=math.add(target_pos,math.multiply(-1,current_pos));
-                    norm=math.norm(err);
-                    err_max=Math.max.apply(null,err);
-                    err_min=Math.min.apply(null,err);
-                    if(norm>1){/*err_max>1||err_min<-1*/
-                        continue;
-					}
-					else{
-                        let outOfRange=false;
-                        for(let i=0;i<theta.length;i++){
-                            let n=theta[i]/(Math.PI*2);
-                            if(Math.abs(n)>1)theta[i]-=Math.round(n)*Math.PI*2;
-                            if(theta[i]>Range[i][1])theta[i]-=Math.PI*2;
-                            if(theta[i]<Range[i][0])theta[i]+=Math.PI*2;
-                            if(theta[i]>Range[i][1]){outOfRange=true;break;}
-                        }
-                        if(outOfRange)continue
-						else  break;
-					}
+                    current_pos=T2pos(currentT);*/
+
                 }
                 if(times>max_times){
                     alert('max times');
