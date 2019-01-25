@@ -32,11 +32,10 @@
     <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/baseOperationExperiment/mulitijointRobot.htm" ></embed></div>
     <div id="index_2"><video id="demo" src="video/demo/robotsOperation.mp4" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100% ">
             <div class="message_div" id="R_messageDiv">
                 <p>ROB_R 关节转角：
                 </p>
-                <br>
                 <p >Ang_1：<input id="R_angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0,'R')">
                     <input id="R_angInput0" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(0,'R')">
                 </p>
@@ -106,7 +105,6 @@
             <div class="message_div" id="L_messageDiv">
                 <p>ROB_L 关节转角：
                 </p>
-                <br>
                 <p >Ang_1：<input id="L_angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0,'L')">
                     <input id="L_angInput0" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(0,'L')">
                 </p>
@@ -218,9 +216,9 @@
     let robot14000VI = new VILibrary.VI.Robot14000VI($('#mainCanvas'), true);
     let L_instructionCompiling= new VILibrary.VI.Instruction_1VI($('#L_messageDiv'), true,"a14000L");
     let R_instructionCompiling= new VILibrary.VI.Instruction_1VI($('#R_messageDiv'), true,"a14000R");
-    let L_tool=new VILibrary.VI.ToolVI($('#L_tool'),true,"14000");
-    let R_tool=new VILibrary.VI.ToolVI($('#R_tool'),true,"14000");
-    VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, L_tool.id, 2, 1);//sourceId, targetId, sourceOutputType, targetInputType；sourceOutputType=2，输出tool数据
+//    let L_tool=new VILibrary.VI.ToolVI($('#L_tool'),true,"14000");
+//    let R_tool=new VILibrary.VI.ToolVI($('#R_tool'),true,"14000");
+//    VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, L_tool.id, 2, 1);//sourceId, targetId, sourceOutputType, targetInputType；sourceOutputType=2，输出tool数据
     VILibrary.InnerObjects.bindDataLine(L_instructionCompiling.id, robot14000VI.id, 1, 1);//sourceOutputType=1，输出robot数据;targetInputType=1,控制机器人左臂
     VILibrary.InnerObjects.bindDataLine(R_instructionCompiling.id, robot14000VI.id, 1, 2);//sourceOutputType=1，输出robot数据;targetInputType=2,控制机器人右臂
 

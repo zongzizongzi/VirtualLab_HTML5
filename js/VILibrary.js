@@ -9850,7 +9850,7 @@ VILibrary.VI = {
 							[0.6190,0.7070,-0.3421,-71.4800],
                             [-0.5389,0.6992,0.4698,413.5100],
 							[0,0,0,1.0000]
-					];
+						];
                         currentPOS=[567.86,4.71,415.14,2.2274,0.4890,2.74366]
                         Pre="R_";
                         Suf="_R"
@@ -10195,7 +10195,7 @@ VILibrary.VI = {
                             z=currentPOS[2]+step[2];
                         tPos=[x,y,z,Ept[k][0],Ept[k][1],Ept[k][2]];
                     }
-                    if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
+                    /*if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
                         currentPOS=tPos.concat();
                         let point=document.getElementById("Robot__LineSet_points"+Suf).getAttribute('point');
                         if(robNumber=="a360")point+=" "+y+" "+z+" "+x;
@@ -10205,8 +10205,8 @@ VILibrary.VI = {
                         let last_Index=parseInt(point_Index.match(/\d+$/))+1;
                         point_Index=point_Index+' '+last_Index;
                         document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex',point_Index);
-                    }
-                    /*let tAng=inverseKinematics(tPos);
+                    }*/
+                    let tAng=inverseKinematics(tPos);
 					if(tAng==0){
 						window.clearInterval(_this.timer);
                         _this.timer=null;
@@ -10215,7 +10215,7 @@ VILibrary.VI = {
 						return;
 					}
 					else targetANG=tAng.concat();
-					kinematicsEquation(targetANG);*/
+					kinematicsEquation(targetANG);
 					if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                         }
@@ -11627,6 +11627,9 @@ VILibrary.VI = {
                 var gongjian6="<transform DEF='gongjian6' translation="+gongjianTrans6+" nameSpaceName id='Robot__gongjian6' render='true'>" +
                     "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
                     "</transform>";
+                var huaban="<transform DEF='huaban' translation='320,150,-400' rotation='0,1,0,-0.785' nameSpaceName id='Robot__huaban' render='true'>" +
+                    "<inline url='../TOOLS/huaban.x3d'></inline>" +
+                    "</transform>";
                 $("#Robot__platform").after(box);
                 $("#Robot__platform").after(gongjian1);
                 $("#Robot__platform").after(gongjian2);
@@ -11634,6 +11637,7 @@ VILibrary.VI = {
                 $("#Robot__platform").after(gongjian4);
                 $("#Robot__platform").after(gongjian5);
                 $("#Robot__platform").after(gongjian6);
+                $("#Robot__platform").after(huaban);
                 haveTool=true;
                /* var toolSwitch= "<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
 						"<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
@@ -11674,15 +11678,25 @@ VILibrary.VI = {
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
+                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     case 2:
                         document.getElementById("Robot__box").setAttribute("render", 'false');
+                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'true');
                         }
                         break;
+                    case 3:
+                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        for (var i=1;i<7;i++) {
+                            document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
+                        }
+                        document.getElementById("Robot__huaban").setAttribute("render", 'true');
+                        break;
                     default:
                         document.getElementById("Robot__box").setAttribute("render", 'false');
+                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }

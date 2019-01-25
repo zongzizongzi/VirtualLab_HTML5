@@ -29,6 +29,9 @@
                      </PointSet>
                 </Shape>
              </Transform>
+             <!--<Transform DEF="huaban" translation="320,150,-400" rotation="0,1,0,-0.785">
+                 <inline  url="../huaban.x3d"> </inline>
+             </Transform>-->
              <inline DEF="platform" url="../platform.x3d"> </inline>
              <transform def="base">
                  <transform DEF="link-1Scale">
