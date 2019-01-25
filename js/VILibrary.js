@@ -9862,11 +9862,11 @@ VILibrary.VI = {
 					ALPHA=[0,0,-Math.PI/2,0,-Math.PI/2,Math.PI/2,-Math.PI/2,0];
                 	THETA=[0,0,-Math.PI/2,0,0,0,0,Math.PI];
                 	currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
-                	Range=[[-165,165],[-110,110],[-110,70],[-160,160],[-120,120],[-400,400]];
+                	Range=[[-165,165],[-110,110],[-90,70],[-160,160],[-120,120],[-400,400]];
                 	OMEGA=[250,250,250,420,590,600];
                 	let lasdjsikdj=1111;
             }
-            const baseA=A,baseD=D,baseTHETA=THETA;
+            const baseA=A.concat(),baseD=D.concat(),baseTHETA=THETA.concat();
 			if(robNumber!="epson")Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {//根据dataType区分发送数据给谁
             	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;//发送数据给robot的X3DOM模型，所发送的数据为关节变量
@@ -9987,7 +9987,9 @@ VILibrary.VI = {
                                 case "J":
                                 	instrAng=inverseKinematics(pPos[n1]);
                                     if(instrAng==0){
-                                        alert("超出工作空间或靠近奇异点！");return;
+                                        alert("超出工作空间或靠近奇异点！");
+                                        moveType='';executiveFlag=false;instrSplit=[];
+                                        return;
                                     }
                                 	_this.moveJ(instrAng,m);
                                 	break;
@@ -10185,6 +10187,7 @@ VILibrary.VI = {
                         window.clearInterval(_this.timer);
                         _this.timer=null;
                         tPos=instructPos.concat();
+                        x=tPos[0],y=tPos[1],z=tPos[2];
                     }
 					else {
                             x=currentPOS[0]+step[0],
@@ -10192,14 +10195,27 @@ VILibrary.VI = {
                             z=currentPOS[2]+step[2];
                         tPos=[x,y,z,Ept[k][0],Ept[k][1],Ept[k][2]];
                     }
-                    let tAng=inverseKinematics(tPos);
+                    if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
+                        currentPOS=tPos.concat();
+                        let point=document.getElementById("Robot__LineSet_points"+Suf).getAttribute('point');
+                        if(robNumber=="a360")point+=" "+y+" "+z+" "+x;
+                        else point+=" "+x+" "+z+" "+(-y);
+                        document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',point);
+                        let point_Index=document.getElementById("Robot__LineSet_index"+Suf).getAttribute('coordIndex');
+                        let last_Index=parseInt(point_Index.match(/\d+$/))+1;
+                        point_Index=point_Index+' '+last_Index;
+                        document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex',point_Index);
+                    }
+                    /*let tAng=inverseKinematics(tPos);
 					if(tAng==0){
 						window.clearInterval(_this.timer);
                         _this.timer=null;
-						alert("超出工作空间或靠近奇异点！");return;
+						alert("超出工作空间或靠近奇异点！");
+                        moveType='';executiveFlag=false;instrSplit=[];
+						return;
 					}
 					else targetANG=tAng.concat();
-					kinematicsEquation(targetANG);
+					kinematicsEquation(targetANG);*/
 					if (_this.dataLine){
                             VILibrary.InnerObjects.dataUpdater(_this.dataLine);
                         }
@@ -10343,6 +10359,7 @@ VILibrary.VI = {
                         if(tAng==0){window.clearInterval(_this.timer);
                             _this.timer=null;
                             alert("超出工作空间或靠近奇异点！");
+                            moveType='';executiveFlag=false;instrSplit=[];
                             return;}
                         else {targetANG=tAng.concat();}
                         /*outerLoop://搜索N*step范围内有没有合适的姿态使得运动学反解有解
@@ -10445,7 +10462,7 @@ VILibrary.VI = {
                                 D_add[len - 1] += 160;
                                 THETA_add[len - 2] -= Math.PI/4;
                                 //D_add[2] += 35.355339;
-                                //THETA[len - 1] += Math.PI/4;
+                                THETA_add[len - 1] += Math.PI/4;
                                 //ALPHA_add[len - 1] = -Math.PI/4;
                                 break;
                             default:
@@ -10895,8 +10912,28 @@ VILibrary.VI = {
                     resultAng[0]=yumiIK(input);
                 }
 				else {
+                    let t6=[
+                        [math.cos(THETA[7]),
+                            -math.sin(THETA[7]),
+                            0,
+                            a[6]
+                        ],
+                        [math.sin(THETA[7])*math.cos(ALPHA[7]),
+                            math.cos(THETA[7])*math.cos(ALPHA[7]),
+                            -math.sin(ALPHA[7]),
+                            -d[7]*math.sin(ALPHA[7])
+                        ],
+                        [
+                            math.sin(THETA[7])*math.sin(ALPHA[7]),
+                            math.cos(THETA[7])*math.sin(ALPHA[7]),
+                            math.cos(ALPHA[7]),
+                            d[7]*math.cos(ALPHA[7])
+                        ],
+                        [0,0,0,1],
+                    ]
                     let T0_s=[[1,0,0,0],[0,1,0,0],[0,0,1,-d[0]],[0,0,0,1]];
-                    let Tt_6=[[-1,0,0,a[6]],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
+                    let Tt_6=math.inv(t6);
+                    // let Tt_6=[[-1,0,0,a[6]],[0,-1,0,0],[0,0,1,-d[7]],[0,0,0,1]];
                     let T=math.multiply(math.multiply(T0_s,R),Tt_6);
                     let nx=T[0][0],ox=T[0][1],ax=T[0][2],px=T[0][3],
                         ny=T[1][0],oy=T[1][1],ay=T[1][2],py=T[1][3],
@@ -10997,7 +11034,7 @@ VILibrary.VI = {
             function pos2T_without_basetool(T){
                 let a=A.concat();a.shift();//a[i-1]
                 let d=D.concat();//d[i]
-                let T0_s=math.inv(T_BASE,);//math.inv()矩阵求逆
+                let T0_s=math.inv(T_BASE);//math.inv()矩阵求逆
                 let Tt_6=[[1,0,0,-a[7]],[0,1,0,0],[0,0,1,-d[8]],[0,0,0,1]];
                 let x=T[0],
                     y=T[1],

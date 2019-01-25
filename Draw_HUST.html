@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/math/math.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script type='text/javascript' src='x3dom/x3dom.js'> </script>
+    <link rel='stylesheet' type='text/css' href='x3dom/x3dom.css'>
+    <link rel="stylesheet" type="text/css" href="homework/main.css">
+    <script>
+        function show(i) {
+            if(i>3||i<0) {alert("indexErr");return;}
+            else {
+                for(let j=0;j<4;j++){
+                    if(j==i)document.getElementById("index_"+i).style.display="block";
+                    else document.getElementById("index_"+j).style.display="none";
+                }
+            }
+            if(i!=2)document.getElementById("demo").pause();
+            else document.getElementById("demo").play();
+        }
+    </script>
+</head>
+<body>
+<div class="main-div" style="width: 1500px;">
+    <div class="title"><b>机器人绘图实验(机器人型号：ABB_IRB120)</b></div>
+    <div class="back" ><a href="index.html">←返回主目录</a>/<a href="Robotics.html">机器人目录</a></div>
+    <!--<button onclick="openTeachPendant()">打开虚拟示教器</button>-->
+    <div id="index_div_robotics">
+        <button class="InstBtn" onclick="show(0)">实验说明书</button><button class="InstBtn" onclick="show(2)">虚拟实验演示</button><button class="InstBtn" onclick="show(1)">开始实验</button><button class="InstBtn" onclick="show(3)">课后训练</button>
+    </div>
+    <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/industrialAppExperiment/robotDrawing.htm" ></embed></div>
+    <div id="index_2"><video id="demo" src="video/demo/drawing.mp4" controls></video></div>
+    <div id="index_1" style="height: 800px">
+        <div style="width: 80%;height: 100%;display: inline;float: left">
+            <div id="robotX3d" style="width: 100%;height: 100%;">
+            </div>
+        </div>
+        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+            <div class="message_div" id="messageDiv">
+                <p>关节转角：</p><br>
+                <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
+                    <input id="angInput0" type="range" max="165" min="-165" value="0" step="0.1" onchange="changeAng(0)">
+                </p>
+                <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
+                    <input  id="angInput1" type="range" max="110" min="-110" value="0" step="0.1" onchange="changeAng(1)">
+                </p>
+                <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
+                    <input id="angInput2" type="range" max="70" min="-90" value="0" step="0.1" onchange="changeAng(2)">
+                </p>
+                <p>Ang_4：<input id="angTxt3"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(3)">
+                    <input id="angInput3" type="range" max="160" min="-160" value="0" step="0.1" onchange="changeAng(3)">
+                </p>
+                <p>Ang_5：<input id="angTxt4"  type="text"value="30" style="width: 50px" onchange="changeAngTxt(4)">
+                    <input id="angInput4" type="range" max="120" min="-120" value="30" step="0.1" onchange="changeAng(4)">
+                </p>
+                <p>Ang_6：<input id="angTxt5"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(5)">
+                    <input id="angInput5" type="range" max="400" min="-400" value="0" step="0.1" onchange="changeAng(5)">
+                </p>
+                <p id="tool" style="padding-top: 4px">Tool :
+                    <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
+                        <option value="0">tool0</option>
+                        <option value="3">huabi</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
+                </p>
+            </div>
+            <div class="message_div" id="resultDiv" onchange="changePos()">
+                <div style="width: 50%;display: inline;float: left">
+                    <p>末端坐标：</p><br>
+                    <p>P_X：<input id="posX" type="text" value="364.35" class="robotPA"></p>
+                    <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
+                    <p>P_Z：<input id="posZ" type="text" value="594" class="robotPA"></p>
+                </div>
+                <div style="width: 50%;display: inline;">
+                    <p>末端姿态：</p><br>
+                    <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
+                    <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
+                    <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
+                </div>
+            </div>
+            <form id="myform" onsubmit="return PostData()" style="height: 100%;height: 100%">
+                <div class="message_div" style="height: 21%;">
+                    <p>设置示教点</p>
+                    <textarea id="points" name="points" style="width: 90%;height: 60%;margin: 10px">
+                    </textarea>
+                    <div class="rowFlex-div">
+                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
+                        <button type="button" id="delete" onclick="changePoints(2)">删除</button>
+                        <button type="button" id="clear" onclick="changePoints(0)">清空</button>
+                    </div>
+                </div>
+                <div class="message_div" style="height: 22%;">
+                    <p>控制指令</p>
+                    <textarea id="instrInput" name="instrInput" style="width: 90%;height: 60%;margin: 10px"></textarea><br>
+                    <div class="rowFlex-div">
+                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="index_3">
+        <div class="wrapper">
+            <form action="#" id="form" method="post" enctype="multipart/form-data">
+                <div class="baseInform">
+                    <div class="nameDiv">
+                        <label for="name">姓名：</label>
+                        <input type="text" id="name" value="">
+                    </div>
+                    <div class="studentIdDiv">
+                        <label for="studentId">学号:</label>
+                        <input type="text" id="studentId" value="">
+                    </div>
+                </div>
+                <div class="workContent">
+                    <div class="homeworkDiv">
+                        <strong>练习题：</strong><p id="homework">
+                            (1)软件生成的图案示教点数量庞大，使得示教和编写程序的过程过于繁琐，可以采取哪些措施简化？<br>
+                            (2)尝试在XZ、YZ或倾斜平面上绘制图形,并录制并提交操作过程视频。
+                        </p>
+                    </div>
+                    <div class="answerDiv">
+                        <textarea name="" id="answer"></textarea>
+                    </div>
+                    <div class="annexDiv">
+                        <label for="annex">附件（.zip,.docx,.pdf,.mp4,rar格式）：</label>
+                        <input type="file" id="annex"  accept=".zip,.docx,.pdf,.mp4,rar">
+                    </div>
+                </div>
+                <div class="submit">
+                    <input type="button" value="提交" id="submit">
+                </div>
+            </form>
+        </div>
+    </div>
+<canvas style="width: 100px;height: 100px">
+    <x3d>
+        <scene>
+            <Transform>
+                <inline url="assets/huaban.x3d">
+                </inline>
+            </Transform>
+        </scene>
+    </x3d>
+</canvas>
+</div>
+<script type="text/javascript" src="homework/main.js"></script>
+
+<script src="js/VILibrary.js"></script>
+<!--js简写方法-->
+<script src="js/jquery-3.1.1.min.js"></script>
+<!--弹出框-->
+<script src="js/layui/lay/dest/layui.all.js"></script>
+<script>
+    'use strict';
+    let robot120VI = new VILibrary.VI.Robot120VI($('#robotX3d'), true);
+    let instructionCompiling= new VILibrary.VI.Instruction_1VI($('#messageDiv'), true,"a120");
+    let tool=new VILibrary.VI.ToolVI($('#tool'),true,"a120");
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, robot120VI.id, 1, 1);
+    VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
+    let val=[0],ang;
+    let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
+    let s=[];
+    var RTCPID='';
+    /*//切换视角
+    setTimeout(function () {
+        document.getElementById("Robot__viewP").setAttribute('position',"-83.39889 237.17003 -1446.33305");
+        document.getElementById("Robot__viewP").setAttribute('orientation',"-0.01371 0.98526 0.17053 3.25211");
+    },100)*/
+    function changeAng(input) {
+        let currentAng=[0,0,0,0,Math.PI/6,0];
+        document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
+        for(let i=0;i<=5;i++){
+            currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
+        }
+        instructionCompiling.moveJ(currentAng,500);
+    }
+    function changeAngTxt(input) {
+        document.getElementById("angInput"+input).value=document.getElementById("angTxt"+input).value;
+        changeAng(input);
+    }
+    function changePos() {
+        let x=parseFloat(document.getElementById("posX").value),
+            y=parseFloat(document.getElementById("posY").value),
+            z=parseFloat(document.getElementById("posZ").value),
+            gamma=parseFloat(document.getElementById("eulerX").value)/180*Math.PI,
+            beta=parseFloat(document.getElementById("eulerY").value)/180*Math.PI,
+            alpha=parseFloat(document.getElementById("eulerZ").value)/180*Math.PI;
+        let pos=[x,y,z,gamma,beta,alpha];
+        instructionCompiling.moveL(pos,100);
+    }
+    function Instructions() {
+        let points=document.getElementById("points").value.toString();
+        let cmd=document.getElementById("instrInput").value.toString();
+        instructionCompiling.toggleObserver(points,cmd);
+    }
+    function changePoints(type) {
+        let turnPoints,Instruction;
+        switch (type){
+            case 0:/*清空*/
+                s=[];
+                /*----------------点集清空-------------------*/
+                turnPoints='';
+                Instruction='';
+                /*-----------------------------------*/
+                break;
+            case 1:/*增加示教点*/
+                let x=parseFloat(document.getElementById("posX").value),
+                    y=parseFloat(document.getElementById("posY").value),
+                    z=parseFloat(document.getElementById("posZ").value),
+                    gamma=parseFloat(document.getElementById("eulerX").value),
+                    beta=parseFloat(document.getElementById("eulerY").value),
+                    alpha=parseFloat(document.getElementById("eulerZ").value);
+                let si="p"+s.length+":["+x+","+y+","+z+","+gamma+"°,"
+                    +beta+"°,"+alpha+"°];\n";
+                /*----------------点集增加点的坐标-------------------*/
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
+                /*-----------------------------------*/
+                s.push(si);
+                break;
+            case 2:/*删除示教点*/
+                s.pop();
+                /*----------------点集删除最后一点的坐标-------------------*/
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+//                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
+                turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
+                /*-----------------------------------*/
+                break;
+            case -1:
+                var obj=document.getElementById('toolSelect');
+                var index=obj.selectedIndex; //序号，取当前选中选项的序号
+                var val = obj.options[index].value;
+
+                switch (val) {
+                    case '0':
+                        s = ["p0:[364.35,0,594,-180°,60°,-180°];\n",
+                            "p1:[464.35,0,594,-180°,60°,-180°];\n",
+                            "p2:[467.54,0,371.09,180°,30°,-180°];\n",
+                            "p3:[346.62,0,225.29,180°,0°,-180°];\n"],
+                            Instruction = "moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
+                        /*------------------点集-------------------------*/
+                        turnPoints = "364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
+                        /*---------------------------------------------*/
+                        break;
+                    case '2':
+                        s = ["p0:[472.53,35.36,572.37,-129.23°,37.76°,-116.57°];\n",//472.53 572.37 -35.36
+                            "p1:[365,0,189.5,180°,0°,-180°];\n",//365 189.5 0
+                            "p2:[461.395,-285.61,12.3038,180°,0°,-180°];\n",//461.395 12.3038 285.61
+                            "p3:[461.395,-225.609,12.3038,180°,0°,-180°];\n",//461.395 12.3038 225.609
+                            "p4:[461.395,-165.609,12.3038,180°,0°,-180°];\n",//461.395 12.3038 165.609
+                            "p5:[401.395,-285.609,12.3038,180°,0°,-180°];\n",//401.395 12.3038 285.609
+                            "p6:[401.395,-225.609,12.3038,180°,0°,-180°];\n",//401.395 12.3038 225.609
+                            "p7:[401.395,-165.609,12.3038,180°,0°,-180°];\n",//401.395 12.3038 165.609
+                            "p8:[460.90,102.53,12.275,180°,0°,-180°];\n",//460.90 12.275 -102.53
+                            "p9:[460.897,162.528,12.275,180°,0°,-180°];\n",//460.897 12.275 -162.528
+                            "p10:[460.897,102.528,37.275,180°,0°,-180°];\n",//460.897 37.275 -102.528
+                            "p11:[460.897,162.528,37.275,180°,0°,-180°];\n",//460.897 37.27 -162.528
+                            "p12:[460.897,102.528,62.275,180°,0°,-180°];\n",//460.897 62.27 -102.528
+                            "p13:[460.897,162.528,62.275,180°,0°,-180°];\n",//460.897 62.275 -162.528
+                            "p14:[461.395,-285.609,120,180°,0°,-180°];\n",//461.395 120 285.609
+                            "p15:[461.395,-225.609,120,180°,0°,-180°];\n",//461.395 120 225.609
+                            "p16:[461.395,-165.609,120,180°,0°,-180°];\n",//461.395 120 165.609
+                            "p17:[401.395,-285.609,120,180°,0°,-180°];\n",//401.395 120 285.609
+                            "p18:[401.395,-225.609,120,180°,0°,-180°];\n",//401.395 120 225.609
+                            "p19:[401.395,-165.609,120,180°,0°,-180°];\n",//401.395 120 165.609
+                            "p20:[460.897,102.528,120,180°,0°,-180°];\n",//460.897 120 -102.528
+                            "p21:[460.897,162.528,120,180°,0°,-180°];\n",//460.897 120 162.528
+                            "p22:[461.395,-285.61,37.3038,180°,0°,-180°];\n",//461.395 37.3038 285.61
+                            "p23:[461.395,-225.61,37.3038,180°,0°,-180°];\n",//461.395 37.3038 225.61
+                            "p24:[461.395,-165.61,37.3038,180°,0°,-180°];\n",//461.395 37.3038 165.61
+                            "p25:[401.395,-285.61,37.3038,180°,0°,-180°];\n",//401.395 37.3038 285.61
+                            "p26:[401.395,-225.61,37.3038,180°,0°,-180°];\n",//401.395 37.3038 225.61
+                            "p27:[401.395,-165.61,37.3038,180°,0°,-180°];\n",//401.395 37.3038 165.61
+                            "p28:[460.90,102.53,37.275,180°,0°,-180°];\n",//460.90 37.275 -102.53
+                            "p29:[460.897,162.528,37.275,180°,0°,-180°];\n",//460.897 37.275 -162.528
+                            "p30:[460.90,102.53,62.275,180°,0°,-180°];\n",//460.90 62.275 -102.53
+                            "p31:[460.897,162.528,62.275,180°,0°,-180°];\n",//460.897 62.275 -162.528
+                            "p32:[460.90,102.53,87.275,180°,0°,-180°];\n",//460.90 87.275 -102.53
+                            "p33:[460.897,162.528,87.275,180°,0°,-180°];\n"];//460.897 87.275 -162.528
+                        Instruction = "reset do1;\nmoveJ p1,v120;\nmoveJ p14,v120;\nmoveJ p22,v60;\nmoveL p2,v30;\nset do1;\nmoveL p14,v120;\nmoveJ p20,v120;\nmoveJ p28,v60;\nmoveL p8,v30;\nreset do1;\nmoveL p20,v120;\nmoveJ p15,v120;\nmoveJ p23,v60;\nmoveL p3,v30;\nset do1;\nmoveL p15,v120;\nmoveJ p21,v120;\nmoveJ p29,v60;\nmoveL p9,v30;\nreset do1;\nmoveL p21,v120;\nmoveJ p16,v120;\nmoveJ p24,v60;\nmoveL p4,v30;\nset do1;\nmoveL p16,v120;\nmoveJ p20,v120;\nmoveJ p30,v60;\nmoveL p10,v30;\nreset do1;\nmoveL p20,v120;\nmoveJ p17,v120;\nmoveJ p25,v60;\nmoveL p5,v30;\nset do1;\nmoveL p17,v120;\nmoveJ p21,v120;\nmoveJ p31,v60;\nmoveL p11,v30;\nreset do1;\nmoveL p21,v120;\nmoveJ p18,v120;\nmoveJ p26,v60;\nmoveL p6,v30;\nset do1;\nmoveL p18,v120;\nmoveJ p20,v120;\nmoveJ p32,v60;\nmoveL p12,v30;\nreset do1;\nmoveL p20,v120;\nmoveJ p19,v120;\nmoveJ p27,v60;\nmoveL p7,v30;\nset do1;\nmoveL p19,v120;\nmoveJ p21,v120;\nmoveJ p33,v60;\nmoveL p13,v30;\nreset do1;\nmoveL p21,v120;\nmoveJ p1,v120;";
+                        turnPoints = "472.53 -572.37 35.36 365 189.5 0 461.395 12.3038 285.61 461.395 12.3038 225.609 461.395 12.3038 165.609 401.395 12.3038 285.609 401.395 12.3038 225.609 401.395 12.3038 165.609 460.90 12.275 -102.53 460.897 12.275 -162.528 460.897 37.275 -102.528 460.897 37.27 -162.528 460.897 62.27 -102.528 460.897 62.275 -162.528 461.395 120 285.609 461.395 120 225.609 461.395 120 165.609 401.395 120 285.609 401.395 120 225.609 401.395 120 165.609 460.897 120 -102.528 460.897 120 -162.528 461.395 37.3038 285.61 461.395 37.3038 225.61 461.395 37.3038 165.61 401.395 37.3038 285.61 401.395 37.3038 225.61 401.395 37.3038 165.61 460.90 37.275 -102.53 460.897 37.275 -162.528 460.90 62.275 -102.53 460.897 62.275 -162.528 460.90 87.275 -102.53 460.897 87.275 -162.528";
+                        break;
+                    case '3':
+                        document.getElementById("Robot__viewP").setAttribute('position',"-83.39889 237.17003 -1446.33305");
+                        document.getElementById("Robot__viewP").setAttribute('orientation',"-0.01371 0.98526 0.17053 3.25211");
+                        turnPoints ='0 0 0';
+                        s=["p0:[300,341,275,130°,59.2°,168.2°];\n",
+                    "p1:[227.165372517,471.302160504,149.714468011,123.4°,39.9°,157.9°];\n",
+                    "p2:[227.985428962,472.122216949,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p3:[231.796363215,469.62678991,154.1963567,123.4°,39.9°,157.9°];\n",
+                    "p4:[233.870267699,470.124104072,158.09534079,123.4°,39.9°,157.9°];\n",
+                    "p5:[248.590917911,485.531985963,203.782107852,123.4°,39.9°,157.9°];\n",
+                    "p6:[247.609758492,488.067835726,206.139633116,123.4°,39.9°,157.9°];\n",
+                    "p7:[246.026670755,490.163458741,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p8:[246.8467272,490.983515186,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p9:[261.298805158,476.531437228,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p10:[260.478748713,475.711380783,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p11:[256.545816495,478.226298731,204.766568951,123.4°,39.9°,157.9°];\n",
+                    "p12:[253.616543607,476.833190773,198.21213058,123.4°,39.9°,157.9°];\n",
+                    "p13:[248.559528862,471.776176028,182.87526293,123.4°,39.9°,157.9°];\n",
+                    "p14:[267.316911163,453.018793727,182.87526293,123.4°,39.9°,157.9°];\n",
+                    "p15:[273.832605277,460.444059181,204.015269691,123.4°,39.9°,157.9°];\n",
+                    "p16:[272.735283113,462.985022378,206.204400293,123.4°,39.9°,157.9°];\n",
+                    "p17:[271.282434963,464.907694533,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p18:[272.102491408,465.727750978,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p19:[286.493931277,451.33631111,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p20:[285.673874832,450.516254665,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p21:[282.072767491,452.938530865,205.129265145,123.4°,39.9°,157.9°];\n",
+                    "p22:[279.920719255,452.544987219,201.269141362,123.4°,39.9°,157.9°];\n",
+                    "p23:[265.164937197,437.445589322,155.996884236,123.4°,39.9°,157.9°];\n",
+                    "p24:[265.511803079,435.407357023,153.432104004,123.4°,39.9°,157.9°];\n",
+                    "p25:[267.632633039,432.475012872,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p26:[283.722933954,416.384711957,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p27:[282.067503299,421.098269772,156.838857545,123.4°,39.9°,157.9°];\n",
+                    "p28:[282.770310984,425.358512031,164.364803579,123.4°,39.9°,157.9°];\n",
+                    "p29:[295.18389025,438.964640388,203.820968158,123.4°,39.9°,157.9°];\n",
+                    "p30:[294.338805639,441.313161815,206.100772809,123.4°,39.9°,157.9°];\n",
+                    "p31:[292.697786846,443.49234265,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p32:[293.517843291,444.312399095,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p33:[307.828432374,430.001810012,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p34:[307.008375929,429.181753567,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p35:[303.41310381,431.589652292,205.11631171,123.4°,39.9°,157.9°];\n",
+                    "p36:[301.261055574,431.196108646,201.256187926,123.4°,39.9°,157.9°];\n",
+                    "p37:[288.638671815,417.926918601,161.99432488,123.4°,39.9°,157.9°];\n",
+                    "p38:[288.637772584,414.57071176,156.903624722,123.4°,39.9°,157.9°];\n",
+                    "p39:[291.213690182,409.910484031,153.742986456,123.4°,39.9°,157.9°];\n",
+                    "p40:[297.67802359,403.155713965,153.302569649,123.4°,39.9°,157.9°];\n",
+                    "p41:[302.006667482,400.227999833,155.426933073,123.4°,39.9°,157.9°];\n",
+                    "p42:[305.819886281,399.250809574,159.727473665,123.4°,39.9°,157.9°];\n",
+                    "p43:[308.97264177,400.463146204,166.346679213,123.4°,39.9°,157.9°];\n",
+                    "p44:[320.997609378,412.851942348,203.367597915,123.4°,39.9°,157.9°];\n",
+                    "p45:[320.438931337,415.042191024,205.841704099,123.4°,39.9°,157.9°];\n",
+                    "p46:[318.468974813,417.721154683,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p47:[319.289031258,418.541211128,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p48:[333.09430293,404.735939456,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p49:[332.274246485,403.915883011,206.916839247,123.4°,39.9°,157.9°];\n",
+                    "p50:[328.602815861,406.348686713,205.038591097,123.4°,39.9°,157.9°];\n",
+                    "p51:[326.473687355,405.957850101,201.21732762,123.4°,39.9°,157.9°];\n",
+                    "p52:[314.528246145,394.497513606,165.724914308,123.4°,39.9°,157.9°];\n",
+                    "p53:[310.934781829,393.57212522,158.872546921,123.4°,39.9°,157.9°];\n",
+                    "p54:[305.77248673,394.95874377,153.147128423,123.4°,39.9°,157.9°];\n",
+                    "p55:[320.589897725,379.517748187,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p56:[324.416827802,383.344678264,163.807805852,123.4°,39.9°,157.9°];\n",
+                    "p57:[327.650859233,380.110646833,163.807805852,123.4°,39.9°,157.9°];\n",
+                    "p58:[327.453308032,376.173746789,157.538343062,123.4°,39.9°,157.9°];\n",
+                    "p59:[329.38211871,371.998323141,154.131589522,123.4°,39.9°,157.9°];\n",
+                    "p60:[333.829694642,366.824655566,153.030547503,123.4°,39.9°,157.9°];\n",
+                    "p61:[339.333623002,362.303086489,154.520192587,123.4°,39.9°,157.9°];\n",
+                    "p62:[342.999036958,360.93553903,158.004666741,123.4°,39.9°,157.9°];\n",
+                    "p63:[345.629030301,361.867665871,163.406249351,123.4°,39.9°,157.9°];\n",
+                    "p64:[346.552193734,364.549333895,168.872599138,123.4°,39.9°,157.9°];\n",
+                    "p65:[345.047187487,368.804946135,173.043605374,123.4°,39.9°,157.9°];\n",
+                    "p66:[335.824838096,384.322937193,182.590287349,123.4°,39.9°,157.9°];\n",
+                    "p67:[334.131299646,389.501715534,187.875289039,123.4°,39.9°,157.9°];\n",
+                    "p68:[335.058072013,392.692309902,194.118844957,123.4°,39.9°,157.9°];\n",
+                    "p69:[338.269901498,393.862657046,200.763957377,123.4°,39.9°,157.9°];\n",
+                    "p70:[342.97452378,392.523683091,205.86761097,123.4°,39.9°,157.9°];\n",
+                    "p71:[348.938049276,388.704263508,209.118923284,123.4°,39.9°,157.9°];\n",
+                    "p72:[355.510664034,382.866282649,210.232918738,123.4°,39.9°,157.9°];\n",
+                    "p73:[363.136626222,374.625278128,209.300271381,123.4°,39.9°,157.9°];\n",
+                    "p74:[366.24120078,370.837323198,208.26399654,123.4°,39.9°,157.9°];\n",
+                    "p75:[362.24342561,366.839548028,196.139580898,123.4°,39.9°,157.9°];\n",
+                    "p76:[359.009394179,370.07357946,196.139580898,123.4°,39.9°,157.9°];\n",
+                    "p77:[359.013060037,374.059146517,202.188835283,123.4°,39.9°,157.9°];\n",
+                    "p78:[357.192832675,377.878261464,205.219939194,123.4°,39.9°,157.9°];\n",
+                    "p79:[353.294970041,382.348455158,206.087819374,123.4°,39.9°,157.9°];\n",
+                    "p80:[347.925973549,386.641127566,204.455686499,123.4°,39.9°,157.9°];\n",
+                    "p81:[344.301827293,387.84781576,200.789864248,123.4°,39.9°,157.9°];\n",
+                    "p82:[342.431613867,387.129726031,196.864973287,123.4°,39.9°,157.9°];\n",
+                    "p83:[341.569389156,384.549422123,191.644738774,123.4°,39.9°,157.9°];\n",
+                    "p84:[343.653826479,379.236012548,186.748340149,123.4°,39.9°,157.9°];\n",
+                    "p85:[351.977071104,365.385929173,178.367467371,123.4°,39.9°,157.9°];\n",
+                    "p86:[353.88097814,359.851563916,172.862257277,123.4°,39.9°,157.9°];\n",
+                    "p87:[353.779555766,357.749084594,169.520270914,123.4°,39.9°,157.9°];\n",
+                    "p88:[351.152090678,355.020556025,161.398466846,123.4°,39.9°,157.9°];\n",
+                    "p89:[346.81021492,355.125473484,154.97356283,123.4°,39.9°,157.9°];\n",
+                    "p90:[343.584757484,356.522888427,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p91:[364.501980751,335.60566516,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p92:[368.718311872,332.747552526,154.261123877,123.4°,39.9°,157.9°];\n",
+                    "p93:[371.20248562,333.210456628,158.73005913,123.4°,39.9°,157.9°];\n",
+                    "p94:[386.594906688,348.501814215,205.258799501,123.4°,39.9°,157.9°];\n",
+                    "p95:[378.655829153,356.005236763,204.598174289,123.4°,39.9°,157.9°];\n",
+                    "p96:[375.347445685,357.365986174,201.644790992,123.4°,39.9°,157.9°];\n",
+                    "p97:[370.478657172,356.964203576,193.652521279,123.4°,39.9°,157.9°];\n",
+                    "p98:[367.244625741,360.198235007,193.652521279,123.4°,39.9°,157.9°];\n",
+                    "p99:[372.43831656,365.391925826,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p100:[409.953081162,327.877161225,209.403898865,123.4°,39.9°,157.9°];\n",
+                    "p101:[404.759390343,322.683470405,193.652521279,123.4°,39.9°,157.9°];\n",
+                    "p102:[401.525358912,325.917501837,193.652521279,123.4°,39.9°,157.9°];\n",
+                    "p103:[401.711117816,331.540476085,202.460857429,123.4°,39.9°,157.9°];\n",
+                    "p104:[399.784954579,335.132378977,204.986777355,123.4°,39.9°,157.9°];\n",
+                    "p105:[393.06296955,342.033751352,205.258799501,123.4°,39.9°,157.9°];\n",
+                    "p106:[377.348169093,325.89448427,156.955438464,123.4°,39.9°,157.9°];\n",
+                    "p107:[377.530446256,323.610812466,153.768893328,123.4°,39.9°,157.9°];\n",
+                    "p108:[380.166820496,319.940825415,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p109:[379.346763933,319.120768852,149.714467654,123.4°,39.9°,157.9°];\n",
+                    "p110:[252.421136731,446.046396301,149.714468028,123.4°,39.9°,157.9°];\n",
+                    "p111:[253.24119317,446.866452741,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p112:[256.794896957,444.457411076,153.937287989,123.4°,39.9°,157.9°];\n",
+                    "p113:[258.968721983,444.812093422,157.771504902,123.4°,39.9°,157.9°];\n",
+                    "p114:[265.950150421,451.652032985,178.730163565,123.4°,39.9°,157.9°];\n",
+                    "p115:[247.192768121,470.409415286,178.730163565,123.4°,39.9°,157.9°];\n",
+                    "p116:[239.872838611,462.361828705,155.426933073,123.4°,39.9°,157.9°];\n",
+                    "p117:[240.829935359,459.781703575,152.965780326,123.4°,39.9°,157.9°];\n",
+                    "p118:[242.437506921,457.670138991,152.20152763,123.4°,39.9°,157.9°];\n",
+                    "p119:[241.617450475,456.850082545,149.714468011,123.4°,39.9°,157.9°];\n",
+                    "p120:[227.165372517,471.302160504,149.714468011,123.4°,39.9°,157.9°];\n",
+
+                    ];
+                        Instruction='\
+moveJ p0,v400;\n\
+moveL p1,v100;\n\
+moveL p2,v100;\n\
+moveL p3,v100;\n\
+moveL p4,v100;\n\
+moveL p5,v100;\n\
+moveL p6,v100;\n\
+moveL p7,v100;\n\
+moveL p8,v100;\n\
+moveL p9,v100;\n\
+moveL p10,v100;\n\
+moveL p11,v100;\n\
+moveL p12,v100;\n\
+moveL p13,v100;\n\
+moveL p14,v100;\n\
+moveL p15,v100;\n\
+moveL p16,v100;\n\
+moveL p17,v100;\n\
+moveL p18,v100;\n\
+moveL p19,v100;\n\
+moveL p20,v100;\n\
+moveL p21,v100;\n\
+moveL p22,v100;\n\
+moveL p23,v100;\n\
+moveL p24,v100;\n\
+moveL p25,v100;\n\
+moveL p26,v100;\n\
+moveL p27,v100;\n\
+moveL p28,v100;\n\
+moveL p29,v100;\n\
+moveL p30,v100;\n\
+moveL p31,v100;\n\
+moveL p32,v100;\n\
+moveL p33,v100;\n\
+moveL p34,v100;\n\
+moveL p35,v100;\n\
+moveL p36,v100;\n\
+moveL p37,v100;\n\
+moveL p38,v100;\n\
+moveL p39,v100;\n\
+moveL p40,v100;\n\
+moveL p41,v100;\n\
+moveL p42,v100;\n\
+moveL p43,v100;\n\
+moveL p44,v100;\n\
+moveL p45,v100;\n\
+moveL p46,v100;\n\
+moveL p47,v100;\n\
+moveL p48,v100;\n\
+moveL p49,v100;\n\
+moveL p50,v100;\n\
+moveL p51,v100;\n\
+moveL p52,v100;\n\
+moveL p53,v100;\n\
+moveL p54,v100;\n\
+moveL p55,v100;\n\
+moveL p56,v100;\n\
+moveL p57,v100;\n\
+moveL p58,v100;\n\
+moveL p59,v100;\n\
+moveL p60,v100;\n\
+moveL p61,v100;\n\
+moveL p62,v100;\n\
+moveL p63,v100;\n\
+moveL p64,v100;\n\
+moveL p65,v100;\n\
+moveL p66,v100;\n\
+moveL p67,v100;\n\
+moveL p68,v100;\n\
+moveL p69,v100;\n\
+moveL p70,v100;\n\
+moveL p71,v100;\n\
+moveL p72,v100;\n\
+moveL p73,v100;\n\
+moveL p74,v100;\n\
+moveL p75,v100;\n\
+moveL p76,v100;\n\
+moveL p77,v100;\n\
+moveL p78,v100;\n\
+moveL p79,v100;\n\
+moveL p80,v100;\n\
+moveL p81,v100;\n\
+moveL p82,v100;\n\
+moveL p83,v100;\n\
+moveL p84,v100;\n\
+moveL p85,v100;\n\
+moveL p86,v100;\n\
+moveL p87,v100;\n\
+moveL p88,v100;\n\
+moveL p89,v100;\n\
+moveL p90,v100;\n\
+moveL p91,v100;\n\
+moveL p92,v100;\n\
+moveL p93,v100;\n\
+moveL p94,v100;\n\
+moveL p95,v100;\n\
+moveL p96,v100;\n\
+moveL p97,v100;\n\
+moveL p98,v100;\n\
+moveL p99,v100;\n\
+moveL p100,v100;\n\
+moveL p101,v100;\n\
+moveL p102,v100;\n\
+moveL p103,v100;\n\
+moveL p104,v100;\n\
+moveL p105,v100;\n\
+moveL p106,v100;\n\
+moveL p107,v100;\n\
+moveL p108,v100;\n\
+moveL p109,v100;\n\
+moveL p110,v100;\n\
+moveL p111,v100;\n\
+moveL p112,v100;\n\
+moveL p113,v100;\n\
+moveL p114,v100;\n\
+moveL p115,v100;\n\
+moveL p116,v100;\n\
+moveL p117,v100;\n\
+moveL p118,v100;\n\
+moveL p119,v100;\n\
+moveL p120,v100;\n\
+moveJ p0,v400;'
+                }
+        }
+        let str="";
+        for(let m=0;m<s.length;m++){
+            str= str + s[m] ;
+        }
+        document.getElementById("points").value=str;
+        if(Instruction)document.getElementById("instrInput").value=Instruction;
+        if(turnPoints)document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+    }
+</script>
+</body>
+</html>
