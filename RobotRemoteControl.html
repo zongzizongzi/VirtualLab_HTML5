@@ -37,11 +37,11 @@
             <div class="remoteDiv">
                 <div id="robotX3d" style="width: 100%;height: 100%;"></div>
             </div>
-            <div class="remoteDiv" style="overflow: hidden">
+            <div class="remoteDiv" id="videoParent" style="overflow: hidden">
                 <!--<iframe id="videoFrame" style="width: 950px;height: 550px;overflow: hidden" frameborder="0">-->
-                <iframe id="videoFrame" style="width: 950px;height: 712px;" frameborder="0" >
+                <button id="videoButton" onclick="remoteVideo()" style="margin: auto">连接远程视频监控</button>
+                <!--<iframe id="videoFrame" style="width: 950px;height: 712px;" frameborder="0" ></iframe>-->
                 <!--src="RTCP/sub.html" -->
-                </iframe>
             </div>
         </div>
         <div  class="rowFlex-div" style="height: 250px;align-items: stretch;background-color: #aaddff;">
@@ -178,7 +178,15 @@
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
     let s=[];
     var RTCPID='';
+    function remoteVideo() {
+        document.getElementById('videoButton').style.display='none';
+        let videoNode=document.createElement("iframe");
+        videoNode.id="videoFrame";
+        videoNode.src="RTCP/sub.html"
 
+        /*let videoNode='<iframe id="videoFrame" frameborder="0" src="RTCP/sub.html">';*/
+        document.getElementById('videoParent').appendChild(videoNode);
+    }
     function changeAng(input) {
         let currentAng=[0,0,0,0,Math.PI/6,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;

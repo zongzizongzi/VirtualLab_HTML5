@@ -22,7 +22,7 @@
         var rtcSub = new (RtcpKit || window.RtcpKit)();
         // rtcSub.configServerForPriCloud('teameeting.anyrtc.io', 9091);
 		
-		rtcSub.setVideoMode("RTCP_Videos_QHD");
+		rtcSub.setVideoMode("RTCP_Videos_HD");
 
         //添加视频窗口
         rtcSub.on("onRTCOpenVideoRender", function(strRtcpId){

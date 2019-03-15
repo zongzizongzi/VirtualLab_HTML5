@@ -51,7 +51,7 @@ function communcication(object){
         else if(received_msg.match('rtcpId')!==null){
             let msg=JSON.parse(received_msg).rtcpId;
             RTCPID=msg;
-            document.getElementById('videoFrame').src="RTCP/sub.html";
+            // document.getElementById('videoFrame').src="RTCP/sub.html";
             console.log("RTCPID:",msg);
         }
         else{

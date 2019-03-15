@@ -647,18 +647,14 @@ class RobotTemplateVI extends TemplateVI {
 
         return '机器人模型';
     }
-
     static get defaultWidth() {
 
         return '550px';
     }
-
     static get defaultHeight() {
 
         return '300px';
     }
-
-
 }
 
 VILibrary.VI = {

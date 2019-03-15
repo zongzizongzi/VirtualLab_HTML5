@@ -8,6 +8,7 @@ var login=require('./lib/login');//用于提交登录port=3003(https)
 
 global.db=require('./lib/database');//数据库操作
 global.tcpConnectState=false;
+global.using=false;
 // var rtcp=require('./lib/rtcp');//用于直播114.215.189.49:3004
 /*
 var app = express();
