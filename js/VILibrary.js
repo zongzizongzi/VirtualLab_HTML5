@@ -9760,7 +9760,7 @@ VILibrary.VI = {
             const _this = this;
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
-            let currentPOS;
+            // let currentPOS;
             let targetANG2;//专为IRB360提供
             let pPos=[];
             let instrIndex,
@@ -9770,7 +9770,7 @@ VILibrary.VI = {
 				T_BASE,//基座矩阵，除YUMI外，基座矩阵都包含在D_H参数里
 				A,D,ALPHA,THETA;//D-H参数
 			let Pre='';//前缀，区分双臂的左右臂
-			let Suf='';//前缀，区分双臂的左右臂
+			let Suf='';//后缀，区分双臂的左右臂
 
 			let ToolFlag=0,//加载工具标志
 				ToolDO=false,
@@ -9819,7 +9819,7 @@ VILibrary.VI = {
                     Range=[[30,470],[55,500],[0,300]];
                     OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];break;
                     break;
-				case 'a14000L':case 'a14000R':
+				case 'yumiL':case 'yumiR':
 					A=[0,0,30,30,40.5,40.5,27,27,0];
                     D=[0,103.2,0,251.5,0,265,0,36,0];
                     ALPHA=[0,0,-Math.PI/2,-Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,0];
@@ -9829,7 +9829,7 @@ VILibrary.VI = {
                     Range=[[-168.5,168.5],[-143.5,43.5],[-168.5,168.5],[-123.5,80],[-290,290],[-88,138],[-229,229]];
                     OMEGA=[180,180,180,180,400,400,400];
                     targetANG=[0,0,0,0,0,0,0];
-                    if(robNumber=='a14000L') {
+                    if(robNumber=='yumiL') {
                         T_BASE=[
                             [0.5714,0.1066,0.8138,51.11],
                             [-0.6190,0.7071,0.3420,71.48],
@@ -9866,7 +9866,7 @@ VILibrary.VI = {
 			if(robNumber!="epson")Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {//根据dataType区分发送数据给谁
             	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;//发送数据给robot的X3DOM模型，所发送的数据为关节变量
-            	else if(dataType==2)return [ToolFlag,ToolDO];//发送数据给TOOL，所发送的数据为[是否安装tool，夹具状态]
+            	else if(dataType==2)return [ToolFlag,ToolDO];//发送数据给TOOL，所发送的数据为[加载工具标志，夹具状态]
             }
             this.setData=function (input) {
                 let a_D=input.concat();
@@ -10252,10 +10252,12 @@ VILibrary.VI = {
 				},INTERVAL*1000)
 
             }
+
+
             //圆弧插补，以线速度v沿圆弧轨迹到达末端位姿input2（由当前点、轨迹上的一点input1,目标点input2，三点确定圆弧）
             this.moveC=function (input1,input2,input3) {
                 moveType="C";
-            	let F=input3;
+            	let F=input3;//速度
                 const T=0.05;
                 let p1=input1.concat();
                 let p2=input2.concat();
@@ -10309,8 +10311,19 @@ VILibrary.VI = {
 				let C=math.multiply(-1,math.multiply(niA,D));
 				xc=C[0];yc=C[1];zc=C[2];*/
                let R=Math.sqrt(Math.pow(x1-xc,2)+Math.pow(y1-yc,2)+Math.pow(z1-zc,2));
-
-                //插补算法
+               let Pc=[xc,yc,zc],P0=[x0,y0,z0],P1=[x1,y1,z1],P2=[x2,y2,z2];
+               //插补算法  局部坐标系 林威
+				let Pc0=math.subtract(P0,Pc),P01=math.subtract(P1,P0),P12=math.subtract(P2,P1);
+				let vx=math.multiply(Pc0,1/math.norm(Pc0));
+				let vz=math.multiply(math.cross(P01,P12),1/math.norm(math.cross(P01,P12)));
+				let vy=math.cross(vz,vx);
+				let TR=[
+					[vx[0],vy[0],vz[0],xc],
+                    [vx[1],vy[1],vz[1],yc],
+                    [vx[2],vy[2],vz[2],zc],
+                    [0,0,0,1]
+				];
+                //插补算法 叶伯生
                 let u,v,w,u1,v1,w1;
 				u=(y1-y0)*(z2-z1)-(z1-z0)*(y2-y1);
                 v=(z1-z0)*(x2-x1)-(x1-x0)*(z2-z1);
@@ -10319,7 +10332,8 @@ VILibrary.VI = {
                 v1=(z0-zc)*(x2-x0)-(x0-xc)*(z2-z0);
                 w1=(x0-xc)*(y2-y0)-(y0-yc)*(x2-x0);
                 let G=R/Math.sqrt(R*R+F*T*T),
-					delta=Math.asin(F*T/R),
+					// delta=Math.asin(F*T/R),
+                    delta=F*T/R,
 					H=u*u1+v*v1+w*w1,
 					E=F*T/(R*Math.sqrt(u*u+v*v+w*w));
                 let theta;
@@ -10343,14 +10357,19 @@ VILibrary.VI = {
                         targetANG=inverseKinematics(p2);
                     }
                     else {
+                    	//局部坐标系 林威
+                    	let p=[R*Math.cos(delta*i), R*Math.sin(delta*i), 0, 1]//在局部坐标系中的坐标
+						let tp=math.multiply(TR,p);
+                        tPos=[tp[0],tp[1],tp[2],Ept[i][0],Ept[i][1],Ept[i][2]];
+                       /* //叶伯生
                         m[i]=v*(Z[i]-zc)-w*(Y[i]-yc);
                         n[i]=w*(X[i]-xc)-u*(Z[i]-zc);
                         l[i]=u*(Y[i]-yc)-v*(X[i]-xc);
                         X[i+1]=xc+G*(X[i]+E*m[i]-xc);
                         Y[i+1]=yc+G*(Y[i]+E*n[i]-yc);
-                        Z[i+1]=zc+G*(Z[i]+E*l[i]-zc);
+                        Z[i+1]=zc+G*(Z[i]+E*l[i\]-zc);
                         //
-                        tPos=[X[i+1],Y[i+1],Z[i+1],Ept[i][0],Ept[i][1],Ept[i][2]];
+                        tPos=[X[i+1],Y[i+1],Z[i+1],Ept[i][0],Ept[i][1],Ept[i][2]];*/
                         tAng=inverseKinematics(tPos);
                         if(tAng==0){window.clearInterval(_this.timer);
                             _this.timer=null;
@@ -10409,7 +10428,7 @@ VILibrary.VI = {
                     i++;
                 },T*1000);
             }
-            //切换工具时调用此函数，修改最末端的DH参数。input值对应的工具：0-无工具；1-普通夹具；2-跟实际机器人上一致的夹具；3-画笔。
+            //切换工具时调用此函数，修改最末端的DH参数。input值对应的工具：0-无工具；1-普通夹具；2-跟实际机器人上一致的夹具；3-画笔；4-gripper。
             this.changeTool=function(input){
                 ToolFlag=input;
                 if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
@@ -10466,12 +10485,28 @@ VILibrary.VI = {
                         }
                         $('#setDO').enabled=false;
                         break;
+                    case 4:
+                        switch (robNumber) {
+                            case "yumiL":case "yumiR":
+                                // A_add[len - 1] += 50;
+                                D_add[len - 1] += 160;
+                              /*  THETA_add[len - 2] -= Math.PI/4;
+                                //D_add[2] += 35.355339;
+                                THETA_add[len - 1] += Math.PI/4;*/
+                                //ALPHA_add[len - 1] = -Math.PI/4;
+                                break;
+                            default:
+                                break;
+                        }
+                        $('#setDO').enabled=true;
+                        break;
+					default:console.log('tool error');return;
                 }
                 A=math.add(baseA,A_add);
                 D=math.add(baseD,D_add);
                 THETA=math.add(baseTHETA,THETA_add);
                 kinematicsEquation(currentANG);
-                    }
+			}
             //数字输出信号，用于抓紧、松开夹具。0松开，1夹紧。
             this.setIO=function (input) {
             	ToolDO=input;
@@ -10646,7 +10681,7 @@ VILibrary.VI = {
                     theta=math.add(theta,THETA);//实际角度→计算角度
                     for(let i=0;i<len;i++)
                     {
-                    	if(i==0&&(robNumber=='a14000L'||robNumber=='a14000R')){
+                    	if(i==0&&(robNumber=='yumiL'||robNumber=='yumiR')){
                     		t[0]=T_BASE.concat();
 						}
 						else{
@@ -10718,7 +10753,7 @@ VILibrary.VI = {
                     for(let i=0;i<targetANG.length;i++){
                         let a;
                         if(robNumber=="a910"&&i==2||robNumber=="epson")a=(targetANG[i]).toFixed(2);
-                        else if((robNumber=='a14000L'||robNumber=='a14000R')&&(i==1||i==3||i==5))a=-(targetANG[i]*180/Math.PI).toFixed(2);
+                        else if((robNumber=='yumiL'||robNumber=='yumiR')&&(i==1||i==3||i==5))a=-(targetANG[i]*180/Math.PI).toFixed(2);
                         else a=(targetANG[i]*180/Math.PI).toFixed(2);
                         document.getElementById(Pre+"angInput"+(i)).value=a;
                         document.getElementById(Pre+"angTxt"+(i)).value=a;
@@ -10810,7 +10845,7 @@ VILibrary.VI = {
                     	let tmp=(px*px+py*py-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]);
                     	if(tmp>1)tmp=1;
                     	else if(tmp<-1)tmp=-1;
-                        theta[i][1]=Math.acos(tmp);//胡杰
+                        theta[i][1]=Math.acos(tmp);//薛宁
                         // theta[i][1]=Math.atan((r*Math.cos(theta[i][0]+phi))/(r*Math.sin(theta[i][0]+phi)-a[1]));
                         // let aaa0=Math.acos((r*Math.cos(theta[i][0]+phi)-a[1])/a[2]);
                         // let aaa1=Math.acos((px*px+py*py-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]));
@@ -10889,7 +10924,7 @@ VILibrary.VI = {
 					}
 					if(inRange)resultAng=theta.concat();
                 }
-                else if(robNumber=='a14000L'||robNumber=='a14000R'){
+                else if(robNumber=='yumiL'||robNumber=='yumiR'){
                     /*let T0_s=math.inv(T_BASE,);//math.inv()矩阵求逆
                     let Tt_6=[[1,0,0,-a[7]],[0,1,0,0],[0,0,1,-d[8]],[0,0,0,1]];
                     let T=math.multiply(math.multiply(T0_s,R),Tt_6);//目标位姿的T,去掉基座和工具
@@ -11167,7 +11202,7 @@ VILibrary.VI = {
 
                 }
                 if(times>max_times){
-                    let msg=robNumber=="a14000L"?"ROB_left":"ROB_right"
+                    let msg=robNumber=="yumiL"?"ROB_left":"ROB_right"
                     alert(msg+'error');
                     return 0;
                 }
@@ -11541,6 +11576,8 @@ VILibrary.VI = {
             let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40',qijiaTrans="13,0,0",qijiaRotate="1,0,0,-0.785398163";
             let gongjianTrans1='461.395,0,285.5',gongjianTrans2='461.395,0,225.5',gongjianTrans3='460,0,165.5';
             let gongjianTrans4='401.395,0,285.609',gongjianTrans5='401.395,0,225.609',gongjianTrans6='401.395,0,165.609';
+            let gripperTrans="0,0,0",gripperScal="1,1,1",gripperRotate="1,0,0,0";
+            let Suf='';//后缀，区分双臂的左右臂
             //X3DOM场景中插入工具
             function draw() {
             	switch(robNum){//根据不同的机器人调整夹具及立方体的显示比例和位置
@@ -11569,9 +11606,17 @@ VILibrary.VI = {
                         boxTrans='195,100,0';
 						boxSize='40,200,40';
 						break;
+					case "yumiL":
+						Suf='L';
+                        jiajuTrans="36,0,0";
+						break;
+                    case "yumiR":
+                        Suf='R';
+                        jiajuTrans="36,0,0";
+                        break;
 					case "a120":default:break;
 				}
-                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL'>" +
+                var toolSwitch="<switch whichChoice='-1' DEF='TOOL' nameSpaceName id='Robot__TOOL"+Suf+"'>" +
                     "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
                     "<Transform rotation="+jiajuRotate2+">"+
                     "<Transform DEF='jiajuL' translation='0 0 10' nameSpaceName id='Robot__jiajuL'>" +
@@ -11599,8 +11644,21 @@ VILibrary.VI = {
                     "<inline url='../TOOLS/huabi/huabi.x3d'> </inline>" +
                     "</Transform>" +
                     "</Transform>" +
+
+                    "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
+                    "<Transform rotation="+jiajuRotate2+">"+
+                    "<Transform DEF='gripperL' translation='0 0 10' nameSpaceName id='Robot__gripperL'>" +
+                    "<inline url='../TOOLS/gripper/gripper_L.x3d' > </inline>" +
+                    "</Transform>" +
+                    "<Transform DEF='gripperR' translation='0 0 -10' nameSpaceName id='Robot__gripperR'>" +
+                    "<inline url='../TOOLS/gripper/gripper_R.x3d'> </inline>" +
+                    "</Transform>" +
+                    "<inline url='../TOOLS/gripper/gripper.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>" +
+
                     "</switch>";
-                $("#Robot__lastLink").after(toolSwitch);
+                $("#Robot__lastLink"+Suf).after(toolSwitch);
                 var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
                     "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
                     "<box size="+boxSize+"></box>" +
@@ -11663,7 +11721,7 @@ VILibrary.VI = {
             //切换工具
             function toolSwitch(input){
                 if(!haveTool)draw();
-                document.getElementById("Robot__TOOL").setAttribute("whichChoice", ""+(input-1)+"");
+                document.getElementById("Robot__TOOL"+Suf).setAttribute("whichChoice", ""+(input-1)+"");
 				/*if(input){
 					document.getElementById("Robot__box").setAttribute("render", 'true');
 				}
@@ -11690,6 +11748,13 @@ VILibrary.VI = {
                         }
                         document.getElementById("Robot__huaban").setAttribute("render", 'true');
                         break;
+                    case 4:
+                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        for (var i=1;i<7;i++) {
+                            document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
+                        }
+                        document.getElementById("Robot__huaban").setAttribute("render", 'true');
+                        break;
                     default:
                         document.getElementById("Robot__box").setAttribute("render", 'false');
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
@@ -11708,6 +11773,9 @@ VILibrary.VI = {
 
                     document.getElementById("Robot__qijiaL").setAttribute('translation','0,0,-10');
                     document.getElementById("Robot__qijiaR").setAttribute('translation','0,0,10');
+
+                    document.getElementById("Robot__gripperL").setAttribute('translation','0,-12.5,0');
+                    document.getElementById("Robot__gripperR").setAttribute('translation','0,12.5,0');
                 }
                 else{
                     document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,10');
@@ -11715,6 +11783,9 @@ VILibrary.VI = {
 
                     document.getElementById("Robot__qijiaL").setAttribute('translation','0,0,0');
                     document.getElementById("Robot__qijiaR").setAttribute('translation','0,0,0');
+
+                    document.getElementById("Robot__gripperL").setAttribute('translation','0,8,0');
+                    document.getElementById("Robot__gripperR").setAttribute('translation','0,-8,0');
                 }
             }
         }

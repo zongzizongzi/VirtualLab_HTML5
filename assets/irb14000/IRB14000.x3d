@@ -94,7 +94,7 @@
                                         <transform DEF="link5_L"  translation="265,-27,0" rotation="0,0,1,0">
                                             <inline url="L6.x3d"> </inline>
                                             <transform DEF="link6_L"  translation="0,27,0" rotation="1,0,0,0">
-                                                <inline url="L7.x3d" DEF="lastLink"> </inline>
+                                                <inline url="L7.x3d" DEF="lastLinkL"> </inline>
                                             </transform>
                                         </transform>
                                     </transform>
@@ -118,7 +118,7 @@
                                         <transform DEF="link5_R"  translation="265,-27,0" rotation="0,0,1,0">
                                             <inline url="L6.x3d"> </inline>
                                             <transform DEF="link6_R"  translation="0,27,0" rotation="1,0,0,0">
-                                                <inline url="L7.x3d" DEF="lastLink"> </inline>
+                                                <inline url="L7.x3d" DEF="lastLinkR"> </inline>
                                             </transform>
                                         </transform>
                                     </transform>

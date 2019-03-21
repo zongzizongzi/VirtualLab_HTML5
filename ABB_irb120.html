@@ -61,7 +61,7 @@
                     <input id="angInput5" type="range" max="400" min="-400" value="0" step="1" onchange="changeAng(5)">
                 </p>
                 <p id="tool" style="padding-top: 4px">Tool :
-                    <select onchange="instructionCompiling.changeTool(this.selectedIndex)" id="toolSelect" style="width:70px;font-size: 15px" >
+                    <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
                     <option value="0">tool0</option>
                     <option value="1">tool1</option>
                     </select>&nbsp;&nbsp;&nbsp;
