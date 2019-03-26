@@ -88,7 +88,8 @@
                     <textarea id="points" name="points" style="width: 90%;height: 60%;margin: 10px">
                     </textarea>
                     <div class="rowFlex-div">
-                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
+                        <button type="button" id="add" onclick="changePoints(1)">位置型</button>
+                        <button type="button" id="add1" onclick="changePoints(3)">关节型</button>
                         <button type="button" id="delete" onclick="changePoints(2)">删除</button>
                         <button type="button" id="clear" onclick="changePoints(0)">清空</button>
                     </div>
@@ -138,7 +139,6 @@
             </form>
         </div>
     </div>
-
 </div>
 <script type="text/javascript" src="homework/main.js"></script>
 <script src="js/VILibrary.js"></script>
@@ -191,9 +191,11 @@
     //增加、删除、清空示教点
     function changePoints(type) {
         let turnPoints;
+        let si;
         switch (type){
             case 0:/*清空*/
                 s=[];
+                indexI=0;
                 /*----------------点集清空-------------------*/
                 document.getElementById("Robot__PointSet_points").setAttribute('point','');
                 /*-----------------------------------*/
@@ -205,7 +207,7 @@
                     gamma=parseFloat(document.getElementById("eulerX").value),
                     beta=parseFloat(document.getElementById("eulerY").value),
                     alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+s.length+":["+x+","+y+","+z+","+gamma+"°,"
+                si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
@@ -213,20 +215,40 @@
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
                 s.push(si);
+                indexI++;
                 break;
             case 2:/*删除示教点*/
-                s.pop();
+                if(s.length<=0){
+                    alert("已删除所有示教点");
+                    return
+                }
+                let last_s=s.pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
-//                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
+//              console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                /*-----------------------------------*/
+                if(last_s.indexOf('p')!=-1) indexI--;
+                break;
+            case 3:/*添加关节型示教点*/
+                let q=[];
+                for(let i=0;i<6;i++){q[i]=parseFloat(document.getElementById("angTxt"+i).value);}
+                si="q"+(s.length-indexI)+":["+q[0]+"°," +q[1]+"°," +q[2]+"°," +q[3]+"°," +q[4]+"°,"+q[5]+"°];\n";
+                s.push(si);
+                /*----------------点集增加点的坐标-------------------*/
+                let xx=parseFloat(document.getElementById("posX").value),
+                    yy=parseFloat(document.getElementById("posY").value),
+                    zz=parseFloat(document.getElementById("posZ").value);
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+xx+" "+zz+" "+(-yy);
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
                 break;
             case -1:
-                var obj=document.getElementById('toolSelect');
-                var index=obj.selectedIndex; //序号，取当前选中选项的序号
-                var vall = obj.options[index].value;
+                let obj=document.getElementById('toolSelect');
+                let index=obj.selectedIndex; //序号，取当前选中选项的序号
+                let vall = obj.options[index].value;
                 switch (vall){
                     case "0":
                         s=["p0:[364.35,0,594,-180°,60°,-180°];\n","p1:[464.35,0,594,-180°,60°,-180°];\n","p2:[467.54,0,371.09,180°,30°,-180°];\n","p3:[346.62,0,225.29,180°,0°,-180°];\n"],
@@ -234,13 +256,16 @@
                         //------------------点集-------------------------
                         turnPoints="364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
                         document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                        indexI=4;
                         break;
                     case "1":
                         s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
                         document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;\nmoveJ p0,v200;";
                         turnPoints="480.95 565.94 0 300 100 -300 300 20 -300 400 100 0 400 20 0";
                         document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                        indexI=5;
                 }
+                break;
 
                /* s=["p0:[480.95,0,565.94,-180°,60°,-180°];\n","p1:[300,300,100,180°,0°,-180°];\n","p2:[300,300,20,180°,0°,-180°];\n","p3:[400,0,100,180°,0°,-180°];\n","p4:[400,0,20,180°,0°,-180°];\n"]
                 pAngle=[[0, 0, 0, 0, 0.5235987755982988, 0],

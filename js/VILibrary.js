@@ -9762,7 +9762,7 @@ VILibrary.VI = {
             let currentANG,targetANG;
             // let currentPOS;
             let targetANG2;//专为IRB360提供
-            let pPos=[];
+            let pPos=[],qJoint=[];
             let instrIndex,
                 instrSplit,//指令划分后
 				moveType,//当前执行的运动类型
@@ -9879,6 +9879,8 @@ VILibrary.VI = {
 				 	A[2]=a_D[5];
                 kinematicsEquation(currentANG);
             }
+
+            //划分指令条
             function Split(str) {
                 // let str= document.getElementById(idName).value.toString();
                 let arr=(str.replace(/\r|\n|\s|°/g,'')).split(";");//剔除所有换行回车和空格，并以分号分割
@@ -9888,55 +9890,105 @@ VILibrary.VI = {
                 }
                 return newArr;
             }
+
+            //输入示教点。指令
             this.toggleObserver = function (str_points,str_cmd,stFlag) {
                     // instrParse();
-				if(stFlag)singleStepFlag=true;
+				if(stFlag)singleStepFlag=true;//单步执行指令。用于远程控制
 				else singleStepFlag=false;
-					let pPoints=Split(str_points);
-					pPos=[];
-					for(let p of pPoints){
-						let pNum=p.match(/p\d+/);
-						if(pNum==null){
-							alert("示教点格式错误！",p);
-							return;
-						}
-						pNum=parseInt(pNum[0].replace(/p/g,''));
-						if(isNaN(pNum)){
-                            alert("示教点格式错误！",p);
+				let pPoints=Split(str_points);//划分指令条
+				pPos=[],qJoint=[];
+				for(let p of pPoints){
+					let pNum=p.match(/p\d+/i);
+					if(pNum==null){//匹配不到位置型P,匹配关节型q
+                        let qNum=p.match(/q\d+/);
+                        if(qNum==null){
+                            errInfo(-1,p);
                             return;
 						}
-						if(pPos[pNum]!=undefined){
-                            alert("示教点重复定义错误！");
+                        qNum=parseInt(qNum[0].replace(/q/g,''));
+                        if(isNaN(qNum)){
+                            errInfo(-1,p);
                             return;
-						}
-						p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');//获取[]中间的内容并去掉[],以逗号分隔内容
-						for(let i=0;i<p.length;i++){
-							if(p[i]!=''){
-								p[i]=i<3?parseFloat(p[i]):(parseFloat(p[i])/180*Math.PI);//前三个数为坐标；后三个数为角度，需要转换为弧度
-							}
-						}
-						pPos[pNum]=p;
-						// console.log(pPos)
+                        }
+                        if(qJoint[qNum]!=undefined){
+                            errInfo(-2,p);
+                            return;
+                        }
+                        p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');//获取[]中间的内容并去掉[],以逗号分隔内容
+                        for(let i=0;i<p.length;i++){
+                            if(p[i]!=''){
+                                p[i]=parseFloat(p[i])/180*Math.PI;//角度，需要转换为弧度
+                            }
+                        }
+                        qJoint[qNum]=p;//添加到关节型示教点数组
 					}
-                    executiveFlag=true;
-                    instrIndex=0;
-                    let instrAll=str_cmd;
-                    // let instrAll=document.getElementById("instrInput").value.toString();//输入指令,获取字符串
-                    let replacedStr=instrAll.replace(/[\n]/g,"");//去掉回车
-					instrSplit=replacedStr.split(";");//以分号分割字符串
-					let points="";
-					if(robNumber=="a360")points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
-                    else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
-                    document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',points);
-                    document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex','0');
-                    _this.instrCompiling(); //逐条指令解析
+					else {
+                        pNum=parseInt(pNum[0].replace(/p/g,''));
+                        if(isNaN(pNum)){
+                            errInfo(-1,p);
+                            return;
+                        }
+                        if(pPos[pNum]!=undefined){
+                            errInfo(-2,p);
+                            return;
+                        }
+                        p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');//获取[]中间的内容并去掉[],以逗号分隔内容
+                        for(let i=0;i<p.length;i++){
+                            if(p[i]!=''){
+                                p[i]=i<3?parseFloat(p[i]):(parseFloat(p[i])/180*Math.PI);//前三个数为坐标；后三个数为角度，需要转换为弧度
+                            }
+                        }
+                        pPos[pNum]=p;//添加到位置型示教点数组
+					}
+				}
+				executiveFlag=true;
+				instrIndex=0;
+				let instrAll=str_cmd;
+				// let instrAll=document.getElementById("instrInput").value.toString();//输入指令,获取字符串
+				let replacedStr=instrAll.replace(/[\n]/g,"");//去掉回车
+				instrSplit=replacedStr.split(";");//以分号分割字符串
+				let points="";
+				if(robNumber=="a360")points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
+				else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
+				document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',points);
+				document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex','0');
+				_this.instrCompiling(); //逐条指令解析
             };
-            function errInfo() {
+            function errInfo(errorType,errInstr) {
+
+            	switch (errorType){
+					case -1:
+                        errorType='示教点格式错误:';
+                        break;
+					case -2:
+                        errorType='重复定义示教点:';
+                        break;
+					case 1:
+						errorType='未知指令类型:';
+						break;
+					case 2:
+                        errorType='示教点错误:';
+                        break;
+					case 3:
+						errorType='速度设置错误:';
+						break;
+                    case 4:
+                        errorType='未知IO对象:';
+                        break;
+					default:
+                        errorType='指令语法错误:';
+                        break;
+				}
                 layer.open({
                     title: '系统提示'
-                    ,content: '输入指令不符合语法规则'
+                    ,content: errorType+errInstr
                 });
+                executiveFlag=false;
             }
+
+
+            //指令解析
             this.instrCompiling=function() {
                 let instrLen=instrSplit.length;
                 if(instrIndex<instrLen){
@@ -9953,66 +10005,68 @@ VILibrary.VI = {
                         }
 					};
                     let lengthI=instrI.length;
-                    let moveIndex=instrI.indexOf('move');
+                    let moveIndex=instrI.search(/move/i);
+
+                    //IO指令
                     if(moveIndex==-1){
-                        if(instrI.indexOf('Reset')>=0||instrI.indexOf('reset')>=0){
+                        if(instrI.search(/Reset/i)>=0){
                             _this.setIO(false);
                         }
-                        else if(instrI.indexOf('Set')>=0||instrI.indexOf('set')>=0){
+                        else if(instrI.search(/Set/i)>=0){
                             _this.setIO(true);
                         }
-                        else {errInfo();return;}
+                        else {errInfo(1,instrI);return;}
                     }
+                    //运动指令
                     else {
                         /*let pIndex=instrI.indexOf("p");
                         let pNum=instrI.slice(pIndex+1,lengthI);//从p到结束之间的部分*/
-                        let pNum=instrI.match(/p\d+/g);//匹配该命令中“p数字”的部分
-						// let strN=;
-                        let n1 = Number(pNum[0].replace(/p/,""));//p后面的数字
-						let vNum=instrI.match(/v\d+/);
-						let m=Number(vNum[0].replace(/v/,""))//v后面的数字
-                        if(isNaN(n1)||(pPos[n1]==undefined)){layer.open({
-                            title: '系统提示'
-                            ,content: '未知示教点'
-                        });return;}
-                        else  {
+
+						let isAbsj=(instrI.search(/moveabsj/i)!=-1);//区分是否是moveAbsJ，moveAbsJ的示教点时pJoint类型，其他的为pPos
+						let pNum=isAbsj?instrI.match(/q\d+/gi):instrI.match(/p\d+/gi);//匹配该命令中“p数字”或‘q数字’的部分
+						if(pNum==null){errInfo(2,instrI);return;}//匹配不到示教点
+						let n1 =isAbsj?Number(pNum[0].replace(/q/i,"")):Number(pNum[0].replace(/p/,""));//p后面的数字
+						if(isNaN(n1)||isAbsj?(qJoint[n1]==undefined):(pPos[n1]==undefined)){errInfo(2,instrI);return;}
+						let vNum=instrI.match(/v\d+/i);
+						if(vNum==null){errInfo(3,instrI);return;}
+						let m=Number(vNum[0].replace(/v/i,""))//v后面的数字
+						if(isNaN(m)||m<=0){errInfo(3,instrI);return;}
+						if(isAbsj){
+                            moveType=instrI[moveIndex+4];
+                            let instrAng;
+                            instrAng=qJoint[n1];
+                            _this.moveJ(instrAng,m);
+						}
+						else {
                             moveType=instrI[moveIndex+4];
                             let instrPos,lastPos;
                             let instrAng;
                             switch(moveType){
-                                case "J":
-                                	instrAng=inverseKinematics(pPos[n1]);
-                                    if(instrAng==0){
-                                        alert("超出工作空间或靠近奇异点！");
-                                        moveType='';executiveFlag=false;instrSplit=[];
-                                        return;
-                                    }
-                                	_this.moveJ(instrAng,m);
-                                	break;
-                                case "L":
-                                    let LPos=pPos[n1].concat();
-                                    _this.moveL(LPos,m);
-                                	break;
-                                case "C":
-
-                                    let n2 = Number(pNum[1].replace(/p/,""));//第二个p后面的数字
-                                    if(isNaN(n2)||(n2>=pPos.length)){layer.open({
-                                        title: '系统提示'
-                                        ,content: '未知示教点'
-                                    });return;}
-                                    if(n2==undefined){
-                                        layer.open({
-                                            title: '系统提示'
-                                            ,content: 'moveC指令缺少关键参数'
-                                        });return;
-									}
-                                    let CPos1=pPos[n1].concat();
-                                    let CPos2=pPos[n2].concat();
-                                    _this.moveC(CPos1,CPos2,m);
-                                	break;
-                                default: errInfo();return;
+                                case "J":case "j":
+                                instrAng=inverseKinematics(pPos[n1]);
+                                if(instrAng==0){
+                                    alert("超出工作空间或靠近奇异点！");
+                                    moveType='';executiveFlag=false;instrSplit=[];
+                                    return;
+                                }
+                                _this.moveJ(instrAng,m);
+                                break;
+                                case "L":case "l":
+                                let LPos=pPos[n1].concat();
+                                _this.moveL(LPos,m);
+                                break;
+                                case "C":case "c":
+                                if(pNum[1]==undefined){errInfo(2,instrI);return;}
+                                let n2 = Number(pNum[1].replace(/p/,""));//第二个p后面的数字
+                                if(isNaN(n2)||(n2>=pPos.length)||pPos[n2]==undefined){errInfo(2,instrI);return;}
+                                let CPos1=pPos[n1].concat();
+                                let CPos2=pPos[n2].concat();
+                                _this.moveC(CPos1,CPos2,m);
+                                break;
+                                default: errInfo(1,instrI);return;
                             }
-                        }
+						}
+
                     }
                 }
             }
@@ -10058,10 +10112,6 @@ VILibrary.VI = {
             //关节运动插补，各个关节匀速转动，同时到达目标位姿。input为目标点的关节变量，v为运动速度（每隔50ms输出一次插补点的位置和姿态，下同）
             this.moveJ=function(input,v){
             	moveType="J";
-            	if(v<=0){
-            		alert("参数设置错误！");
-            		return;
-				}
                 // let distanceL=Math.sqrt(Math.pow(targetPOS[0]-LastPOS[0],2)+Math.pow(targetPOS[1]-LastPOS[1],2)+Math.pow(targetPOS[2]-LastPOS[2],2));
                 // let t=distanceL/v;
             	let instructAng=input.concat();
