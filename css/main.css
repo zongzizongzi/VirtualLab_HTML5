@@ -472,6 +472,8 @@ html {
 #index_1{//说明书
     width: 100%;
     height: 450px;
+    box-sizing: border-box;
+    border: 1.5px solid #01AAED;
 }
 #instructTxt{
     width: 100%;
@@ -529,6 +531,11 @@ html {
     /*margin-top: 0px;*/
     padding: 10px;
     flex: 1 0 auto;
+}
+.instrTxt{
+    width: 90%;
+    height: 60%;
+    margin: 10px
 }
 .robotPA{
     width: 60px;
@@ -598,6 +605,9 @@ html {
     border-right: 1px solid;
     border-left: 1px solid;
 }
+.matrix_table td{
+    font-size: 17px;
+}
 .message_div h4{
     font-size: 17px;
     padding: 0.4em 0;
@@ -614,18 +624,23 @@ html {
 }
 
 .left_column{
-    width: 80%;height: 100%;display: inline;float: left
+    width: 70%;height: 100%;display: inline;float: left;
 }
 .right_column{
-    width:20%;
+    width:30%;
     font: normal 15px Calibri;
     display: inline;
-    overflow: scroll;
+    overflow: auto;
     align-items: stretch;
     float: left;
     text-align: center;
     background-color: #aaddff;
     height: 100%;
+}
+.x3d{
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 .msgLable{
     /*width: 100px;*/
@@ -637,7 +652,7 @@ html {
     height: 100%;
     float: left;
     box-sizing: border-box;
-    border: 1px solid #01AAED
+    border: 1.5px solid #01AAED
 }
 .message_title{
     font-size: 16px;

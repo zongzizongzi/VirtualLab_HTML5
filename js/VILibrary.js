@@ -11929,7 +11929,7 @@ VILibrary.VI = {
             this.draw=function() {
                 if (draw3DFlag) {
                     //此处向网页插入HTML代码
-                    this.container.innerHTML='<x3d style="width: 100%;height: 100%;"><scene>'+
+                    this.container.innerHTML='<x3d  class="x3d"><scene>'+
                         '<inline nameSpaceName="axis" mapDEFToID="true" url="assets/CoordTrans/coordTrans.x3d"></inline>'+
                         '</scene></x3d>';
                 }
@@ -12014,11 +12014,16 @@ VILibrary.VI = {
                 let ca=Math.cos(alpha), sa=Math.sin(alpha),
                     cb=Math.cos(belta), sb=Math.sin(belta),
                     cy=Math.cos(gamma), sy=Math.sin(gamma);
-                let R=[
+                /*let R=[
                 	[ca*cb*cy-sa*sy,-ca*cb*sy-sa*cy,ca*sb],
 					[sa*cb*cy+ca*sy,-sa*cb*sy+ca*cy,sa*sb],
 					[-sb*cy,sb*sy,cb]
-				];
+				];*/
+                let R=[
+                	[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy],
+					[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy],
+					[-sb,cb*sy,cb*cy]
+				];//ZYX
                 return R
             }
             function RPY(rot,pos) {
@@ -12144,7 +12149,7 @@ VILibrary.VI = {
             this.draw = function (){
                 if (draw3DFlag) {
                     //此处向网页插入HTML代码
-                    this.container.innerHTML = '<x3d style="width: 100%;height: 100%;"><scene>' +
+                    this.container.innerHTML = '<x3d  class="x3d"><scene>' +
                         '<inline nameSpaceName="axis" mapDEFToID="true" url="assets/CoordTrans/coordTrans.x3d"></inline>' +
                         '</scene></x3d>';
                 }
@@ -12254,7 +12259,7 @@ VILibrary.VI = {
             ];
             this.draw = function (index){
                 if (draw3DFlag) {
-                    this.container.innerHTML = '<x3d style="width: 100%;height: 100%;"><scene>' +
+                    this.container.innerHTML = '<x3d class="x3d"><scene>' +
                         '<inline nameSpaceName="Link" mapDEFToID="true" url="assets/RobotLinks/robotLinks.x3d"></inline>' +
                         '</scene></x3d>';
                     //此处向网页插入HTML代码

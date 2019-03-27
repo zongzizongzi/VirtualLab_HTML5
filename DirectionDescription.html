@@ -33,11 +33,11 @@
     <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/baseTheoryExperiment/orientationDescription.htm" ></embed></div>
     <div id="index_2"><video id="demo" src="video/demo/orientation.mp4" controls></video></div>
     <div id="index_1" style="height: 700px">
-        <div class="left_column" style="width: 70%">
-            <div id="X3d" style="width: 100%;height: 100%;">
+        <div class="left_column" >
+            <div id="X3d" class="x3d" >
             </div>
         </div>
-        <div class="right_column columnFlex-div " style="width: 30%">
+        <div class="right_column columnFlex-div " >
             <div class="message_div " id="examType">
                 <h4>转换方式</h4>
                 <div class="rowFlex-div">
@@ -47,7 +47,7 @@
                     <input type="radio" name="typeRadio" value="Quaternion">四元数
                 </div>
             </div>
-            <div class="message_div transform_div" id="tyransform_RPY" style="display: block">
+            <div class="message_div transform_div" id="tyransform_RPY" style="display: block;font-size: 17px">
                 <h4>转换过程</h4>
                 <form class="rotateDiv" id="rotate_RPY" style="display: block">
                     <p>绕固定轴X转动：<input type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
@@ -67,7 +67,7 @@
                     <p>绕浮动轴Y转动：<input  type="text"value="0" style="width: 50px" onchange="changeTransTxt(this)">
                         <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
                     </p>
-                    <p>绕浮动轴Z转动：<input   type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
+                    <p>绕浮动轴X转动：<input   type="text" value="0" style="width: 50px" onchange="changeTransTxt(this)">
                         <input class="rotInput" type="range" max="180" min="-180" value="0" step="1" onchange="changeTrans(this)">
                     </p>
                 </form>
@@ -102,7 +102,7 @@
                     <span style="width: 200px;display: inline-block"></span><button class="button" onclick="quater();return false">归一化四元数</button>
                 </form>
             </div>
-            <div class="message_div">
+            <div class="message_div " style="font-size: 16px">
                 <h4>与旋转矩阵的转换</h4>
                 R=
                 <table class="matrix_table" id="formula_table">
@@ -128,7 +128,7 @@
             </div>
             <div class="message_div" id="matrix">
                <h4>计算旋转矩阵</h4>
-                <table class="matrix_table" id="result_table">
+                <table class="matrix_table" id="result_table" style="font-size: 17px">
                     <tr>
                         <td class="matrix_top"></td>
                         <td><input value="1"></td>
@@ -151,7 +151,7 @@
                         <td class="matrix_bottom">&nbsp;</td>
                     </tr>
                 </table>
-                <button class="button" onclick="coordSystemVI.check()" style="float: right;margin-top: 0.5em">提交计算结果</button>
+                <button class="button" onclick="coordSystemVI.check()" style="/*float: right;*/margin-top: 0.5em">提交计算结果</button>
             </div>
             <!--<div class="message_div">
                 <h4>四元数表示：</h4>
@@ -217,10 +217,13 @@
     let quterSpans=$('.quaternion');
     let method="RPY";
     let R_E=[
-        ['cα*cβ*cγ-sα*sγ','-cα*cβ*sγ-sα*cγ','cα*sβ'],
-        ['sα*cβ*cγ+cα*sγ','-sα*cβ*sγ+cα*cγ','sα*sβ'],
-        ['-sβ*cγ','sβ*sγ','cβ']
+        ['cα*cβ','cα*sβ*sγ-sα*cγ','cα*sβ*cγ+sα*sγ'],
+        ['sα*cβ','sα*sβ*sγ+cα*cγ','sα*sβ*cγ-cα*sγ'],
+        ['-sβ','cβ*sγ','cβ*cγ']
     ],
+      /*  [ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy],
+        [sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy],
+        [-sb,cb*sy,cb*cy]*/
         R_R=[
             ['cα*cβ','cα*sβ*sγ-sα*cγ','cα*sβ*cγ+sα*sγ'],
             ['sα*cβ','sα*sβ*sγ+cα*cγ','sα*sβ*cγ-cα*sγ'],
@@ -237,7 +240,7 @@
             ['2*q1*q3-2*q2*q0','2*q2*q3+2*q1*q0','1-2*q1*q1-2*q2*q2'],
         ];
     let note_A='运动坐标系绕k=(kx,ky,kz)定义的轴旋转角度θ；sθ=sinθ,cθ=cosθ,Versθ=(1-cosθ);',
-        note_E='运动坐标系绕其Z轴旋转角度α，后绕其Y轴旋转角度β，最后绕其Z轴旋转角度γ；sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推',
+        note_E='运动坐标系绕其Z轴旋转角度α，后绕其Y轴旋转角度β，最后绕其X轴旋转角度γ；sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推',
         note_Q='四元数将轴_角所包含的信息归一化到一个统一的四维空间中，便于计算和插值。',//q=(kx*sin(θ/2), ky*sin(θ/2), kz*sin(θ/2)，cos(θ/2)) 。',
         note_R='运动坐标系绕固定坐标系X轴旋转角度γ，称为偏转(Yaw)；绕固定Y轴旋转角度β，称为俯仰(Pitch)；绕固定Z轴旋转角度α，称为回转(Roll);sα=sinα,cα=cosα;sβ,cβ,sγ,cγ以此类推';
     let f_trs=document.getElementById("formula_table").getElementsByTagName("tr");
@@ -342,9 +345,9 @@
     }
     function changeTransTxt(input) {
         input.nextElementSibling.value=input.value;
-        if(!(method=="Axis_Ang"&&input.id!='a_Ang'&&input.nextElementSibling.className=="rotInput")){
+//        if(!(method=="Axis_Ang"&&input.id!='a_Ang'&&input.nextElementSibling.className=="rotInput")){
             changeTrans(input.nextElementSibling);
-        }
+//        }
     }
 </script>
 </body>

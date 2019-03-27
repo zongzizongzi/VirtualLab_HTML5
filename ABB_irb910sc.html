@@ -31,23 +31,11 @@
     <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/baseOperationExperiment/cylindricalCoordinateRobot.htm" ></embed></div>
     <div id="index_2"><video id="demo" src="video/demo/robotsOperation.mp4" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div style="width: 80%;height: 100%;display: inline;float: left">
-            <div id="robotX3d" style="width: 100%;height: 100%;">
-            </div>
-            <div id="tools" style="width: 100%;">
-                <input type="checkbox" checked="true" onclick="lightSwitch('point')">
-                <label>point light</label>
-                <input type="checkbox" checked="true" onclick="lightSwitch('spot')">
-                <label>spot light</label>
-                <input type="checkbox" checked="true" onclick="lightSwitch('directional')">
-                <label>directional light</label>
-                <input type="checkbox" checked="true" onclick="lightSwitch('directional2')">
-                <label>directional2 light</label>
-                <input type="checkbox" checked="true" onclick="headlight()">
-                <label>headlight</label>
+        <div class="left_column">
+            <div id="robotX3d"  class="x3d">
             </div>
         </div>
-        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+        <div class="right_column columnFlex-div">
             <div class="message_div" id="messageDiv">
                 <p>关节变量：</p><br>
                 <p >Ang_1：<input id="angTxt0" type="text" max="140" min="-140" value="0" style="width: 50px" onchange="changeAngTxt(0)">
@@ -86,7 +74,7 @@
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>设置示教点</p>
-                <textarea id="points" style="width: 90%;height: 60%;margin: 10px">
+                <textarea id="points" class="instrTxt" >
                 </textarea>
                 <div class="rowFlex-div">
                     <button id="add" onclick="points(1)">添加</button>
@@ -96,7 +84,7 @@
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>控制指令</p>
-                <textarea id="instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <textarea id="instrInput" class="instrTxt" ></textarea><br>
                 <div class="rowFlex-div">
                     <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>

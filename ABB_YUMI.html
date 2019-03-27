@@ -32,7 +32,7 @@
     <div id="index_0" style="width: 1500px;"> <embed id="instructTxt" src="pdf/Robotics/baseOperationExperiment/mulitijointRobot.htm" ></embed></div>
     <div id="index_2"><video id="demo" src="video/demo/robotsOperation.mp4" controls></video></div>
     <div id="index_1" style="height: 800px">
-        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100% ">
+        <div class="right_column" style="width:20%; ">
             <div class="message_div" id="R_messageDiv">
                 <p>ROB_R 关节转角：
                 </p>
@@ -81,7 +81,7 @@
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>设置示教点</p>
-                <textarea id="R_points" style="width: 90%;height: 60%;margin: 10px">
+                <textarea id="R_points" class="instrTxt">
                 </textarea>
                 <div class="rowFlex-div">
                     <button id="R_add" onclick="points(1,'R')">添加</button>
@@ -91,17 +91,17 @@
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>控制指令</p>
-                <textarea id="R_instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <textarea id="R_instrInput"  class="instrTxt"></textarea><br>
                 <div class="rowFlex-div">
                     <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
             </div>
         </div>
-        <div style="width: 60%;height: 100%;display: inline;float: left">
+        <div class="left_column" style="width: 60%;">
             <div id="mainCanvas" style="width: 100%;height: 100%;">
             </div>
         </div>
-        <div  style="width:20%;font: normal 15px Calibri;display: inline;float: left;text-align: center;background-color: #aaddff;height: 100%">
+        <div class="right_column"  style="width:20%">
             <div class="message_div" id="L_messageDiv">
                 <p>ROB_L 关节转角：
                 </p>
@@ -150,7 +150,7 @@
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>设置示教点</p>
-                <textarea id="L_points" style="width: 90%;height: 60%;margin: 10px">
+                <textarea id="L_points"  class="instrTxt">
                 </textarea>
                 <div class="rowFlex-div">
                     <button id="L_add" onclick="points(1,'L')">添加</button>
@@ -160,7 +160,7 @@
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>控制指令</p>
-                <textarea id="L_instrInput" style="width: 80%;height: 60%;margin: 10px"></textarea><br>
+                <textarea id="L_instrInput" class="instrTxt"></textarea><br>
                 <div class="rowFlex-div">
                     <button  onclick="points(-1,'L') ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
