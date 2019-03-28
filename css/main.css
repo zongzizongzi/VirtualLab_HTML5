@@ -532,6 +532,13 @@ html {
     padding: 10px;
     flex: 1 0 auto;
 }
+.msgTitle{
+    font-size: 18px;
+    padding-bottom: 10px;
+}
+.strTitle{
+    font-size: 18px;
+}
 .instrTxt{
     width: 90%;
     height: 60%;
@@ -606,7 +613,7 @@ html {
     border-left: 1px solid;
 }
 .matrix_table td{
-    font-size: 17px;
+    font-size: 15px;
 }
 .message_div h4{
     font-size: 17px;

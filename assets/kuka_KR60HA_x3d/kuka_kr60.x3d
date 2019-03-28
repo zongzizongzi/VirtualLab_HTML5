@@ -1,6 +1,6 @@
 <x3d id="120X3d" style="width: 100%;height: 100%;">
     <scene>
-        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(0.66,0.8,1)'></Background>
         <Viewpoint position="228.15508 1110.10239 4034.47942" orientation="-0.97946 0.19317 -0.05782 0.27431"></Viewpoint>
         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
         <directionalLight id="directional1" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>

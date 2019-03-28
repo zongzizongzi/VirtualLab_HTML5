@@ -38,8 +38,8 @@
             </div>
         </div>
         <div  class="right_column">
-            <div class="message_div" id="messageDiv">
-                <p>关节转角：</p><br>
+            <div class="message_div" id="messageDiv" style="font-size: 16px">
+                <p class="msgTitle">关节转角：</p>
                 <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
                     <input id="angInput0" type="range" max="185" min="-185" value="0" step="5" onchange="changeAng(0)">
                 </p>
@@ -66,22 +66,22 @@
                     Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button>
                 </p>
             </div>
-            <div class="message_div" id="resultDiv" onchange="changePos()">
+            <div class="message_div" id="resultDiv" onchange="changePos()" style="font-size: 16px">
                 <div style="width: 50%;display: inline;float: left">
-                    <p>末端坐标：</p><br>
+                    <p  class="msgTitle">末端坐标：</p>
                     <p>P_X：<input id="posX" type="text" value="1317.22" class="robotPA"></p>
                     <p>P_Y：<input id="posY" type="text" value="0" class="robotPA"></p>
                     <p>P_Z：<input id="posZ" type="text" value="1725" class="robotPA"></p>
                 </div>
                 <div style="width: 50%;display: inline;">
-                    <p>末端姿态：</p><br>
+                    <p  class="msgTitle">末端姿态：</p>
                     <p>E_X：<input id="eulerX" type="text" value="-180" class="robotPA">°</p>
                     <p>E_Y：<input id="eulerY" type="text" value="60" class="robotPA">°</p>
                     <p>E_Z：<input id="eulerZ" type="text" value="-180" class="robotPA">°</p>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
-                <p>设置示教点</p>
+                <p  class="strTitle">设置示教点</p>
                 <textarea id="points" class="instrTxt">
                 </textarea>
                 <div class="rowFlex-div">
@@ -91,7 +91,7 @@
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
-                <p>控制指令</p>
+                <p  class="strTitle">控制指令</p>
                 <textarea id="instrInput" class="instrTxt"></textarea><br>
                 <div class="rowFlex-div">
                     <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>

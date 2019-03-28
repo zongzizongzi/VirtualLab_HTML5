@@ -1,10 +1,11 @@
 <x3d id="epson" style="width: 100%;height: 100%;">
     <scene>
-        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(1,1,1)'></Background>
+        <Background groudcolor="(0.5,0.5,0.5)" skyColor='(0.66,0.8,1)'></Background>
         <Viewpoint position="222.06448 725.28530 1059.81005" orientation="-0.99937 0.02460 0.02545 0.33766" zNear="118.31384" zFar="4000.00000" description=""></Viewpoint>
         <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
-        <DirectionalLight ambientIntensity='1'  direction='1,-1,-1' intensity='0.5'  ></DirectionalLight>
-        <DirectionalLight ambientIntensity='1' direction='-1,-1,-1' intensity='0.5' ></DirectionalLight>
+        <directionalLight id="directional" direction='0 -0.5 -0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <!--<directionalLight id="directional" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>-->
+        <directionalLight id="directional2"  direction='0 0.5 0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
         <transform  translation="0,0,0">
             <inline DEF="platform" url="../platform.x3d"> </inline>
         </transform>

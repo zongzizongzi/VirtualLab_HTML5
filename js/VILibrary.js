@@ -11796,14 +11796,14 @@ VILibrary.VI = {
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
-                        document.getElementById("Robot__huaban").setAttribute("render", 'true');
+                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     case 4:
                         document.getElementById("Robot__box").setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
-                        document.getElementById("Robot__huaban").setAttribute("render", 'true');
+                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     default:
                         document.getElementById("Robot__box").setAttribute("render", 'false');
