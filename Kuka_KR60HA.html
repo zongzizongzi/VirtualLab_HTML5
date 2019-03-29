@@ -85,16 +85,17 @@
                 <textarea id="points" class="instrTxt">
                 </textarea>
                 <div class="rowFlex-div">
-                    <button id="add" onclick="points(1)">添加</button>
-                    <button id="delete" onclick="points(2)">删除</button>
-                    <button id="clear" onclick="points(0)">清空</button>
+                    <button type="button" id="add" onclick="changePoints(1)">位置型</button>
+                    <button type="button" id="add1" onclick="changePoints(3)">关节型</button>
+                    <button type="button" id="delete" onclick="changePoints(2)">删除</button>
+                    <button type="button" id="clear" onclick="changePoints(0)">清空</button>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
                 <p  class="strTitle">控制指令</p>
                 <textarea id="instrInput" class="instrTxt"></textarea><br>
                 <div class="rowFlex-div">
-                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
+                    <button  onclick="changePoints(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
             </div>
         </div>
@@ -198,8 +199,9 @@
         let cmd=document.getElementById("instrInput").value.toString();
         instructionCompiling.toggleObserver(points,cmd);
     }
-    function points(type) {
+    function changePoints(type) {
         let turnPoints;
+        let si;
         switch (type){
             case 0:/*清空*/
                 s=[];
@@ -215,24 +217,43 @@
                     gamma=parseFloat(document.getElementById("eulerX").value),
                     beta=parseFloat(document.getElementById("eulerY").value),
                     alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
+                si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
+                s.push(si);
                 indexI++;
                 break;
             case 2:/*删除示教点*/
-                s.pop();
+                if(s.length<=0){
+                    alert("已删除所有示教点");
+                    return
+                }
+                let last_s=s.pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
 //                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
-                indexI--;
+                if(last_s.indexOf('p')!=-1) indexI--;
+                break;
+            case 3:/*添加关节型示教点*/
+                let q=[];
+                for(let i=0;i<6;i++){q[i]=parseFloat(document.getElementById("angTxt"+i).value);}
+                si="q"+(s.length-indexI)+":["+q[0]+"°," +q[1]+"°," +q[2]+"°," +q[3]+"°," +q[4]+"°,"+q[5]+"°];\n";
+                s.push(si);
+                /*----------------点集增加点的坐标-------------------*/
+                let xx=parseFloat(document.getElementById("posX").value),
+                    yy=parseFloat(document.getElementById("posY").value),
+                    zz=parseFloat(document.getElementById("posZ").value);
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+xx+" "+zz+" "+(-yy);
+                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+                /*-----------------------------------*/
                 break;
             case -1:
                 /*s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],
@@ -244,13 +265,15 @@
                     "p0:[1550.41,0,1668.89,-180°,60°,-180°];\n",
                     "p1:[1000,-1000,200,180°,0°,-180°];\n",
                     "p2:[1000,-1000,40,180°,0°,-180°];\n",
-                    "p3:[1000,0,200,180°,0°,-180°];\n",
-                    "p4:[1000,0,40,180°,0°,180°];\n"
+                    "p3:[1500,0,200,180°,0°,-180°];\n",
+                    "p4:[1000,1000,200,180°,0°,-180°];\n",
+                    "p5:[1000,1000,40,180°,0°,180°];\n",
+                    "q0:[0°,0°,0°,0°,30°,0°];\n"
                 ];
-                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveJ p1,v400;\nmoveL p2,v400;\nset do1;\nmoveL p1,v400;\nmoveJ p3,v400;\nmoveL p4,v400;\nreset do1;\nmoveL p3,v400;\nmoveJ p0,v400;";
-
+                document.getElementById("instrInput").value="moveJ p0,v400;\nmoveJ p1,v400;\nmoveL p2,v400;\nset do1;\nmoveL p1,v400;\nmoveC p3,p4,v400;\nmoveL p5,v400;\nreset do1;\nmoveL p4,v400;\nmoveabsJ q0,v400;";
+                indexI=6;
                 //------------------点集-------------------------
-                turnPoints=" 1550.41 1668.89 0 1000 200 1000 1000 40 1000 1000 40 0 1000 200 0";
+                turnPoints=" 1550.41 1668.89 0 1000 200 1000 1000 40 1000 1500 200 0 1000 200 -1000 1000 40 -1000";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
         }
         let str="";
@@ -259,17 +282,7 @@
         }
         document.getElementById("points").value=str;
     }
-    function openTeachPendant() {
-        layer.open({
-            type: 2,
-            title: 'iframe父子操作',
-            maxmin: true,
-            shadeClose: true, //点击遮罩关闭层
-            area : ['800px' , '520px'],
-            content: 'teachPendant.html'
-        });
 
-    }
 
 </script>
 </body>
