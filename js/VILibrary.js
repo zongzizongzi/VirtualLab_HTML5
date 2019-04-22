@@ -9760,7 +9760,10 @@ VILibrary.VI = {
             const _this = this;
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
-            // let currentPOS;
+            if(robNumber=="yumiL"||robNumber=="yumiR"){
+                var currentPOS;
+			}
+
             let targetANG2;//专为IRB360提供
             let pPos=[],qJoint=[];
             let instrIndex,
@@ -9802,6 +9805,14 @@ VILibrary.VI = {
                     OMEGA=[415,659,1000*180/Math.PI,2400];
                     break;
 				case "a360":
+                    A=[0,0,0,0,0,0];
+                    D=[0,0,0,0,0,0];//d[3]<=0;
+                    ALPHA=[0,0,0,0,0,0];
+                    THETA=[0,0,0,0,0,0];
+                    currentANG=[0,0,0],targetANG=[0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
+                    Range=[[-55,110],[-55,110],[-55,110]];
+                    OMEGA=[400,400,400];break;
+                case "a360-1":
                     A=[0,0,0,0,0,0];
                     D=[0,0,0,0,0,0];//d[3]<=0;
                     ALPHA=[0,0,0,0,0,0];
@@ -9865,7 +9876,7 @@ VILibrary.VI = {
             const baseA=A.concat(),baseD=D.concat(),baseTHETA=THETA.concat();
 			if(robNumber!="epson")Range=math.multiply(Range,Math.PI/180);
             this.getData=function (dataType) {//根据dataType区分发送数据给谁
-            	if(dataType==1)return robNumber=="a360"?targetANG2:targetANG;//发送数据给robot的X3DOM模型，所发送的数据为关节变量
+            	if(dataType==1)return (robNumber=="a360"||robNumber=="a360-1")?targetANG2:targetANG;//发送数据给robot的X3DOM模型，所发送的数据为关节变量
             	else if(dataType==2)return [ToolFlag,ToolDO];//发送数据给TOOL，所发送的数据为[加载工具标志，夹具状态]
             }
             this.setData=function (input) {
@@ -9949,7 +9960,7 @@ VILibrary.VI = {
 				let replacedStr=instrAll.replace(/[\n]/g,"");//去掉回车
 				instrSplit=replacedStr.split(";");//以分号分割字符串
 				let points="";
-				if(robNumber=="a360")points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
+				if(robNumber=='a360'||robNumber=='a360-1')points+=currentPOS[1]+" "+currentPOS[2]+" "+currentPOS[0];
 				else points+=currentPOS[0]+" "+currentPOS[2]+" "+(-currentPOS[1]);
 				document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',points);
 				document.getElementById("Robot__LineSet_index"+Suf).setAttribute('coordIndex','0');
@@ -10035,6 +10046,12 @@ VILibrary.VI = {
                             moveType=instrI[moveIndex+4];
                             let instrAng;
                             instrAng=qJoint[n1];
+                            if(instrAng.length==7){
+                                instrAng[1]=-instrAng[1];
+                                instrAng[3]=-instrAng[3];
+                                instrAng[5]=-instrAng[5]
+							}
+                            
                             _this.moveJ(instrAng,m);
 						}
 						else {
@@ -10224,11 +10241,11 @@ VILibrary.VI = {
 				let step=math.multiply(diffPos,1/N);
                 let maxStep=Math.max.apply(Math,math.abs(step));
 				let k=0;
+                // let current=math.multiply(-1,currentPOS);
+                // let diff=math.add(instructPos, current);
+                // let maxDiff=Math.max.apply(Math,math.abs(diff));
+                let x,y,z,alpha,beta,gamma,tPos;
                 this.timer = window.setInterval(function () {
-                    let current=math.multiply(-1,currentPOS);
-                    let diff=math.add(instructPos, current);
-                    let maxDiff=Math.max.apply(Math,math.abs(diff));
-                    let x,y,z,alpha,beta,gamma,tPos;
                     if(k+1>=N){//最后一步
                         window.clearInterval(_this.timer);
                         _this.timer=null;
@@ -10236,15 +10253,16 @@ VILibrary.VI = {
                         x=tPos[0],y=tPos[1],z=tPos[2];
                     }
 					else {
-                            x=currentPOS[0]+step[0],
-                            y=currentPOS[1]+step[1],
-                            z=currentPOS[2]+step[2];
+                            x=lastPos[0]+step[0],
+                            y=lastPos[1]+step[1],
+                            z=lastPos[2]+step[2];
                         tPos=[x,y,z,Ept[k][0],Ept[k][1],Ept[k][2]];
+                        lastPos=tPos;
                     }
                     /*if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
                         currentPOS=tPos.concat();
                         let point=document.getElementById("Robot__LineSet_points"+Suf).getAttribute('point');
-                        if(robNumber=="a360")point+=" "+y+" "+z+" "+x;
+                        if(robNumber=='a360'||robNumber=='a360-1')point+=" "+y+" "+z+" "+x;
                         else point+=" "+x+" "+z+" "+(-y);
                         document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',point);
                         let point_Index=document.getElementById("Robot__LineSet_index"+Suf).getAttribute('coordIndex');
@@ -10539,7 +10557,7 @@ VILibrary.VI = {
                         switch (robNumber) {
                             case "yumiL":case "yumiR":
                                 // A_add[len - 1] += 50;
-                                D_add[len - 1] += 160;
+                                D_add[len - 1] += 115;
                               /*  THETA_add[len - 2] -= Math.PI/4;
                                 //D_add[2] += 35.355339;
                                 THETA_add[len - 1] += Math.PI/4;*/
@@ -10565,7 +10583,7 @@ VILibrary.VI = {
                     switch (ToolFlag) {
                         case 1:
                             var trans = document.getElementById('Robot__box').getFieldValue('translation');
-                            let boxPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
+                            let boxPos=(robNumber=='a360'||robNumber=='a360-1')?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
                             for(var i=0;i<3;i++){
                                 if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>10)break;
                                 if(i==2)LoadFlag=true;
@@ -10575,7 +10593,7 @@ VILibrary.VI = {
                             var i=0,j=0;
                             for(i=1;i<7;i++) {
                                 var trans = document.getElementById('Robot__gongjian'+i).getFieldValue('translation');
-                                let gongjianPos=robNumber=="a360"?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
+                                let gongjianPos=(robNumber=='a360'||robNumber=='a360-1')?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
                                 for(j=0;j<3;j++){
                                     if(Math.abs(parseFloat(gongjianPos[j])-currentPOS[j])>15)break;
                                     if(j==2) {
@@ -10636,10 +10654,17 @@ VILibrary.VI = {
                 let x,y,z,EulerZ,EulerY,EulerX;
                 //并联型
                 let theta2=[],n=[];
-				if(robNumber=='a360'){
+				if(robNumber=='a360'||robNumber=='a360-1'){
                     // let R=200,r=45,L1=350,L2=800;
                     // let psi=[0,0,Math.PI/3*2,Math.PI/3*4];
                     let R=200,r=45,L1=235,L2=800;
+					switch (robNumber){
+						case 'a360':
+							break;
+                        case 'a360-1':
+                        	L1=350;
+                            break;
+					}
                     let psi=[0,0,Math.PI/3*4,Math.PI/3*2];
                     let E=[];
                     for(let i=1;i<=3;i++){
@@ -10811,7 +10836,7 @@ VILibrary.VI = {
 				}
                 if(executiveFlag){//若当前执行控制指令，将当前点添加至轨迹线，并更新页面上的关节角度
                     let point=document.getElementById("Robot__LineSet_points"+Suf).getAttribute('point');
-                    if(robNumber=="a360")point+=" "+y+" "+z+" "+x;
+                    if(robNumber=='a360'||robNumber=='a360-1')point+=" "+y+" "+z+" "+x;
                     else point+=" "+x+" "+z+" "+(-y);
                     document.getElementById("Robot__LineSet_points"+Suf).setAttribute('point',point);
 					let point_Index=document.getElementById("Robot__LineSet_index"+Suf).getAttribute('coordIndex');
@@ -10824,7 +10849,7 @@ VILibrary.VI = {
                     switch (ToolFlag) {
                         case 1:
                             var trans = document.getElementById('Robot__box').getFieldValue('translation');
-                            if(robNumber=="a360"){
+                            if(robNumber=='a360'||robNumber=='a360-1'){
                                 trans.x=currentPOS[1];
                                 trans.y=currentPOS[2];
                                 trans.z=currentPOS[0];
@@ -10838,7 +10863,7 @@ VILibrary.VI = {
                             break;
                         case 2:
                             var trans = document.getElementById('Robot__gongjian'+gongjianIndex).getFieldValue('translation');
-                            if(robNumber=="a360"){
+                            if(robNumber=='a360'||robNumber=='a360-1'){
                                 trans.x=currentPOS[1];
                                 trans.y=currentPOS[2];
                                 trans.z=currentPOS[0];
@@ -10884,18 +10909,22 @@ VILibrary.VI = {
 						px=T[0][3],py=T[1][3],pz=T[2][3];
                     // let nx=ca*cb,ny=sa*cb,nz=-sb;
                     theta=[[],[]];
-                    let r=Math.sqrt(px*px+py*py),
-						AA=(px*px+py*py+a[1]*a[1]-a[2]*a[2])/(2*a[1]*r),
+                    let r=Math.sqrt(px*px+py*py);
+                    if(r==0)return 0;
+					let	AA=(px*px+py*py+a[1]*a[1]-a[2]*a[2])/(2*a[1]*r),
 						phi=Math.atan(px/py);
-                    if(AA>1)AA=1;
-                    else if(AA<-1)AA=-1;
+                    /*if(AA>1)AA=1;
+                    else if(AA<-1)AA=-1;*/
+                    if(AA>1||AA<-1)return 0;
                     theta[0][0]=Math.atan(AA/Math.sqrt(1-AA*AA))-phi;
                     theta[1][0]=Math.atan(AA/(-Math.sqrt(1-AA*AA)))-phi;
                     for(let i=0;i<2;i++){
-                    	let tmp=(px*px+py*py-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]);
-                    	if(tmp>1)tmp=1;
-                    	else if(tmp<-1)tmp=-1;
-                        theta[i][1]=Math.acos(tmp);//薛宁
+                    	let tmp=(r*r-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]);
+                    	/*if(tmp>1)tmp=1;
+                    	else if(tmp<-1)tmp=-1;*/
+                        // let tmp=(r*Math.sin(theta[i][0]+phi)-a[1])/a[2];
+                        if(tmp>1||tmp<-1)theta[i][1]=NaN;
+                        else theta[i][1]=Math.acos(tmp);//薛宁
                         // theta[i][1]=Math.atan((r*Math.cos(theta[i][0]+phi))/(r*Math.sin(theta[i][0]+phi)-a[1]));
                         // let aaa0=Math.acos((r*Math.cos(theta[i][0]+phi)-a[1])/a[2]);
                         // let aaa1=Math.acos((px*px+py*py-a[1]*a[1]-a[2]*a[2])/(2*a[1]*a[2]));
@@ -10915,13 +10944,21 @@ VILibrary.VI = {
                         }
                     }
                 }
-                else if(robNumber=='a360'){
+                else if(robNumber=='a360'||robNumber=='a360-1'){
                     if(ToolFlag){
                         z+=115;
                         y-=34;
                     }
                 	z=z+274;
                 	let R=200,r=45,l=[0,235,800];
+                    switch (robNumber){
+                        case 'a360':
+                            l=[0,235,800];
+                            break;
+                        case 'a360-1':
+                            l=[0,350,800];
+                            break;
+                    }
                     theta=[[],[],[],[]]
                     let psi=[0,0,Math.PI/3*4,Math.PI/3*2];
 					/*let psi=[0,Math.PI,-Math.PI/3,Math.PI/3];
@@ -11538,6 +11575,43 @@ VILibrary.VI = {
             return '300px';
         }
     },
+    Robot360_1130VI:class RobotIrb360_1130VI extends RobotTemplateVI {
+        constructor(VICanvas, draw3DFlag) {
+            super(VICanvas,draw3DFlag);
+            const _this = this;
+            this.robotURL='assets/irb360_1130_x3d/irb360_1130.x3d';
+            this.draw(draw3DFlag);
+            this.name = 'ABB_IRB360';
+            this.jiontsControl=function(TargetANG){
+                let rotat="0,0,0,0";
+                for(let i=0;i<3;i++){
+                    //主动轴转角
+                    rotat="1,0,0,"+TargetANG[i];
+                    document.getElementById("Robot__link"+i+"_1").setAttribute('rotation',rotat);
+                    //从动轴转角和旋转轴
+                    rotat=""+(TargetANG[(2+i)*3+1])+","+(TargetANG[(2+i)*3+2])+","+(TargetANG[(2+i)*3+0])+","+TargetANG[i+3];
+                    document.getElementById("Robot__link"+(i)+"_2r").setAttribute('rotation',rotat);
+                    document.getElementById("Robot__link"+(i)+"_2l").setAttribute('rotation',rotat);
+                }
+                let trans=(TargetANG[16]).toFixed(2)+","+TargetANG[17].toFixed(2)+","+(TargetANG[15]).toFixed(2);
+                document.getElementById("Robot__plate").setAttribute('translation',trans);
+            }
+        }
+        static get cnName() {
+
+            return 'KUKA_kr60';
+        }
+
+        static get defaultWidth() {
+
+            return '550px';
+        }
+
+        static get defaultHeight() {
+
+            return '300px';
+        }
+    },
     RobotEpsonVI:class RobotEpsonVI extends RobotTemplateVI {
         constructor(VICanvas, draw3DFlag) {
             super(VICanvas,draw3DFlag);
@@ -11642,7 +11716,7 @@ VILibrary.VI = {
                         jiajuTrans="0,65,0";
                         boxTrans='300,20,-300';
                         break;
-                    case "a360":
+                    case "a360":case "a360-1":
                         jiajuRotate='0,0,1,-1.5707963';
                         jiajuTrans="0,5,0";
                         boxTrans='250,-1180,-250';
@@ -11708,7 +11782,10 @@ VILibrary.VI = {
                     "</Transform>" +
 
                     "</switch>";
-                $("#Robot__lastLink"+Suf).after(toolSwitch);
+                 $("#Robot__lastLink"+Suf).after(toolSwitch);
+                /*let tempNode = new DOMParser().parseFromString(toolSwitch, 'text/html');
+                let node = tempNode.getElementsByTagName('switch')[0];
+                document.getElementById("Robot__link5"+Suf).appendChild(node);*/
                 var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
                     "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
                     "<box size="+boxSize+"></box>" +

@@ -84,7 +84,8 @@
                 <textarea id="R_points" class="instrTxt">
                 </textarea>
                 <div class="rowFlex-div">
-                    <button id="R_add" onclick="points(1,'R')">添加</button>
+                    <button id="R_add" onclick="points(1,'R')">位置型</button>
+                    <button type="button" onclick="points(3,'R')">关节型</button>
                     <button id="R_delete" onclick="points(2,'R')">删除</button>
                     <button id="R_clear" onclick="points(0,'R')">清空</button>
                 </div>
@@ -153,7 +154,8 @@
                 <textarea id="L_points"  class="instrTxt">
                 </textarea>
                 <div class="rowFlex-div">
-                    <button id="L_add" onclick="points(1,'L')">添加</button>
+                    <button id="L_add" onclick="points(1,'L')">位置型</button>
+                    <button type="button" onclick="points(3,'L')">关节型</button>
                     <button id="L_delete" onclick="points(2,'L')">删除</button>
                     <button id="L_clear" onclick="points(0,'L')">清空</button>
                 </div>
@@ -311,6 +313,7 @@
     function points(type,rob) {
         let turnPoints;
         let robI=0;
+        let si;
         switch (rob){
             case "L":robI=0;break;
             case 'R':robI=1;break;
@@ -331,7 +334,7 @@
                     gamma=parseFloat(document.getElementById(rob+"_eulerX").value),
                     beta=parseFloat(document.getElementById(rob+"_eulerY").value),
                     alpha=parseFloat(document.getElementById(rob+"_eulerZ").value);
-                let si="p"+indexI[robI]+":["+x+","+y+","+z+","+gamma+"°,"
+                si="p"+indexI[robI]+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points_"+rob).getAttribute('point');
@@ -342,14 +345,31 @@
                 indexI[robI]++;
                 break;
             case 2:/*删除示教点*/
-                s[robI].pop();
+                if((s[robI]).length<=0){
+                    alert("已删除所有示教点");
+                    return;}
+                let last_s=s[robI].pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points_"+rob).getAttribute('point');
 //                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
                 document.getElementById("Robot__PointSet_points_"+rob).setAttribute('point',turnPoints);
                 /*-----------------------------------*/
-                indexI[robI]--;
+                if(last_s.indexOf('p')!=-1) indexI[robI]--;
+                break;
+            case 3:/*添加关节型示教点*/
+                let q=[];
+                for(let i=0;i<=6;i++){q[i]=parseFloat(document.getElementById(rob+"_angTxt"+i).value);}
+                si="q"+(s[robI].length-indexI[robI])+":["+q[0]+"°," +q[1]+"°," +q[2]+"°," +q[3]+"°," +q[4]+"°,"+q[5]+"°,"+q[6]+"°];\n";
+                s[robI].push(si);
+                /*----------------点集增加点的坐标-------------------*/
+                let xx=parseFloat(document.getElementById(rob+"_posX").value),
+                    yy=parseFloat(document.getElementById(rob+"_posY").value),
+                    zz=parseFloat(document.getElementById(rob+"_posZ").value);
+                turnPoints=document.getElementById("Robot__PointSet_points_"+rob).getAttribute('point');
+                turnPoints=turnPoints+" "+xx+" "+zz+" "+(-yy);
+                document.getElementById("Robot__PointSet_points_"+rob).setAttribute('point',turnPoints);
+                /*-----------------------------------*/
                 break;
             case -1:
                 /*s=["p0:[1317.22,0,1725,-180°,60°,-180°];\n","p1:[1140.75,658.61,1725,-180°,60°,-150°];\n","p2:[634.49,366.32,2086.7,-30°,90°,0°];\n","p3:[757.6,-437.4,1358.74,180°,45°,150°];\n"],

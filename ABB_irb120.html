@@ -88,17 +88,17 @@
                     <textarea id="points" class="instrTxt">
                     </textarea>
                     <div class="rowFlex-div">
-                        <button type="button" id="add" onclick="changePoints(1)">位置型</button>
-                        <button type="button" id="add1" onclick="changePoints(3)">关节型</button>
-                        <button type="button" id="delete" onclick="changePoints(2)">删除</button>
-                        <button type="button" id="clear" onclick="changePoints(0)">清空</button>
+                        <button type="button" id="add" onclick="points(1)">位置型</button>
+                        <button type="button" id="add1" onclick="points(3)">关节型</button>
+                        <button type="button" id="delete" onclick="points(2)">删除</button>
+                        <button type="button" id="clear" onclick="points(0)">清空</button>
                     </div>
                 </div>
                 <div class="message_div" style="height: 22%;">
                     <p>控制指令</p>
                     <textarea id="instrInput" class="instrTxt" ></textarea><br>
                     <div class="rowFlex-div">
-                        <button type="button"  onclick="changePoints(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
+                        <button type="button"  onclick="points(-1) ">示例程序</button><button type="button"   onclick="Instructions()">提交</button>
                     </div>
                 </div>
         </div>
@@ -183,12 +183,12 @@
     }
     //提交指令
     function Instructions() {
-        let points=document.getElementById("points").value.toString();
+        let pnt=document.getElementById("points").value.toString();
         let cmd=document.getElementById("instrInput").value.toString();
-        instructionCompiling.toggleObserver(points,cmd);
+        instructionCompiling.toggleObserver(pnt,cmd);
     }
     //增加、删除、清空示教点
-    function changePoints(type) {
+    function points(type) {
         let turnPoints;
         let si;
         switch (type){
