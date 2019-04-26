@@ -9760,10 +9760,10 @@ VILibrary.VI = {
             const _this = this;
             this.name = 'Instruction_1VI';
             let currentANG,targetANG;
-            if(robNumber=="yumiL"||robNumber=="yumiR"){
+            /*if(robNumber=="yumiL"||robNumber=="yumiR"){
                 var currentPOS;
-			}
-
+			}*/
+            let currentPOS;
             let targetANG2;//专为IRB360提供
             let pPos=[],qJoint=[];
             let instrIndex,
@@ -9794,6 +9794,7 @@ VILibrary.VI = {
                     currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
                     Range=[[-185,185],[-135,135],[-120,158],[-350,350],[-119,119],[-350,350]];
                     OMEGA=[128,102,128,260,245,322];
+                    currentPOS=[1317.22,0,1725,-Math.PI,Math.PI/3,-Math.PI];
 					break;
 				case "a910":
                     A=[0,0,200,250,0,0];
@@ -9803,6 +9804,7 @@ VILibrary.VI = {
                     currentANG=[0,0,0,0],targetANG=[0,0,0,0];
                     Range=[[-140,140],[-160,150],[-180*180/Math.PI,0],[-400,400]];
                     OMEGA=[415,659,1000*180/Math.PI,2400];
+                    currentPOS=[450,0,220,Math.PI,0,0];
                     break;
 				case "a360":
                     A=[0,0,0,0,0,0];
@@ -9811,15 +9813,19 @@ VILibrary.VI = {
                     THETA=[0,0,0,0,0,0];
                     currentANG=[0,0,0],targetANG=[0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
                     Range=[[-55,110],[-55,110],[-55,110]];
-                    OMEGA=[400,400,400];break;
+                    OMEGA=[400,400,400];
+                    currentPOS=[0,0,-972.5,0,0,Math.PI];
+                    break;
                 case "a360-1":
                     A=[0,0,0,0,0,0];
                     D=[0,0,0,0,0,0];//d[3]<=0;
                     ALPHA=[0,0,0,0,0,0];
                     THETA=[0,0,0,0,0,0];
-                    currentANG=[0,0,0],targetANG=[0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
-                    Range=[[-55,110],[-55,110],[-55,110]];
-                    OMEGA=[400,400,400];break;
+                    currentANG=[0,0,0,0],targetANG=[0,0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
+                    Range=[[-55,110],[-55,110],[-55,110],[-55,110]];
+                    OMEGA=[400,400,400,400];
+                    currentPOS=[0,0,-937.46,0,0,Math.PI];
+                    break;
                 case "epson":
                     A=[0,0,0,0,0,0];
                     D=[0,0,0,0,0,0];//d[3]<=0;
@@ -9828,7 +9834,8 @@ VILibrary.VI = {
                     // THETA=[92,80,227];
                     currentANG=[92,80,227],targetANG=[92,80,227];//theta,theta2,n0,n1,n2,x,y,z
                     Range=[[30,470],[55,500],[0,300]];
-                    OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];break;
+                    OMEGA=[1000*180/Math,1000*180/Math,1000*180/Math];
+                    currentPOS=[190.5,4.5,372,Math.PI/2,0,0];
                     break;
 				case 'yumiL':case 'yumiR':
 					A=[0,0,30,30,40.5,40.5,27,27,0];
@@ -9871,6 +9878,7 @@ VILibrary.VI = {
                 	currentANG=[0,0,0,0,Math.PI/6,0],targetANG=[0,0,0,0,Math.PI/6,0];
                 	Range=[[-165,165],[-110,110],[-90,70],[-160,160],[-120,120],[-400,400]];
                 	OMEGA=[250,250,250,420,590,600];
+                	currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
                 	let lasdjsikdj=1111;
             }
             const baseA=A.concat(),baseD=D.concat(),baseTHETA=THETA.concat();
@@ -10513,6 +10521,10 @@ VILibrary.VI = {
                                 A_add[len-1]+=34;
                                 D_add[len-1]+=115;
                                 break;
+                            case "a360":
+                                A_add[len-1]+=34;
+                                D_add[len-1]+=115;
+                                break;
 							case "k60":
                                 A_add[len-1]+=68;
                                 D_add[len-1]+=230;
@@ -10657,11 +10669,13 @@ VILibrary.VI = {
 				if(robNumber=='a360'||robNumber=='a360-1'){
                     // let R=200,r=45,L1=350,L2=800;
                     // let psi=[0,0,Math.PI/3*2,Math.PI/3*4];
-                    let R=200,r=45,L1=235,L2=800;
+                    let R,r,L1,L2;
 					switch (robNumber){
 						case 'a360':
+                            R=200,r=45,L1=235,L2=800;
 							break;
                         case 'a360-1':
+                            R=200,r=45,L2=800;
                         	L1=350;
                             break;
 					}
@@ -10696,7 +10710,7 @@ VILibrary.VI = {
 						OP=math.add(OG,math.add(GF,FP));
 					x=OP[0],y=OP[1],z=OP[2];
 					z-=274;
-					EulerX=3.1415926,EulerY=0,EulerZ=0;
+					EulerX=3.1415926,EulerY=0,EulerZ=-theta[4];
 					let EP=[],AC=[];
                     for(let i=1;i<=3;i++){
 						EP[i]=math.add(OP,math.multiply(-1,E[i]));
@@ -10882,15 +10896,12 @@ VILibrary.VI = {
 
             }
 
-            this.fk=function (i1) {
+           /* this.fk=function (i1) {
                 // targetANG=
                 let a=inverseKinematics(i1);
                 console.log(currentPOS)
-            }
-            //运动学反解
-            function inverseKinematics(input) {
-                let a=A.concat();a.shift();//a[i-1]
-                let d=D.concat();//d[i]
+            }*/
+            function pos2T(input) {
                 let x=input[0],
                     y=input[1],
                     z=input[2],
@@ -10900,8 +10911,18 @@ VILibrary.VI = {
                 let ca=Math.cos(alpha),sa=Math.sin(alpha),
                     cb=Math.cos(beta),sb=Math.sin(beta),
                     cy=Math.cos(gamma),sy=Math.sin(gamma);
+                let T=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
+                return T;
+            }
+            //运动学反解
+            function inverseKinematics(input) {
+                let a=A.concat();a.shift();//a[i-1]
+                let d=D.concat();//d[i]
                 let theta,resultAng=[];
-                let R=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
+                let x=input[0],
+                    y=input[1],
+                    z=input[2];
+                let R=pos2T(input);
                 if(robNumber=="a910"){
                 	let Tt=[[1,0,0,-a[a.length-1]],[0,1,0,0],[0,0,1,-d[d.length-1]],[0,0,0,1]];
                 	let T=math.multiply(R,Tt);
@@ -11589,12 +11610,26 @@ VILibrary.VI = {
                     rotat="1,0,0,"+TargetANG[i];
                     document.getElementById("Robot__link"+i+"_1").setAttribute('rotation',rotat);
                     //从动轴转角和旋转轴
-                    rotat=""+(TargetANG[(2+i)*3+1])+","+(TargetANG[(2+i)*3+2])+","+(TargetANG[(2+i)*3+0])+","+TargetANG[i+3];
+                    rotat=""+(TargetANG[(2+i)*3+2])+","+(TargetANG[(2+i)*3+3])+","+(TargetANG[(2+i)*3+1])+","+TargetANG[i+4];
                     document.getElementById("Robot__link"+(i)+"_2r").setAttribute('rotation',rotat);
                     document.getElementById("Robot__link"+(i)+"_2l").setAttribute('rotation',rotat);
                 }
-                let trans=(TargetANG[16]).toFixed(2)+","+TargetANG[17].toFixed(2)+","+(TargetANG[15]).toFixed(2);
+                //动平台移动
+                let trans=(TargetANG[17]).toFixed(2)+","+TargetANG[18].toFixed(2)+","+(TargetANG[16]).toFixed(2);
                 document.getElementById("Robot__plate").setAttribute('translation',trans);
+                //第四轴转动
+                rotat="0,1,0,"+TargetANG[3];
+                document.getElementById("Robot__facePlate").setAttribute('rotation',rotat);
+                //顶部万向节
+                document.getElementById("Robot__MUU").setAttribute('rotation',rotat);
+                //第四轴连杆倾斜
+				let x=-TargetANG[16],y=-TargetANG[17],z=-200-TargetANG[18]-29.5,l=Math.sqrt(x*x+y*y);
+				let theta=-Math.atan(l/z);
+				// let a=document.getElementById("Robot__ML").requestFieldRef('rotation');
+                let rot=document.getElementById("Robot__ML").getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+theta;
+                document.getElementById("Robot__ML").setAttribute('rotation',rot);
+                document.getElementById("Robot__MU").setAttribute('rotation',rot);
+
             }
         }
         static get cnName() {

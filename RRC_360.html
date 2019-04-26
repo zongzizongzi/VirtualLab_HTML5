@@ -58,6 +58,9 @@
                         <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
                             <input id="angInput2" type="range" max="70" min="-70" value="0" step="0.01" onchange="changeAng(2)">
                         </p>
+                        <p>Ang_4：<input id="angTxt3"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(3)">
+                            <input id="angInput3" type="range" max="70" min="-70" value="0" step="0.01" onchange="changeAng(3)">
+                        </p>
                     </div>
                     <div class="columnFlex-div">
                         <p id="tool" style="padding-top: 4px">Tool :
@@ -182,7 +185,7 @@
     function changeAng(input) {
         let currentAng=[0,0,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
-        for(let i=0;i<3;i++){
+        for(let i=0;i<4;i++){
             currentAng[i]=document.getElementById("angInput"+i).value/180*Math.PI;
         }
         instructionCompiling.moveJ(currentAng,500);
@@ -249,7 +252,7 @@
                 break;
             case 3:/*添加关节型示教点*/
                 let q=[];
-                for(let i=0;i<3;i++){q[i]=parseFloat(document.getElementById("angTxt"+i).value);}
+                for(let i=0;i<4 ;i++){q[i]=parseFloat(document.getElementById("angTxt"+i).value);}
                 si="q"+(s.length-indexI)+":["+q[0]+"°," +q[1]+"°," +q[2]+"°," +q[3]+"°," +q[4]+"°,"+q[5]+"°];\n";
                 s.push(si);
                 /*----------------点集增加点的坐标-------------------*/
