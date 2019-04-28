@@ -50,23 +50,23 @@
                 <div class="rowFlex-div flex_items">
                     <div class="columnFlex-div">
                         <p >Ang_1：<input id="angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0)">
-                            <input id="angInput0" type="range" max="165" min="-165" value="0" step="0.01" onchange="changeAng(0)">
+                            <input id="angInput0" type="range" max="110" min="-50" value="0" step="0.01" onchange="changeAng(0)">
                         </p>
                         <p>Ang_2：<input id="angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1)">
-                            <input  id="angInput1" type="range" max="110" min="-110" value="0" step="0.01" onchange="changeAng(1)">
+                            <input  id="angInput1" type="range" max="110" min="-50" value="0" step="0.01" onchange="changeAng(1)">
                         </p>
                         <p>Ang_3：<input id="angTxt2"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(2)">
-                            <input id="angInput2" type="range" max="70" min="-70" value="0" step="0.01" onchange="changeAng(2)">
+                            <input id="angInput2" type="range" max="110" min="-50" value="0" step="0.01" onchange="changeAng(2)">
                         </p>
                         <p>Ang_4：<input id="angTxt3"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(3)">
-                            <input id="angInput3" type="range" max="70" min="-70" value="0" step="0.01" onchange="changeAng(3)">
+                            <input id="angInput3" type="range" max="110" min="-110" value="0" step="0.01" onchange="changeAng(3)">
                         </p>
                     </div>
                     <div class="columnFlex-div">
                         <p id="tool" style="padding-top: 4px">Tool :
                             <select onchange="instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="toolSelect" style="width:70px;font-size: 15px" >
                                 <option value="0">tool0</option>
-                                <option value="2">qijia</option>
+                                <option value="1">jiaju</option>
                             </select>
                         </p>
                         <p>Digital Output : <button id="setDO" type="button" style="width: 20px" onclick="instructionCompiling.setIO(!parseInt(this.innerText))" >0</button></p>

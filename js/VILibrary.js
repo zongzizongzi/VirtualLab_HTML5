@@ -9821,8 +9821,8 @@ VILibrary.VI = {
                     D=[0,0,0,0,0,0];//d[3]<=0;
                     ALPHA=[0,0,0,0,0,0];
                     THETA=[0,0,0,0,0,0];
-                    currentANG=[0,0,0,0],targetANG=[0,0,0,0],targetANG2=[0,0,0,2.0800204983301263,2.0800204983301263,2.0800204983301263,0,1,0,0,1,0,0,1,0,0,0,-972.5];//theta,theta2,n0,n1,n2,x,y,z
-                    Range=[[-55,110],[-55,110],[-55,110],[-55,110]];
+                    currentANG=[0,0,0,0],targetANG=[0,0,0,0],targetANG2=[0,0,0,0,2.2539601816,2.2539601816,2.2539601816,0,1,0,0,1,0,0,1,0,0,0,-894.46];//theta,theta2,n0,n1,n2,x,y,z
+                    Range=[[-55,110],[-55,110],[-55,110],[-110,110]];
                     OMEGA=[400,400,400,400];
                     currentPOS=[0,0,-937.46,0,0,Math.PI];
                     break;
@@ -10005,7 +10005,6 @@ VILibrary.VI = {
                 });
                 executiveFlag=false;
             }
-
 
             //指令解析
             this.instrCompiling=function() {
@@ -10282,7 +10281,7 @@ VILibrary.VI = {
 					if(tAng==0){
 						window.clearInterval(_this.timer);
                         _this.timer=null;
-						alert("超出工作空间或靠近奇异点！");
+						alert("超出工作空间或靠近奇异点！ ");
                         moveType='';executiveFlag=false;instrSplit=[];
 						return;
 					}
@@ -10524,6 +10523,14 @@ VILibrary.VI = {
                             case "a360":
                                 A_add[len-1]+=34;
                                 D_add[len-1]+=115;
+                                THETA_add[len - 1] = Math.PI/2;
+                                THETA_add[len - 2] = -Math.PI/2;
+                                break;
+                            case "a360-1":
+                                A_add[len-1]+=34;
+                                D_add[len-1]+=115;
+                                THETA_add[len - 1] = Math.PI/2;
+                                THETA_add[len - 2] = -Math.PI/2;
                                 break;
 							case "k60":
                                 A_add[len-1]+=68;
@@ -10658,6 +10665,8 @@ VILibrary.VI = {
                 ]
                 return c;
             }
+
+
             //运动学正解
             function kinematicsEquation(input,flag)  {//第二个参数指定是否仅用于计算
                 let theta = input.concat();
@@ -10710,7 +10719,8 @@ VILibrary.VI = {
 						OP=math.add(OG,math.add(GF,FP));
 					x=OP[0],y=OP[1],z=OP[2];
 					z-=274;
-					EulerX=3.1415926,EulerY=0,EulerZ=-theta[4];
+                    let len=THETA.length;
+					EulerX=3.1415926,EulerY=0,EulerZ=-math.add(theta[4],THETA[len-2]);//EulerZ?????
 					let EP=[],AC=[];
                     for(let i=1;i<=3;i++){
 						EP[i]=math.add(OP,math.multiply(-1,E[i]));
@@ -10737,10 +10747,42 @@ VILibrary.VI = {
 						// console.log(norm(math.add(OP,math.multiply(-1,OP1)))<0.05);
                     }
                     targetANG2=targetANG.concat(theta2,n[0],n[1],n[2],[x,y,z]);
-                    if(ToolFlag){
+                    /*if(ToolFlag){
                         z-=115;
                         y+=34;
-                    }
+                    }*/
+                    if(ToolFlag){
+                        let alpha=ALPHA.concat();
+                        let a=A.concat();
+                        let d=D.concat();
+                        let theta3;
+                        if(theta[4])theta3=math.add(theta[4],THETA[len-1]);//实际角度→计算角度
+                        else theta3=THETA[len-1];
+                        // theta3=theta[4];
+                    	let T1=pos2T([x,y,z,EulerX,EulerY,EulerZ]);
+                    	let Ttool=[
+                            [math.cos(theta3),
+                                -math.sin(theta3),
+                                0,
+                                a[5]
+                            ],
+                            [math.sin(theta3)*math.cos(alpha[5]),
+                                math.cos(theta3)*math.cos(alpha[5]),
+                                -math.sin(alpha[5]),
+                                -d[5]*math.sin(alpha[5])
+                            ],
+                            [
+                                math.sin(theta3)*math.sin(alpha[5]),
+                                math.cos(theta3)*math.sin(alpha[5]),
+                                math.cos(alpha[5]),
+                                d[5]*math.cos(alpha[5])
+                            ],
+                            [0,0,0,1]
+                        ]
+						let T=math.multiply(T1,Ttool);
+                    	let pos=T2pos(T);
+                        x=pos[0];y=pos[1];z=pos[2],EulerX=pos[3],EulerY=pos[4],EulerZ=pos[5];
+					}
 				}
                 //串联型
                 else if (robNumber=="epson"){
@@ -10804,26 +10846,13 @@ VILibrary.VI = {
                         T=math.multiply(T,t[i])
                     }
                     // }
-                    x=T[0][3];y=T[1][3];z=T[2][3];
                     for(let i=0;i<=3;i++){
                         for(let j=0;j<=3;j++){
                             T[i][j]= parseFloat((T[i][j]).toFixed(4));
                         }
                     }
-                    //ZYX顺序
-                    let cosBeta=Math.sqrt(Math.pow((T[0][0]),2)+Math.pow(T[1][0],2));
-                    //计算三个欧拉角
-                    if(cosBeta!=0){
-                        EulerY=Math.atan2(-T[2][0],cosBeta);
-                        if(EulerY>Math.PI/2||EulerY<-Math.PI/2){cosBeta=-cosBeta;EulerY=Math.atan2(-T[2][0],cosBeta);}
-                        EulerZ=Math.atan2(T[1][0],T[0][0]);
-                        EulerX=Math.atan2(T[2][1],T[2][2]);
-                    }
-                    else{
-                        EulerY=Math.PI/2;
-                        EulerZ=0;
-                        EulerX=Math.atan2(T[0][1],T[1][1]);
-                    }
+                    let pos=T2pos(T);
+                    x=pos[0];y=pos[1];z=pos[2],EulerX=pos[3],EulerY=pos[4],EulerZ=pos[5];
 				}
                 
                 if(flag){
@@ -10901,19 +10930,7 @@ VILibrary.VI = {
                 let a=inverseKinematics(i1);
                 console.log(currentPOS)
             }*/
-            function pos2T(input) {
-                let x=input[0],
-                    y=input[1],
-                    z=input[2],
-                    gamma=input[3],
-                    beta=input[4],
-                    alpha=input[5];
-                let ca=Math.cos(alpha),sa=Math.sin(alpha),
-                    cb=Math.cos(beta),sb=Math.sin(beta),
-                    cy=Math.cos(gamma),sy=Math.sin(gamma);
-                let T=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
-                return T;
-            }
+            
             //运动学反解
             function inverseKinematics(input) {
                 let a=A.concat();a.shift();//a[i-1]
@@ -11152,6 +11169,19 @@ VILibrary.VI = {
                         let minAng=resultAng[runTime.indexOf(minTime)];
                         return minAng;
                 }
+            }
+            function pos2T(input) {
+                let x=input[0],
+                    y=input[1],
+                    z=input[2],
+                    gamma=input[3],
+                    beta=input[4],
+                    alpha=input[5];
+                let ca=Math.cos(alpha),sa=Math.sin(alpha),
+                    cb=Math.cos(beta),sb=Math.sin(beta),
+                    cy=Math.cos(gamma),sy=Math.sin(gamma);
+                let T=[[ca*cb,ca*sb*sy-sa*cy,ca*sb*cy+sa*sy,x],[sa*cb,sa*sb*sy+ca*cy,sa*sb*cy-ca*sy,y],[-sb,cb*sy,cb*cy,z],[0,0,0,1]];
+                return T;
             }
             function T2pos(T) {
                 let cosBeta=Math.sqrt(Math.pow((T[0][0]),2)+Math.pow(T[1][0],2));

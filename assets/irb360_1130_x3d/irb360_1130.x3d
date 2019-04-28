@@ -70,12 +70,12 @@
                     </transform>
                 </transform>
                 <transform DEF="plate" translation="0,-894.46,0">
-                    <inline url="plate.x3d" DEF="lastLink"></inline>
+                    <inline url="plate.x3d" ></inline>
                     <Transform  DEF="ML" translation="0 29.5 0" rotation="0.55,0,0.835,0" >
                         <inline url="ML.x3d"></inline>
                     </Transform>
                     <transform DEF="facePlate">
-                        <inline url="facePlate.x3d"></inline>
+                        <inline url="facePlate.x3d" DEF="lastLink"></inline>
                     </transform>
                 </transform>
                 <Transform DEF="MUU" rotation="">
