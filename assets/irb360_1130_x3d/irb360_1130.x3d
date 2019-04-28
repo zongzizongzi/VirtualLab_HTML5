@@ -71,20 +71,19 @@
                 </transform>
                 <transform DEF="plate" translation="0,-894.46,0">
                     <inline url="plate.x3d" DEF="lastLink"></inline>
+                    <Transform  DEF="ML" translation="0 29.5 0" rotation="0.55,0,0.835,0" >
+                        <inline url="ML.x3d"></inline>
+                    </Transform>
                     <transform DEF="facePlate">
                         <inline url="facePlate.x3d"></inline>
-                        <Transform  DEF="ML" translation="0 29.5 0" rotation="0.55,0,0.835,0" >
-                            <inline url="ML.x3d"></inline>
-                        </Transform>
                     </transform>
                 </transform>
                 <Transform DEF="MUU" rotation="">
                     <inline url="MUU.x3d"></inline>
-                    <Transform  DEF="MU" translation="0 -199 0" rotation="0.835,0,0.55,0" >
-                        <inline url="MU.x3d" DEF="lastLink"></inline>
-                    </Transform>
                 </Transform>
-
+                <Transform  DEF="MU" translation="0 -199 0" rotation="0.835,0,0.55,0" >
+                    <inline url="MU.x3d" DEF="lastLink"></inline>
+                </Transform>
             </Transform>
         </transform>
     </scene>

@@ -11615,7 +11615,7 @@ VILibrary.VI = {
                     document.getElementById("Robot__link"+(i)+"_2l").setAttribute('rotation',rotat);
                 }
                 //动平台移动
-                let trans=(TargetANG[17]).toFixed(2)+","+TargetANG[18].toFixed(2)+","+(TargetANG[16]).toFixed(2);
+                let trans=(TargetANG[17]).toFixed(2)+","+TargetANG[18].toFixed(2)+","+(TargetANG[16]).toFixed(2);//X3D场景中xyz对应计算场景中yzx
                 document.getElementById("Robot__plate").setAttribute('translation',trans);
                 //第四轴转动
                 rotat="0,1,0,"+TargetANG[3];
@@ -11623,12 +11623,49 @@ VILibrary.VI = {
                 //顶部万向节
                 document.getElementById("Robot__MUU").setAttribute('rotation',rotat);
                 //第四轴连杆倾斜
-				let x=-TargetANG[16],y=-TargetANG[17],z=-200-TargetANG[18]-29.5,l=Math.sqrt(x*x+y*y);
+                let x=-TargetANG[16],y=-TargetANG[17],z=-200-TargetANG[18]-29.5;
+                let A=[0,1,0],B=[y,z,x];//A为ML竖直状态向量，B为倾斜状态向量，X3D场景中xyz对应计算场景中yzx
+                let K=math.cross(A,B),k=math.multiply(K,1/math.norm(K)),kx=k[0],ky=k[1],kz=k[2];//动平台移动导致的旋转轴
+                let theta=Math.acos(math.dot(A,B)/(math.norm(A)*math.norm(B)));//动平台移动导致的旋转角
+				console.log(kx,ky,kz,theta);
+                //若第四轴不为0，ML需要绕向量B旋转
+				if(TargetANG[3]){
+					/*将连杆倾斜的轴角转换为R*/
+                    let s0=Math.sin(theta),c0=Math.cos(theta),vers0=1-c0;
+                    let R1=[
+                        [kx*kx*vers0+c0,ky*kx*vers0-kz*s0,kz*kx*vers0+ky*s0],
+                        [ky*kx*vers0+kz*s0,ky*ky*vers0+c0,kz*ky*vers0-kx*s0],
+                        [kx*kz*vers0-ky*s0,ky*kz*vers0+kx*s0,kz*kz*vers0+c0],
+                    ];
+					/*将连杆绕自身轴B转动的轴角转换为R*/
+                    k=math.multiply(B,1/math.norm(B));
+                    kx=k[0],ky=k[1],kz=k[2];
+                    s0=Math.sin(TargetANG[3]),c0=Math.cos(TargetANG[3]),vers0=1-c0;
+                    let R2=[
+                        [kx*kx*vers0+c0,ky*kx*vers0-kz*s0,kz*kx*vers0+ky*s0],
+                        [ky*kx*vers0+kz*s0,ky*ky*vers0+c0,kz*ky*vers0-kx*s0],
+                        [kx*kz*vers0-ky*s0,ky*kz*vers0+kx*s0,kz*kz*vers0+c0],
+                    ];
+                    let R=math.multiply(R2,R1);
+                    // let R=R1;
+                    /*将复合转动的R转换为轴角*/
+                    let nx=R[0][0],ox=R[0][1],ax=R[0][2],
+                        ny=R[1][0],oy=R[1][1],ay=R[1][2],
+                        nz=R[2][0],oz=R[2][1],az=R[2][2];
+                    theta=Math.acos(0.5*(nx+oy+az-1));
+                    kx=(oz-ay)/(2*Math.sin(theta));
+                    ky=(ax-nz)/(2*Math.sin(theta));
+                    kz=(ny-ox)/(2*Math.sin(theta));
+				}
+                console.log(kx,ky,kz,theta);
+                rotat=''+kx+","+ky+","+kz+","+theta;
+/*				let x=-TargetANG[16],y=-TargetANG[17],z=-200-TargetANG[18]-29.5,l=Math.sqrt(x*x+y*y);
 				let theta=-Math.atan(l/z);
 				// let a=document.getElementById("Robot__ML").requestFieldRef('rotation');
-                let rot=document.getElementById("Robot__ML").getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+theta;
-                document.getElementById("Robot__ML").setAttribute('rotation',rot);
-                document.getElementById("Robot__MU").setAttribute('rotation',rot);
+                let rot=document.getElementById("Robot__ML").getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+theta;*/
+                document.getElementById("Robot__ML").setAttribute('rotation',rotat);
+                document.getElementById("Robot__MU").setAttribute('rotation',rotat);
+
 
             }
         }
