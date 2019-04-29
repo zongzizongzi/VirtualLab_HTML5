@@ -39,23 +39,23 @@
                 <p >Ang_1：<input id="R_angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0,'R')">
                     <input id="R_angInput0" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(0,'R')">
                 </p>
-                <p>Ang_2：<input id="R_angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1,'R')">
-                    <input  id="R_angInput1" type="range" max="43.5" min="-143.5" value="0" step="0.5" onchange="changeAng(1,'R')">
+                <p>Ang_2：<input id="R_angTxt1" type="text" value="-130" style="width: 50px" onchange="changeAngTxt(1,'R')">
+                    <input  id="R_angInput1" type="range" max="43.5" min="-143.5" value="-130" step="0.5" onchange="changeAng(1,'R')">
                 </p>
-                <p>Ang_3：<input id="R_angTxt3"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(3,'R')">
-                    <input id="R_angInput3" type="range"   max="80" min="-123.5" value="0" step="0.5" onchange="changeAng(3,'R')">
+                <p>Ang_3：<input id="R_angTxt3"  type="text"value="30" style="width: 50px"onchange="changeAngTxt(3,'R')">
+                    <input id="R_angInput3" type="range"   max="80" min="-123.5" value="30" step="0.5" onchange="changeAng(3,'R')">
                 </p>
                 <p>Ang_4：<input id="R_angTxt4"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(4,'R')">
                     <input id="R_angInput4" type="range"  max="290" min="-290" value="0" step="0.5" onchange="changeAng(4,'R')">
                 </p>
-                <p>Ang_5：<input id="R_angTxt5"  type="text"value="0" style="width: 50px" onchange="changeAngTxt(5,'R')">
-                    <input id="R_angInput5" type="range" max="138" min="-88" value="0" step="0.5" onchange="changeAng(5,'R')">
+                <p>Ang_5：<input id="R_angTxt5"  type="text"value="40" style="width: 50px" onchange="changeAngTxt(5,'R')">
+                    <input id="R_angInput5" type="range" max="138" min="-88" value="40" step="0.5" onchange="changeAng(5,'R')">
                 </p>
                 <p>Ang_6：<input id="R_angTxt6"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(6,'R')">
                     <input id="R_angInput6" type="range" max="229" min="-229" value="0" step="0.5" onchange="changeAng(6,'R')">
                 </p>
-                <p>Ang_7：<input id="R_angTxt2"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(2,'R')">
-                    <input id="R_angInput2" type="range"  max="168.5" min="-168.5"value="0" step="0.5" onchange="changeAng(2,'R')">
+                <p>Ang_7：<input id="R_angTxt2"  type="text" value="-135" style="width: 50px" onchange="changeAngTxt(2,'R')">
+                    <input id="R_angInput2" type="range"  max="168.5" min="-168.5"value="-135" step="0.5" onchange="changeAng(2,'R')">
                 </p>
                 <p id="R_tool" style="padding-top: 4px">Tool :
                     <select onchange="R_instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="R_toolSelect" style="width:70px;font-size: 15px" >
@@ -68,15 +68,15 @@
             <div class="message_div" id="R_resultDiv" onchange="changePos('R')">
                 <div style="width: 50%;display: inline;float: left">
                     <p>末端坐标：</p><br>
-                    <p>P_X：<input id="R_posX" type="text" value="567.8" class="robotPA"></p>
-                    <p>P_Y：<input id="R_posY" type="text" value="4.73" class="robotPA"></p>
-                    <p>P_Z：<input id="R_posZ" type="text" value="415.13" class="robotPA"></p>
+                    <p>P_X：<input id="R_posX" type="text" value="-9.58" class="robotPA"></p>
+                    <p>P_Y：<input id="R_posY" type="text" value="-182.61" class="robotPA"></p>
+                    <p>P_Z：<input id="R_posZ" type="text" value="198.63" class="robotPA"></p>
                 </div>
                 <div style="width: 50%;display: inline;">
                     <p>末端姿态：</p><br>
-                    <p>E_Z：<input id="R_eulerZ" type="text" value="-157.2" class="robotPA">°</p>
-                    <p>E_Y：<input id="R_eulerY" type="text" value="28.03" class="robotPA">°</p>
-                    <p>E_X：<input id="R_eulerX" type="text" value="-127.63" class="robotPA">°</p>
+                    <p>E_Z：<input id="R_eulerZ" type="text" value="15.45" class="robotPA">°</p>
+                    <p>E_Y：<input id="R_eulerY" type="text" value="-63.63" class="robotPA">°</p>
+                    <p>E_X：<input id="R_eulerX" type="text" value="179.34" class="robotPA">°</p>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
@@ -109,23 +109,23 @@
                 <p >Ang_1：<input id="L_angTxt0" type="text"  value="0" style="width: 50px" onchange="changeAngTxt(0,'L')">
                     <input id="L_angInput0" type="range" max="168.5" min="-168.5" value="0" step="0.5" onchange="changeAng(0,'L')">
                 </p>
-                <p>Ang_2：<input id="L_angTxt1" type="text" value="0" style="width: 50px" onchange="changeAngTxt(1,'L')">
-                    <input  id="L_angInput1" type="range" max="43.5" min="-143.5" value="0" step="0.5" onchange="changeAng(1,'L')">
+                <p>Ang_2：<input id="L_angTxt1" type="text" value="-130" style="width: 50px" onchange="changeAngTxt(1,'L')">
+                    <input  id="L_angInput1" type="range" max="43.5" min="-143.5" value="-130" step="0.5" onchange="changeAng(1,'L')">
                 </p>
-                <p>Ang_3：<input id="L_angTxt3"  type="text"value="0" style="width: 50px"onchange="changeAngTxt(3,'L')">
-                    <input id="L_angInput3" type="range"   max="80" min="-123.5" value="0" step="0.5" onchange="changeAng(3,'L')">
+                <p>Ang_3：<input id="L_angTxt3"  type="text"value="30" style="width: 50px"onchange="changeAngTxt(3,'L')">
+                    <input id="L_angInput3" type="range"   max="80" min="-123.5" value="30" step="0.5" onchange="changeAng(3,'L')">
                 </p>
                 <p>Ang_4：<input id="L_angTxt4"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(4,'L')">
                     <input id="L_angInput4" type="range"  max="290" min="-290" value="0" step="0.5" onchange="changeAng(4,'L')">
                 </p>
-                <p>Ang_5：<input id="L_angTxt5"  type="text"value="0" style="width: 50px" onchange="changeAngTxt(5,'L')">
-                    <input id="L_angInput5" type="range" max="138" min="-88" value="0" step="0.5" onchange="changeAng(5,'L')">
+                <p>Ang_5：<input id="L_angTxt5"  type="text"value="40" style="width: 50px" onchange="changeAngTxt(5,'L')">
+                    <input id="L_angInput5" type="range" max="138" min="-88" value="40" step="0.5" onchange="changeAng(5,'L')">
                 </p>
                 <p>Ang_6：<input id="L_angTxt6"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(6,'L')">
                     <input id="L_angInput6" type="range" max="229" min="-229" value="0" step="0.5" onchange="changeAng(6,'L')">
                 </p>
-                <p>Ang_7：<input id="L_angTxt2"  type="text" value="0" style="width: 50px" onchange="changeAngTxt(2,'L')">
-                    <input id="L_angInput2" type="range"  max="168.5" min="-168.5"value="0" step="0.5" onchange="changeAng(2,'L')">
+                <p>Ang_7：<input id="L_angTxt2"  type="text" value="135" style="width: 50px" onchange="changeAngTxt(2,'L')">
+                    <input id="L_angInput2" type="range"  max="168.5" min="-168.5"value="135" step="0.5" onchange="changeAng(2,'L')">
                 </p>
                 <p id="L_tool" style="padding-top: 4px">Tool :
                     <select onchange="L_instructionCompiling.changeTool(parseInt(this.options[this.selectedIndex].value))" id="L_toolSelect" style="width:70px;font-size: 15px" >
@@ -138,15 +138,15 @@
             <div class="message_div" id="L_resultDiv" onchange="changePos('L')">
                 <div style="width: 50%;display: inline;float: left">
                     <p>末端坐标：</p><br>
-                    <p>P_X：<input id="L_posX" type="text" value="567.8" class="robotPA"></p>
-                    <p>P_Y：<input id="L_posY" type="text" value="-4.73" class="robotPA"></p>
-                    <p>P_Z：<input id="L_posZ" type="text" value="415.13" class="robotPA"></p>
+                    <p>P_X：<input id="L_posX" type="text" value="-9.58" class="robotPA"></p>
+                    <p>P_Y：<input id="L_posY" type="text" value="182.61" class="robotPA"></p>
+                    <p>P_Z：<input id="L_posZ" type="text" value="198.63" class="robotPA"></p>
                 </div>
                 <div style="width: 50%;display: inline;">
                     <p>末端姿态：</p><br>
-                    <p>E_Z：<input id="L_eulerZ" type="text" value="-157.2" class="robotPA">°</p>
-                    <p>E_Y：<input id="L_eulerY" type="text" value="28.03" class="robotPA">°</p>
-                    <p>E_X：<input id="L_eulerX" type="text" value="-127.63" class="robotPA">°</p>
+                    <p>E_Z：<input id="L_eulerZ" type="text" value="-15.45" class="robotPA">°</p>
+                    <p>E_Y：<input id="L_eulerY" type="text" value="-63.63" class="robotPA">°</p>
+                    <p>E_X：<input id="L_eulerX" type="text" value="-179.34" class="robotPA">°</p>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">

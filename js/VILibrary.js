@@ -9843,10 +9843,8 @@ VILibrary.VI = {
                     ALPHA=[0,0,-Math.PI/2,-Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,Math.PI/2,0];
                     THETA=[0,Math.PI,Math.PI,0,Math.PI/2,Math.PI,Math.PI,Math.PI,0];
                     // THETA=[0,0,Math.PI,0,Math.PI/2,Math.PI,Math.PI,0,-Math.PI/2];
-                    currentANG=[0,0,0,0,0,0,0];
                     Range=[[-168.5,168.5],[-143.5,43.5],[-168.5,168.5],[-123.5,80],[-290,290],[-88,138],[-229,229]];
                     OMEGA=[180,180,180,180,400,400,400];
-                    targetANG=[0,0,0,0,0,0,0];
                     if(robNumber=='yumiL') {
                         T_BASE=[
                             [0.5714,0.1066,0.8138,51.11],
@@ -9854,7 +9852,9 @@ VILibrary.VI = {
                             [-0.5389,-0.6991,0.4699,413.51],
                             [0,0,0,1]
                         ];
-                        currentPOS=[567.86, -4.75, 415.18, -2.22756, 0.4892, -2.743832]
+                        currentPOS=[-9.58, 182.61, 198.63,  -3.13005, -1.11061,-0.26968];
+                        currentANG=[0,2.26893,2.35619,-0.5236,0,-0.69813,0];
+                        targetANG=[0,2.26893,2.35619,-0.5236,0,-0.69813,0];
                         Pre='L_';
                         Suf='_L'
 					}
@@ -9865,7 +9865,9 @@ VILibrary.VI = {
                             [-0.5389,0.6992,0.4698,413.5100],
 							[0,0,0,1.0000]
 						];
-                        currentPOS=[567.86,4.71,415.14,2.2274,0.4890,2.74366]
+                        currentPOS=[-9.58, -182.61, 198.63, 3.13005 , -1.11061,0.26968];
+                        currentANG=[0,2.26893,-2.35619,-0.5236,0,-0.69813,0];
+                        targetANG=[0,2.26893,-2.35619,-0.5236,0,-0.69813,0];
                         Pre="R_";
                         Suf="_R"
 					}
@@ -10985,6 +10987,7 @@ VILibrary.VI = {
                 }
                 else if(robNumber=='a360'||robNumber=='a360-1'){
                     z=z+274;
+                    let alpha=ALPHA.concat();
                     if(ToolFlag){
                        /* z+=115;
                         y-=34;*/
@@ -11867,9 +11870,11 @@ VILibrary.VI = {
 					case "yumiL":
 						Suf='L';
                         jiajuTrans="36,0,0";
+                        boxTrans='300,20,-300'
 						break;
                     case "yumiR":
                         Suf='R';
+                        boxTrans='300,20,300'
                         jiajuTrans="36,0,0";
                         break;
 					case "a120":default:break;
@@ -11924,6 +11929,10 @@ VILibrary.VI = {
                     "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
                     "<box size="+boxSize+"></box>" +
                     "</shape></transform>";
+                var box1="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box1' render='false'><shape>" +
+                    "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
+                    "<box size="+boxSize+"></box>" +
+                    "</shape></transform>";
                 var gongjian1="<transform DEF='gongjian1' translation="+gongjianTrans1+" nameSpaceName id='Robot__gongjian1' render='true'>" +
                     "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
                     "</transform>";
@@ -11942,10 +11951,11 @@ VILibrary.VI = {
                 var gongjian6="<transform DEF='gongjian6' translation="+gongjianTrans6+" nameSpaceName id='Robot__gongjian6' render='true'>" +
                     "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
                     "</transform>";
-                var huaban="<transform DEF='huaban' translation='320,150,-400' rotation='0,1,0,-0.785' nameSpaceName id='Robot__huaban' render='true'>" +
+                var huaban="<transform DEF='huaban' translation='320,150,-400' rotation='0,1,0,-0.785' nameSpaceName id='Robot__huaban' render='false'>" +
                     "<inline url='../TOOLS/huaban.x3d'></inline>" +
                     "</transform>";
-                $("#Robot__platform").after(box);
+                if(robNum=="yumiR")$("#Robot__platform").after(box1);
+                else $("#Robot__platform").after(box);
                 $("#Robot__platform").after(gongjian1);
                 $("#Robot__platform").after(gongjian2);
                 $("#Robot__platform").after(gongjian3);
@@ -12010,7 +12020,8 @@ VILibrary.VI = {
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     case 4:
-                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        // if(robNum=="yumiR") document.getElementById("Robot__box1").setAttribute("render", 'true');
+                        // else document.getElementById("Robot__box").setAttribute("render", 'true');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }

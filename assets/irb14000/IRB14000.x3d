@@ -83,15 +83,15 @@
                 <transform DEF="arm_left" translation="71.48,413.51,51.11" rotation="0.0736,-0.8211,-0.5659,2.2495">
                     <transform DEF="link0_L"   rotation="0,1,0,0">
                         <inline url="L1.x3d"> </inline>
-                        <transform DEF="link1_L"  translation="-30,103.2,0" rotation="0,0,1,0">
+                        <transform DEF="link1_L"  translation="-30,103.2,0" rotation="0,0,1,2.2689">
                             <inline url="L2.x3d"> </inline>
-                            <transform DEF="link2_L"  translation="30,0,0" rotation="0,1,0,0">
+                            <transform DEF="link2_L"  translation="30,0,0" rotation="0,1,0,2.35619">
                                 <inline url="L3.x3d"> </inline>
-                                <transform DEF="link3_L"  translation="40.5,251.5,0" rotation="0,0,1,0">
+                                <transform DEF="link3_L"  translation="40.5,251.5,0" rotation="0,0,1,-0.5236">
                                     <inline url="L4.x3d"> </inline>
                                     <transform DEF="link4_L"  translation="0,40.5,0" rotation="1,0,0,0">
                                         <inline url="L5.x3d"> </inline>
-                                        <transform DEF="link5_L"  translation="265,-27,0" rotation="0,0,1,0">
+                                        <transform DEF="link5_L"  translation="265,-27,0" rotation="0,0,1,-0.69813">
                                             <inline url="L6.x3d"> </inline>
                                             <transform DEF="link6_L"  translation="0,27,0" rotation="1,0,0,0">
                                                 <inline url="L7.x3d" DEF="lastLinkL"> </inline>
@@ -107,15 +107,15 @@
                 <transform DEF="arm_right" translation="-71.48,413.51,51.11" rotation="0.7601,-0.6422,-0.0989,1.4730">
                     <transform DEF="link0_R"   rotation="0,1,0,0">
                         <inline url="L1.x3d"> </inline>
-                        <transform DEF="link1_R"  translation="-30,103.2,0" rotation="0,0,1,0">
+                        <transform DEF="link1_R"  translation="-30,103.2,0" rotation="0,0,1,2.26893">
                             <inline url="L2.x3d"> </inline>
-                            <transform DEF="link2_R"  translation="30,0,0" rotation="0,1,0,0">
+                            <transform DEF="link2_R"  translation="30,0,0" rotation="0,1,0,-2.35619">
                                 <inline url="L3.x3d"> </inline>
-                                <transform DEF="link3_R"  translation="40.5,251.5,0" rotation="0,0,1,0">
+                                <transform DEF="link3_R"  translation="40.5,251.5,0" rotation="0,0,1,-0.5236">
                                     <inline url="L4.x3d"> </inline>
                                     <transform DEF="link4_R"  translation="0,40.5,0" rotation="1,0,0,0">
                                         <inline url="L5.x3d"> </inline>
-                                        <transform DEF="link5_R"  translation="265,-27,0" rotation="0,0,1,0">
+                                        <transform DEF="link5_R"  translation="265,-27,0" rotation="0,0,1,-0.69813">
                                             <inline url="L6.x3d"> </inline>
                                             <transform DEF="link6_R"  translation="0,27,0" rotation="1,0,0,0">
                                                 <inline url="L7.x3d" DEF="lastLinkR"> </inline>
