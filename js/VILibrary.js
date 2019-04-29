@@ -10755,9 +10755,9 @@ VILibrary.VI = {
                         let alpha=ALPHA.concat();
                         let a=A.concat();
                         let d=D.concat();
-                        let theta3;
-                        if(theta[4])theta3=math.add(theta[4],THETA[len-1]);//实际角度→计算角度
-                        else theta3=THETA[len-1];
+                        let theta3=THETA[len-1];
+                        /*if(theta[4])theta3=math.add(theta[4],THETA[len-1]);//实际角度→计算角度
+                        elsetheta3=THETA[len-1];*/
                         // theta3=theta[4];
                     	let T1=pos2T([x,y,z,EulerX,EulerY,EulerZ]);
                     	let Ttool=[
@@ -10924,13 +10924,11 @@ VILibrary.VI = {
 				}
 
             }
-
            /* this.fk=function (i1) {
                 // targetANG=
                 let a=inverseKinematics(i1);
                 console.log(currentPOS)
             }*/
-            
             //运动学反解
             function inverseKinematics(input) {
                 let a=A.concat();a.shift();//a[i-1]
@@ -10938,7 +10936,10 @@ VILibrary.VI = {
                 let theta,resultAng=[];
                 let x=input[0],
                     y=input[1],
-                    z=input[2];
+                    z=input[2],
+                    EulerX=input[3],
+                    EulerY=input[4],
+                    EulerZ=input[5];
                 let R=pos2T(input);
                 if(robNumber=="a910"){
                 	let Tt=[[1,0,0,-a[a.length-1]],[0,1,0,0],[0,0,1,-d[d.length-1]],[0,0,0,1]];
@@ -10983,11 +10984,40 @@ VILibrary.VI = {
                     }
                 }
                 else if(robNumber=='a360'||robNumber=='a360-1'){
+                    z=z+274;
                     if(ToolFlag){
-                        z+=115;
-                        y-=34;
+                       /* z+=115;
+                        y-=34;*/
+                        a.unshift(0);
+                        let len=THETA.length;
+                        let theta3=THETA[len-1];
+                        let T=pos2T([x,y,z,EulerX,EulerY,EulerZ]);
+                        let Ttool=[
+                            [math.cos(theta3),
+                                -math.sin(theta3),
+                                0,
+                                a[5]
+                            ],
+                            [math.sin(theta3)*math.cos(alpha[5]),
+                                math.cos(theta3)*math.cos(alpha[5]),
+                                -math.sin(alpha[5]),
+                                -d[5]*math.sin(alpha[5])
+                            ],
+                            [
+                                math.sin(theta3)*math.sin(alpha[5]),
+                                math.cos(theta3)*math.sin(alpha[5]),
+                                math.cos(alpha[5]),
+                                d[5]*math.cos(alpha[5])
+                            ],
+                            [0,0,0,1]
+                        ]
+						let T1=math.multiply(T,math.inv(Ttool));
+                        let pos=T2pos(T1);
+                        x=pos[0], y=pos[1], z=pos[2],
+						EulerX=pos[3],
+						EulerY=pos[4],
+						EulerZ=pos[5];
                     }
-                	z=z+274;
                 	let R=200,r=45,l=[0,235,800];
                     switch (robNumber){
                         case 'a360':
@@ -10997,7 +11027,7 @@ VILibrary.VI = {
                             l=[0,350,800];
                             break;
                     }
-                    theta=[[],[],[],[]]
+                    theta=[[],[],[],[]];
                     let psi=[0,0,Math.PI/3*4,Math.PI/3*2];
 					/*let psi=[0,Math.PI,-Math.PI/3,Math.PI/3];
                 	let a=[[],[],[],[]],k=[[],[],[],[]],phi=[];
@@ -11030,7 +11060,12 @@ VILibrary.VI = {
 					for(let i=1;i<theta[1].length;i++){
                     	if(theta[1][i]>=Range[0][0]&&theta[1][i]<=Range[0][1])for(let j=1;j<theta[2].length;j++){
                             if(theta[2][i]>=Range[1][0]&&theta[2][i]<=Range[1][1])for(let k=1;k<theta[3].length;k++){
-                                if(theta[3][i]>=Range[2][0]&&theta[3][i]<=Range[2][1])resultAng.push([theta[1][i],theta[2][j],theta[3][k]]);
+                                if(theta[3][i]>=Range[2][0]&&theta[3][i]<=Range[2][1]){
+                                    if(robNumber=='a360-1'){
+                                        resultAng.push([theta[1][i],theta[2][j],theta[3][k],-EulerZ-THETA[THETA.length-2]]);
+                                    }
+                                    else resultAng.push([theta[1][i],theta[2][j],theta[3][k]]);
+                                }
 								//100,0,-972.5->-0.2103,0.14666,0.14666
 							}
 						}
@@ -11648,6 +11683,7 @@ VILibrary.VI = {
                 let trans=(TargetANG[17]).toFixed(2)+","+TargetANG[18].toFixed(2)+","+(TargetANG[16]).toFixed(2);//X3D场景中xyz对应计算场景中yzx
                 document.getElementById("Robot__plate").setAttribute('translation',trans);
                 //第四轴转动
+                TargetANG[3]=-TargetANG[3];
                 rotat="0,1,0,"+TargetANG[3];
                 document.getElementById("Robot__facePlate").setAttribute('rotation',rotat);
                 //顶部万向节
@@ -11657,7 +11693,6 @@ VILibrary.VI = {
                 let A=[0,1,0],B=[y,z,x];//A为ML竖直状态向量，B为倾斜状态向量，X3D场景中xyz对应计算场景中yzx
                 let K=math.cross(A,B),k=math.multiply(K,1/math.norm(K)),kx=k[0],ky=k[1],kz=k[2];//动平台移动导致的旋转轴
                 let theta=Math.acos(math.dot(A,B)/(math.norm(A)*math.norm(B)));//动平台移动导致的旋转角
-				console.log(kx,ky,kz,theta);
                 //若第四轴不为0，ML需要绕向量B旋转
 				if(TargetANG[3]){
 					/*将连杆倾斜的轴角转换为R*/
@@ -11687,7 +11722,6 @@ VILibrary.VI = {
                     ky=(ax-nz)/(2*Math.sin(theta));
                     kz=(ny-ox)/(2*Math.sin(theta));
 				}
-                console.log(kx,ky,kz,theta);
                 rotat=''+kx+","+ky+","+kz+","+theta;
 /*				let x=-TargetANG[16],y=-TargetANG[17],z=-200-TargetANG[18]-29.5,l=Math.sqrt(x*x+y*y);
 				let theta=-Math.atan(l/z);
@@ -11695,8 +11729,6 @@ VILibrary.VI = {
                 let rot=document.getElementById("Robot__ML").getAttribute('rotation').replace(/(\-|\+)?\d+(\.\d+)?$/,'')+theta;*/
                 document.getElementById("Robot__ML").setAttribute('rotation',rotat);
                 document.getElementById("Robot__MU").setAttribute('rotation',rotat);
-
-
             }
         }
         static get cnName() {

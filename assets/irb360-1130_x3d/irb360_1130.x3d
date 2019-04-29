@@ -1,0 +1,77 @@
+<x3d id="120X3d" style="width: 100%;height: 100%;">
+    <scene>
+        <Background groudcolor="(0.2,0.2,0.2)" skyColor='(0.66,0.8,1)'></Background>
+        <directionalLight id="directional" direction='0 -0.5 -0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <!--<directionalLight id="directional" direction='0 -1 0' on ="TRUE" intensity='2.0' shadowIntensity='0.0'></directionalLight>-->
+        <directionalLight id="directional2"  direction='0 0.5 0.5' on ="TRUE" intensity='0.7' shadowIntensity='0.0'></directionalLight>
+        <Viewpoint position="-2387.25011 -157.14988 110.24701" orientation="-0.09035 -0.99049 -0.10378 1.54417"></Viewpoint>
+        <navigationInfo id="head" headlight='true' type='"EXAMINE"'>  </navigationInfo>
+        <transform>
+            <Transform def="line">
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='0 0 1'/>
+                    </Appearance>
+                    <IndexedLineSet id='LineSet_index' coordIndex=''>
+                        <Coordinate id='LineSet_points' point=''/>
+                    </IndexedLineSet>
+                </Shape>
+            </Transform>
+            <Transform def="points">
+                <Shape>
+                    <Appearance>
+                        <Material emissiveColor='1 0 0'/>
+                    </Appearance>
+                    <PointSet>
+                        <Coordinate id='PointSet_points' point=''/>
+                    </PointSet>
+                </Shape>
+            </Transform>
+            <inline DEF="platform" url="../platform.x3d" scale="1.5,1,1.5"> </inline>
+            <transform translation="0,-1200,0" scale="3,3,3">
+                <inline DEF="platform" url="platform.x3d" scale="1.5,1,1.5"> </inline>
+            </transform>
+            <Transform translation="">
+                <inline url="base.x3d"> </inline>
+                <transform  translation="0,-275,200">
+                    <transform DEF="link0_1">
+                        <inline url="L1.x3d"> </inline>
+                        <transform translation="50,0,235" DEF="link0_2r"  rotation="1,0,0,2.0800204983301263" >
+                            <inline url="L2(right).x3d"> </inline>
+                        </transform>
+                        <transform translation="-50,0,235" DEF="link0_2l"  rotation="1,0,0,2.0800204983301263" >
+                            <inline url="L2(left).x3d"> </inline>
+                        </transform>
+                    </transform>
+
+                </transform>
+                <transform  translation="-173.20508075689,-275,-100" rotation="0,1,0,-2.0944">
+                    <transform DEF="link1_1">
+                        <inline url="L1.x3d"> </inline>
+                        <transform translation="50,0,235" DEF="link1_2r" rotation="1,0,0,2.0800204983301263">
+                            <inline url="L2(right).x3d"> </inline>
+                        </transform>
+                        <transform translation="-50,0,235" DEF="link1_2l"  rotation="1,0,0,2.0800204983301263" >
+                            <inline url="L2(left).x3d"> </inline>
+                        </transform>
+                    </transform>
+
+                </transform>
+                <transform translation="173.20508075689,-275,-100"  rotation="0,1,0,2.0944" >
+                    <transform DEF="link2_1">
+                        <inline url="L1.x3d"> </inline>
+                        <transform translation="50,0,235" DEF="link2_2r" rotation="1,0,0,2.0800204983301263">
+                            <inline url="L2(right).x3d"> </inline>
+                        </transform>
+                        <transform translation="-50,0,235" DEF="link2_2l"  rotation="1,0,0,2.0800204983301263" >
+                            <inline url="L2(left).x3d"> </inline>
+                        </transform>
+                    </transform>
+                </transform>
+                <transform DEF="plate" translation="0,-972.5,0">
+                    <inline url="plate.x3d" DEF="lastLink"></inline>
+                </transform>
+            </Transform>
+        </transform>
+    </scene>
+</x3d>
