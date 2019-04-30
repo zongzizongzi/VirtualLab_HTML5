@@ -10589,6 +10589,10 @@ VILibrary.VI = {
                         }
                         $('#setDO').enabled=true;
                         break;
+					case 5:
+                        D_add[len - 1] += 147.5;
+                        $('#setDO').enabled=false;
+                        break;
 					default:console.log('tool error');return;
                 }
                 A=math.add(baseA,A_add);
@@ -10785,6 +10789,7 @@ VILibrary.VI = {
                     	let pos=T2pos(T);
                         x=pos[0];y=pos[1];z=pos[2],EulerX=pos[3],EulerY=pos[4],EulerZ=pos[5];
 					}
+                    if(robNumber== 'a360-1')z-=43;
 				}
                 //串联型
                 else if (robNumber=="epson"){
@@ -10987,6 +10992,7 @@ VILibrary.VI = {
                 }
                 else if(robNumber=='a360'||robNumber=='a360-1'){
                     z=z+274;
+                    if(robNumber== 'a360-1')z+=43;
                     let alpha=ALPHA.concat();
                     if(ToolFlag){
                        /* z+=115;
@@ -11837,6 +11843,7 @@ VILibrary.VI = {
             let jiajuTrans="0,0,0",jiajuScal="1,1,1",jiajuRotate="1,0,0,0",boxTrans='300,20,-300',jiajuRotate2='0,0,1,0',boxSize='40,40,40',qijiaTrans="13,0,0",qijiaRotate="1,0,0,-0.785398163";
             let gongjianTrans1='461.395,0,285.5',gongjianTrans2='461.395,0,225.5',gongjianTrans3='460,0,165.5';
             let gongjianTrans4='401.395,0,285.609',gongjianTrans5='401.395,0,225.609',gongjianTrans6='401.395,0,165.609';
+            let penTrans="0,0,0",penScal="1,1,1",penRotate="1,0,0,0";
             let gripperTrans="0,0,0",gripperScal="1,1,1",gripperRotate="1,0,0,0";
             let Suf='';//后缀，区分双臂的左右臂
             //X3DOM场景中插入工具
@@ -11853,11 +11860,17 @@ VILibrary.VI = {
                         jiajuTrans="0,65,0";
                         boxTrans='300,20,-300';
                         break;
-                    case "a360":case "a360-1":
+                    case "a360":
                         jiajuRotate='0,0,1,-1.5707963';
                         jiajuTrans="0,5,0";
                         boxTrans='250,-1180,-250';
                     	break;
+                    case "a360-1":
+                    jiajuRotate='0,0,1,-1.5707963';
+                    jiajuTrans="0,-30,0";
+                    boxTrans='250,-1180,-250';
+                    penTrans='0,-43,0';
+                    break;
 					case "epson":
                         jiajuRotate='0,1,0,-1.5707963';
                         jiajuRotate2='1,0,0,3.1415926';
@@ -11920,7 +11933,12 @@ VILibrary.VI = {
                     "</Transform>" +
                     "</Transform>" +
 
-                    "</switch>";
+                    "<Transform translation="+penTrans+" scale="+penScal+" rotation="+penRotate+">" +
+                    "<Transform>"+
+                    "<inline url='../TOOLS/pen.x3d'> </inline>" +
+                    "</Transform>" +
+                    "</Transform>"+
+                "</switch>";
                  $("#Robot__lastLink"+Suf).after(toolSwitch);
                 /*let tempNode = new DOMParser().parseFromString(toolSwitch, 'text/html');
                 let node = tempNode.getElementsByTagName('switch')[0];
@@ -12022,6 +12040,13 @@ VILibrary.VI = {
                     case 4:
                         // if(robNum=="yumiR") document.getElementById("Robot__box1").setAttribute("render", 'true');
                         // else document.getElementById("Robot__box").setAttribute("render", 'true');
+                        for (var i=1;i<7;i++) {
+                            document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
+                        }
+                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
+                        break;
+					case 5:
+                        document.getElementById("Robot__box").setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
