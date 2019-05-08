@@ -94,7 +94,7 @@
                 <p>控制指令</p>
                 <textarea id="R_instrInput"  class="instrTxt"></textarea><br>
                 <div class="rowFlex-div">
-                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
+                    <button  onclick="points(-1,'R') ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
             </div>
         </div>
@@ -377,14 +377,29 @@
                 turnPoints="1317.22 1725 0 1140.75 1725 -658.61 634.49 2086.7 -366.32 757.6 1358.74 437.4";
                 document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 indexI[robI]=4;*/
-                s[robI]=[
-                    "p0:[1550.41,0,1668.89,-180°,60°,-180°];\n",
-                    "p1:[1000,-1000,200,180°,0°,-180°];\n",
-                    "p2:[1000,-1000,40,180°,0°,-180°];\n",
-                    "p3:[1000,0,200,180°,0°,-180°];\n",
-                    "p4:[1000,0,40,180°,0°,180°];\n"
+                if(robI){
+                    s[robI]=[
+                        "q0:[71°,-115°,-49.5°,-20°,-62.5°,85.5°,146°];\n",
+                        "q1:[65°,-117.5°,-49°,-8°,-62.5°,85.5°,153°];\n",
+                        "q2:[76°,-138.5°,-75°,28°,-103°,52.5°,182.5°];\n",
+                        "q3:[81°,-137.5°,-72°,17.5°,-98.5°,51°,174°];\n",
+                        "q4:[0°,-130°,-135°,30°,0°,40°,0°];"
+
                 ];
-                document.getElementById(rob+"_instrInput").value="moveJ p0,v400;\nmoveJ p1,v400;\nmoveL p2,v400;\nset do1;\nmoveL p1,v400;\nmoveJ p3,v400;\nmoveL p4,v400;\nreset do1;\nmoveL p3,v400;\nmoveJ p0,v400;";
+                    document.getElementById(rob+"_instrInput").value="moveAbsJ q0,v200;\nset do1;\nmoveAbsJ q1,v200;\nmoveAbsJ q2,v200;\nmoveAbsJ q3,v200;\nreset do1;\nmoveAbsJ q4,v200;";
+
+                }
+                else {
+                    s[robI]=[
+                        "q0:[-57.5°,-128.5°,73°,3.5°,13.5°,25.5°,60.5°];\n",
+                        " q1:[-47.5°,-129°,76°,18.5°,23.5°,19.5°,48°];\n",
+                        "q2:[-68.5°,-140.5°,107.5°,30°,-99.5°,27.5°,203°];\n",
+                        "q3:[-75.5°,-140.5°,100.5°,18°,-85°,26°,185.5°];\n",
+                        "q4:[0°,-130°,135°,30°,0°,40°,0°];"
+                    ];
+                    document.getElementById(rob+"_instrInput").value="moveAbsJ q0,v200;\nset do1;\nmoveAbsJ q1,v200;\nmoveAbsJ q2,v200;\nmoveAbsJ q3,v200;\nreset do1;\nmoveAbsJ q4,v200;";
+
+                }
 
                 //------------------点集-------------------------
                 turnPoints=" 1550.41 1668.89 0 1000 200 1000 1000 40 1000 1000 40 0 1000 200 0";

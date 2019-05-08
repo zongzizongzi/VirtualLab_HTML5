@@ -9773,7 +9773,7 @@ VILibrary.VI = {
 				T_BASE,//基座矩阵，除YUMI外，基座矩阵都包含在D_H参数里
 				A,D,ALPHA,THETA;//D-H参数
 			let Pre='';//前缀，区分双臂的左右臂
-			let Suf='';//后缀，区分双臂的左右臂
+			let Suf='',Suf0='';//后缀，区分双臂的左右臂
 
 			let ToolFlag=0,//加载工具标志
 				ToolDO=false,
@@ -9857,6 +9857,7 @@ VILibrary.VI = {
                         targetANG=[0,2.26893,2.35619,-0.5236,0,-0.69813,0];
                         Pre='L_';
                         Suf='_L'
+						Suf0="L"
 					}
 					else{
                         T_BASE=[
@@ -9870,6 +9871,7 @@ VILibrary.VI = {
                         targetANG=[0,2.26893,-2.35619,-0.5236,0,-0.69813,0];
                         Pre="R_";
                         Suf="_R"
+                        Suf0="R"
 					}
                     break;
 				case "a120":default:
@@ -10505,7 +10507,7 @@ VILibrary.VI = {
                     i++;
                 },T*1000);
             }
-            //切换工具时调用此函数，修改最末端的DH参数。input值对应的工具：0-无工具；1-普通夹具；2-跟实际机器人上一致的夹具；3-画笔；4-gripper。
+            //切换工具时调用此函数，修改最末端的DH参数。input值对应的工具：0-无工具；1-普通夹具；2-跟实际机器人上一致的夹具；3-画笔（焊枪）；4-gripper；5：马克笔。
             this.changeTool=function(input){
                 ToolFlag=input;
                 if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
@@ -10606,8 +10608,8 @@ VILibrary.VI = {
             	if(_this.dataLine){VILibrary.InnerObjects.dataUpdater(this.dataLine);}
             	if(input){
                     switch (ToolFlag) {
-                        case 1:
-                            var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                        case 1:case 4:
+                            var trans = document.getElementById('Robot__box'+Suf0).getFieldValue('translation');
                             let boxPos=(robNumber=='a360'||robNumber=='a360-1')?[trans.z,trans.x,trans.y]:[trans.x,-trans.z,trans.y];
                             for(var i=0;i<3;i++){
                                 if(Math.abs(parseFloat(boxPos[i])-currentPOS[i])>10)break;
@@ -10897,8 +10899,8 @@ VILibrary.VI = {
 				//若夹持工件，工件坐标与末端坐标保持一致
 				if(LoadFlag&&(!flag)){
                     switch (ToolFlag) {
-                        case 1:
-                            var trans = document.getElementById('Robot__box').getFieldValue('translation');
+                        case 1:case 4:
+                            var trans = document.getElementById('Robot__box'+Suf0).getFieldValue('translation');
                             if(robNumber=='a360'||robNumber=='a360-1'){
                                 trans.x=currentPOS[1];
                                 trans.y=currentPOS[2];
@@ -10909,7 +10911,7 @@ VILibrary.VI = {
                                 trans.y=currentPOS[2];
                                 trans.z=-currentPOS[1];
                             }
-                            document.getElementById('Robot__box').setFieldValue('translation',trans);
+                            document.getElementById('Robot__box'+Suf0).setFieldValue('translation',trans);
                             break;
                         case 2:
                             var trans = document.getElementById('Robot__gongjian'+gongjianIndex).getFieldValue('translation');
@@ -11883,12 +11885,14 @@ VILibrary.VI = {
 					case "yumiL":
 						Suf='L';
                         jiajuTrans="36,0,0";
-                        boxTrans='300,20,-300'
+                        boxTrans='300,10,-300'
+						boxSize='20,20,20'
 						break;
                     case "yumiR":
                         Suf='R';
-                        boxTrans='300,20,300'
+                        boxTrans='300,10,300'
                         jiajuTrans="36,0,0";
+                        boxSize='20,20,20'
                         break;
 					case "a120":default:break;
 				}
@@ -11923,10 +11927,10 @@ VILibrary.VI = {
 
                     "<Transform translation="+jiajuTrans+" scale="+jiajuScal+" rotation="+jiajuRotate+">" +
                     "<Transform rotation="+jiajuRotate2+">"+
-                    "<Transform DEF='gripperL' translation='0 0 10' nameSpaceName id='Robot__gripperL'>" +
+                    "<Transform DEF='gripperL' translation='0 0 10' nameSpaceName id='Robot__gripperL"+Suf+"'>" +
                     "<inline url='../TOOLS/gripper/gripper_L.x3d' > </inline>" +
                     "</Transform>" +
-                    "<Transform DEF='gripperR' translation='0 0 -10' nameSpaceName id='Robot__gripperR'>" +
+                    "<Transform DEF='gripperR' translation='0 0 -10' nameSpaceName id='Robot__gripperR"+Suf+"'>" +
                     "<inline url='../TOOLS/gripper/gripper_R.x3d'> </inline>" +
                     "</Transform>" +
                     "<inline url='../TOOLS/gripper/gripper.x3d'> </inline>" +
@@ -11943,14 +11947,14 @@ VILibrary.VI = {
                 /*let tempNode = new DOMParser().parseFromString(toolSwitch, 'text/html');
                 let node = tempNode.getElementsByTagName('switch')[0];
                 document.getElementById("Robot__link5"+Suf).appendChild(node);*/
-                var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box' render='false'><shape>" +
+                var box="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box"+Suf+"' render='false'><shape>" +
                     "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
                     "<box size="+boxSize+"></box>" +
                     "</shape></transform>";
-                var box1="<transform DEF='box' translation="+boxTrans+" nameSpaceName id='Robot__box1' render='false'><shape>" +
+             /*   var box1="<transform DEF='box1' translation="+boxTrans+" nameSpaceName id='Robot__box1' render='false'><shape>" +
                     "<appearance><material diffuseColor='1 0 0'></material></appearance>" +
                     "<box size="+boxSize+"></box>" +
-                    "</shape></transform>";
+                    "</shape></transform>";*/
                 var gongjian1="<transform DEF='gongjian1' translation="+gongjianTrans1+" nameSpaceName id='Robot__gongjian1' render='true'>" +
                     "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
                     "</transform>";
@@ -11972,8 +11976,9 @@ VILibrary.VI = {
                 var huaban="<transform DEF='huaban' translation='320,150,-400' rotation='0,1,0,-0.785' nameSpaceName id='Robot__huaban' render='false'>" +
                     "<inline url='../TOOLS/huaban.x3d'></inline>" +
                     "</transform>";
-                if(robNum=="yumiR")$("#Robot__platform").after(box1);
-                else $("#Robot__platform").after(box);
+                // if(robNum=="yumiR")$("#Robot__platform").after(box1);
+                // else $("#Robot__platform").after(box);
+                $("#Robot__platform").after(box);
                 $("#Robot__platform").after(gongjian1);
                 $("#Robot__platform").after(gongjian2);
                 $("#Robot__platform").after(gongjian3);
@@ -12007,7 +12012,7 @@ VILibrary.VI = {
             	toolSwitch(input[0]);
             	toolDo(input[1]);
             }
-            //切换工具
+            //切换工具.input值对应的工具：0-无工具；1-普通夹具；2-跟实际机器人上一致的夹具；3-画笔（焊枪）；4-gripper；5：马克笔。
             function toolSwitch(input){
                 if(!haveTool)draw();
                 document.getElementById("Robot__TOOL"+Suf).setAttribute("whichChoice", ""+(input-1)+"");
@@ -12017,43 +12022,44 @@ VILibrary.VI = {
 				else document.getElementById("Robot__box").setAttribute("render", 'false');*/
                 switch (input) {
                     case 1:
-                        document.getElementById("Robot__box").setAttribute("render", 'true');
+                        document.getElementById("Robot__box"+Suf).setAttribute("render", 'true');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     case 2:
-                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        document.getElementById("Robot__box"+Suf).setAttribute("render", 'false');
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'true');
                         }
                         break;
                     case 3:
-                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        document.getElementById("Robot__box"+Suf).setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     case 4:
-                        // if(robNum=="yumiR") document.getElementById("Robot__box1").setAttribute("render", 'true');
-                        // else document.getElementById("Robot__box").setAttribute("render", 'true');
+                        // if(robNum=="yumiR")
+						document.getElementById("Robot__box"+Suf).setAttribute("render", 'true');
+                        // else document.getElementById("Robot__box"+Suf).setAttribute("render", 'true');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
 					case 5:
-                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        document.getElementById("Robot__box"+Suf).setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         break;
                     default:
-                        document.getElementById("Robot__box").setAttribute("render", 'false');
+                        document.getElementById("Robot__box"+Suf).setAttribute("render", 'false');
                         document.getElementById("Robot__huaban").setAttribute("render", 'false');
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
@@ -12071,8 +12077,8 @@ VILibrary.VI = {
                     document.getElementById("Robot__qijiaL").setAttribute('translation','0,0,-10');
                     document.getElementById("Robot__qijiaR").setAttribute('translation','0,0,10');
 
-                    document.getElementById("Robot__gripperL").setAttribute('translation','0,-12.5,0');
-                    document.getElementById("Robot__gripperR").setAttribute('translation','0,12.5,0');
+                    document.getElementById("Robot__gripperL"+Suf).setAttribute('translation','0,0,0');/*'0,-12.5,0'*/
+                    document.getElementById("Robot__gripperR"+Suf).setAttribute('translation','0,0,0');/*'0,12.5,0'*/
                 }
                 else{
                     document.getElementById("Robot__jiajuL").setAttribute('translation','0,0,10');
@@ -12081,8 +12087,8 @@ VILibrary.VI = {
                     document.getElementById("Robot__qijiaL").setAttribute('translation','0,0,0');
                     document.getElementById("Robot__qijiaR").setAttribute('translation','0,0,0');
 
-                    document.getElementById("Robot__gripperL").setAttribute('translation','0,8,0');
-                    document.getElementById("Robot__gripperR").setAttribute('translation','0,-8,0');
+                    document.getElementById("Robot__gripperL"+Suf).setAttribute('translation','0,8,0');
+                    document.getElementById("Robot__gripperR"+Suf).setAttribute('translation','0,-8,0');
                 }
             }
         }
@@ -12523,7 +12529,7 @@ VILibrary.VI = {
             };
             this.draw();
             this.changeLink=function (index) {
-                let url="120/link2.x3d",linkNum=2;
+                let url="120/link2.x3d",linkNum=2,imgLink='assets/RobotLinks/120/img.jpg',trans='0,0,0';
                 switch (index){
                     case '1':
                         url="120/link2.x3d";
@@ -12536,21 +12542,31 @@ VILibrary.VI = {
                     case '3':
                         url="60/link1.x3d";
                         linkNum=1;
+                        imgLink='assets/RobotLinks/60/img.jpg';
+                        trans='-1000,-800,-1000';
                         break;
                     case '4':
                         url="60/link3.x3d";
                         linkNum=3;
+                        imgLink='assets/RobotLinks/60/img.jpg';
+                        trans='-1000,-300,-1000';
                         break;
                     case '5':
                         // url="60/link5.x3d";
                         url="910/link2.x3d";
                         linkNum=2;
+                        imgLink='assets/RobotLinks/910/img.jpg';
+                        trans='0,0,0';
                         break;
                     default:
                         url="120/link2.x3d";
                         linkNum=2;
                 }
-                if(index==3||index==4) {
+                document.getElementById('robotImg').src=imgLink;
+                document.getElementById("Link__linkTrans").setAttribute("translation",trans);
+                document.getElementById("Link__showLink").setAttribute("url",url);
+                document.getElementById("linkNumber").innerText=linkNum;
+                /*if(index==3||index==4) {
                 	document.getElementById('robotImg').src='assets/RobotLinks/60/img.jpg';
                 	document.getElementById("Link__linkTrans").setAttribute("translation",'-3000,-800,-1000');
                 }
@@ -12563,7 +12579,7 @@ VILibrary.VI = {
                 	document.getElementById("Link__linkTrans").setAttribute("translation",'0,0,0');
                 }
                 document.getElementById("Link__showLink").setAttribute("url",url);
-                document.getElementById("linkNumber").innerText=linkNum;
+                document.getElementById("linkNumber").innerText=linkNum;*/
             }
         }
     }
