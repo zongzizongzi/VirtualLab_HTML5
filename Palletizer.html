@@ -86,7 +86,8 @@
                     <textarea id="points" class="instrTxt">
                     </textarea>
                     <div class="rowFlex-div">
-                        <button type="button" id="add" onclick="changePoints(1)">添加</button>
+                        <button type="button" id="add" onclick="changePoints(1)">位姿型</button>
+                        <button type="button" id="add1" onclick="changePoints(3)">关节型</button>
                         <button type="button" id="delete" onclick="changePoints(2)">删除</button>
                         <button type="button" id="clear" onclick="changePoints(0)">清空</button>
                     </div>
@@ -151,7 +152,6 @@
     VILibrary.InnerObjects.bindDataLine(instructionCompiling.id, tool.id, 2, 1);
     let val=[0],ang;
     let currentPOS=[364.35,0,594,-Math.PI,Math.PI/3,-Math.PI];
-    let s=[];
     var RTCPID='';
     //切换视角
     setTimeout(function () {
@@ -185,11 +185,15 @@
         let cmd=document.getElementById("instrInput").value.toString();
         instructionCompiling.toggleObserver(points,cmd);
     }
+    let s=[],indexI=0;
     function changePoints(type) {
         let turnPoints,Instruction;
+        let si;
+
         switch (type){
             case 0:/*清空*/
                 s=[];
+                indexI=0;
                 /*----------------点集清空-------------------*/
                 turnPoints='';
                 Instruction='';
@@ -202,27 +206,45 @@
                     gamma=parseFloat(document.getElementById("eulerX").value),
                     beta=parseFloat(document.getElementById("eulerY").value),
                     alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+s.length+":["+x+","+y+","+z+","+gamma+"°,"
+                si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
                 /*-----------------------------------*/
                 s.push(si);
+                indexI++;
                 break;
             case 2:/*删除示教点*/
-                s.pop();
+                if(s.length<=0){
+                    alert("已删除所有示教点");
+                    return
+                }
+                let last_s=s.pop();
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
 //                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
+                /*-----------------------------------*/
+                if(last_s.indexOf('p')!=-1) indexI--;
+                break;
+            case 3:/*添加关节型示教点*/
+                let q=[];
+                for(let i=0;i<6;i++){q[i]=parseFloat(document.getElementById("angTxt"+i).value);}
+                si="q"+(s.length-indexI)+":["+q[0]+"°," +q[1]+"°," +q[2]+"°," +q[3]+"°," +q[4]+"°,"+q[5]+"°];\n";
+                s.push(si);
+                /*----------------点集增加点的坐标-------------------*/
+                let xx=parseFloat(document.getElementById("posX").value),
+                    yy=parseFloat(document.getElementById("posY").value),
+                    zz=parseFloat(document.getElementById("posZ").value);
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+xx+" "+zz+" "+(-yy);
                 /*-----------------------------------*/
                 break;
             case -1:
                 var obj=document.getElementById('toolSelect');
                 var index=obj.selectedIndex; //序号，取当前选中选项的序号
                 var val = obj.options[index].value;
-
                 switch (val) {
                     case '0':
                         s = ["p0:[364.35,0,594,-180°,60°,-180°];\n",
@@ -230,6 +252,7 @@
                             "p2:[467.54,0,371.09,180°,30°,-180°];\n",
                             "p3[346.62,0,225.29,180°,0°,-180°];\n"],
                             Instruction = "moveJ p0,v200;\nmoveL p1,v200;\nmoveC p2,p3,v200;\nmoveJ p0,v100;";
+                        indexI=4;
                         /*------------------点集-------------------------*/
                         turnPoints = "364.35 594 0 464.35 594 0 467.54 371.09 0 346.62 225.29 0";
                         /*---------------------------------------------*/
@@ -271,6 +294,7 @@
                             "p33:[460.897,162.528,87.275,180°,0°,-180°];\n"];//460.897 87.275 -162.528
                         Instruction = "reset do1;\nmoveJ p1,v300;\nmoveJ p14,v300;\nmoveJ p22,v150;\nmoveL p2,v100;\nset do1;\nmoveL p14,v300;\nmoveJ p20,v300;\nmoveJ p28,v150;\nmoveL p8,v100;\nreset do1;\nmoveL p20,v300;\nmoveJ p15,v300;\nmoveJ p23,v150;\nmoveL p3,v100;\nset do1;\nmoveL p15,v300;\nmoveJ p21,v300;\nmoveJ p29,v150;\nmoveL p9,v100;\nreset do1;\nmoveL p21,v300;\nmoveJ p16,v300;\nmoveJ p24,v150;\nmoveL p4,v100;\nset do1;\nmoveL p16,v300;\nmoveJ p20,v300;\nmoveJ p30,v150;\nmoveL p10,v100;\nreset do1;\nmoveL p20,v300;\nmoveJ p17,v300;\nmoveJ p25,v150;\nmoveL p5,v100;\nset do1;\nmoveL p17,v300;\nmoveJ p21,v300;\nmoveJ p31,v150;\nmoveL p11,v100;\nreset do1;\nmoveL p21,v300;\nmoveJ p18,v300;\nmoveJ p26,v150;\nmoveL p6,v100;\nset do1;\nmoveL p18,v300;\nmoveJ p20,v300;\nmoveJ p32,v150;\nmoveL p12,v100;\nreset do1;\nmoveL p20,v300;\nmoveJ p19,v300;\nmoveJ p27,v150;\nmoveL p7,v100;\nset do1;\nmoveL p19,v300;\nmoveJ p21,v300;\nmoveJ p33,v150;\nmoveL p13,v100;\nreset do1;\nmoveL p21,v300;\nmoveJ p1,v300;";
                         turnPoints = "472.53 -572.37 35.36 365 189.5 0 461.395 12.3038 285.61 461.395 12.3038 225.609 461.395 12.3038 165.609 401.395 12.3038 285.609 401.395 12.3038 225.609 401.395 12.3038 165.609 460.90 12.275 -102.53 460.897 12.275 -162.528 460.897 37.275 -102.528 460.897 37.27 -162.528 460.897 62.27 -102.528 460.897 62.275 -162.528 461.395 120 285.609 461.395 120 225.609 461.395 120 165.609 401.395 120 285.609 401.395 120 225.609 401.395 120 165.609 460.897 120 -102.528 460.897 120 -162.528 461.395 37.3038 285.61 461.395 37.3038 225.61 461.395 37.3038 165.61 401.395 37.3038 285.61 401.395 37.3038 225.61 401.395 37.3038 165.61 460.90 37.275 -102.53 460.897 37.275 -162.528 460.90 62.275 -102.53 460.897 62.275 -162.528 460.90 87.275 -102.53 460.897 87.275 -162.528";
+                        indexI=34;
                         break;
                 }
         }

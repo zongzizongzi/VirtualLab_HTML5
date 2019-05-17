@@ -43,4 +43,16 @@
     right: 10px;
     font-weight: bold;
 }
+#pubIn{
+    position: absolute;
+    top: 10px;
+    right: 100px;
+    font-weight: bold;
+}
+#backIndex{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-weight: bold;
+}
 

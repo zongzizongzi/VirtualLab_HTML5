@@ -9941,7 +9941,13 @@ VILibrary.VI = {
                         p=p.match(/\[.*]/)[0].replace(/°|\[|]/g,'').split(',');//获取[]中间的内容并去掉[],以逗号分隔内容
                         for(let i=0;i<p.length;i++){
                             if(p[i]!=''){
-                                p[i]=parseFloat(p[i])/180*Math.PI;//角度，需要转换为弧度
+                            	if(robNumber=='epson'||(robNumber=='a910'&&i==2)){
+                                    p[i]=parseFloat(p[i])
+								}
+								else {
+                                    p[i]=parseFloat(p[i])/180*Math.PI;//角度，需要转换为弧度
+								}
+
                             }
                         }
                         qJoint[qNum]=p;//添加到关节型示教点数组
@@ -11973,7 +11979,7 @@ VILibrary.VI = {
                 var gongjian6="<transform DEF='gongjian6' translation="+gongjianTrans6+" nameSpaceName id='Robot__gongjian6' render='true'>" +
                     "<inline url='../TOOLS/gongjian/gongjian.x3d'></inline>" +
                     "</transform>";
-                var huaban="<transform DEF='huaban' translation='320,150,-400' rotation='0,1,0,-0.785' nameSpaceName id='Robot__huaban' render='false'>" +
+                var huaban="<transform DEF='huaban' translation='320,150,-500' rotation='0,1,0,-0.785' nameSpaceName id='Robot__huaban' render='false'>" +
                     "<inline url='../TOOLS/huaban.x3d'></inline>" +
                     "</transform>";
                 // if(robNum=="yumiR")$("#Robot__platform").after(box1);
@@ -12040,7 +12046,7 @@ VILibrary.VI = {
                         for (var i=1;i<7;i++) {
                             document.getElementById("Robot__gongjian"+i).setAttribute("render", 'false');
                         }
-                        document.getElementById("Robot__huaban").setAttribute("render", 'false');
+                        document.getElementById("Robot__huaban").setAttribute("render", 'true');
                         break;
                     case 4:
                         // if(robNum=="yumiR")

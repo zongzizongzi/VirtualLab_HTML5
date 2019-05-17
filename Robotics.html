@@ -9,6 +9,8 @@
 </head>
 <body>
 <a href="homework/admin.html" id="adminLogIn">管理员入口</a>
+<a href="RTCP/pub.html" id="pubIn">监控端入口</a>
+<a href="index.html" id="backIndex" style="">返回虚拟实验目录</a>
 <section class="page-header" >
     <!--<h1 class="project-name">工业机器人认知与操作虚拟实验<br/><br/><br/></h1>-->
     <img src="img/Logo1.jpg" alt="">
@@ -17,7 +19,7 @@
 
     <div style="margin: auto;" id="pc_index" >
         <div  class="outerBox">
-            <h2 ><strong>机器人技术理论与认知实验</strong></h2>
+            <h2 ><strong>理论与认知实验</strong></h2>
             <a  href="CoordinateTransformation.html" class="robotType" >
                 <h3 class="typeTitle"> 坐标转换实验</h3>
                 <div class="imgContainer">
@@ -108,7 +110,7 @@
                 </div>
             </a>
             <a  href="ABB_YUMI.html" class="robotType" >
-                <h3 class="typeTitle">冗余双臂机器人</h3>
+                <h3 class="typeTitle">双臂机器人</h3>
                 <div class="imgContainer">
                     <img src="img/robotics/yumi.png">
                 </div>
@@ -146,7 +148,7 @@
                     <h4>远程控制实验</h4>
                 </div>
             </a>
-            <a  href="RobotRemoteControl.html" class="robotType" >
+            <a  href="RRC_360.html" class="robotType" >
                 <h3 class="typeTitle"> 远程控制实验(irb360)</h3>
                 <div class="imgContainer">
                     <img src="img/robotics/control360.jpg">
@@ -165,7 +167,16 @@
                 <a  class="anchor" href="#welcome-to-virtual-lab" aria-hidden="true"><span
                         aria-hidden="true" class="octicon octicon-link"></span></a>机器人技术基础</h3>-->
             <ul>
-                <li><h4>串联型机器人</h4>
+                <li><h4>原理性实验</h4>
+                    <ul>
+                        <li><h4><a href="CoordinateTransformation.html">坐标转换实验</a></h4></li>
+                        <li><h4><a  href="DirectionDescription.html">刚体方位描述实验</a></h4></li>
+                        <li><h4><a  href="RobotLinks.html">连杆描述实验</a></h4></li>
+                        <li><h4><a href="D-Hmodel.html">D-H模型实验</a></h4></li>
+                        <li><h4><a  href="Disassembly.html">机器人拆装实验</a></h4></li>
+                    </ul>
+                </li>
+                <li><h4>工业机器人操作实验</h4>
                     <ul>
                         <li><h4>关节型机器人</h4></li>
                         <li><a href="ABB_irb120.html">ABB IRB120</a></li>
@@ -174,20 +185,21 @@
                         <li><a href="ABB_irb910sc.html">ABB IRB910sc</a></li>
                         <li><h4>直角坐标机器人</h4></li>
                         <li><a href="EPSON_hms.html">EPSON HMS-3Axis</a></li>
-                    </ul>
-                </li>
-                <li><h4>并联型机器人</h4>
-                    <ul>
+                        <li><h4>双臂机器人</h4></li>
+                        <li><a href="ABB_YUMI.html">ABB YUMI</a></li>
+                        <li><h4>并联型机器人</h4>
                         <li><a href="ABB_irb360.html">ABB IRB360</a></li>
                     </ul>
                 </li>
-                <li><h4>原理和应用性实验</h4>
+                <li><h4>工业机器人应用实验</h4>
                     <ul>
-                        <li><h4><a href="D-Hmodel.html">D-H模型实验</a></h4></li>
-                        <li><h4><a href="CoordinateTransformation.html">坐标转换实验</a></h4></li>
-                        <li><a href="RobotRemoteControl.html">远程控制实验</a></li>
+                        <li><a href="Palletizer.html">码垛实验</a></li>
+                        <li><a href="Drawing.html">绘图实验</a></li>
+                        <li><a href="RobotRemoteControl.html">远程控制实验(irb 120)</a></li>
+                        <li><a href="RRC_360.html">远程控制实验(irb 360)</a></li>
                     </ul>
                 </li>
+
             </ul>
         </section>
     </div>

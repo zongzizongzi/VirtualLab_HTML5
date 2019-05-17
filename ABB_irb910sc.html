@@ -77,16 +77,17 @@
                 <textarea id="points" class="instrTxt" >
                 </textarea>
                 <div class="rowFlex-div">
-                    <button id="add" onclick="points(1)">添加</button>
-                    <button id="delete" onclick="points(2)">删除</button>
-                    <button id="clear" onclick="points(0)">清空</button>
+                    <button type="button" id="add" onclick="changePoints(1)">位姿型</button>
+                    <button type="button" id="add1" onclick="changePoints(3)">关节型</button>
+                    <button id="delete" onclick="changePoints(2)">删除</button>
+                    <button id="clear" onclick="changePoints(0)">清空</button>
                 </div>
             </div>
             <div class="message_div" style="height: 22%;">
                 <p>控制指令</p>
                 <textarea id="instrInput" class="instrTxt" ></textarea><br>
                 <div class="rowFlex-div">
-                    <button  onclick="points(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
+                    <button  onclick="changePoints(-1) ">示例程序</button><button   onclick="Instructions()">提交</button>
                 </div>
             </div>
         </div>
@@ -144,8 +145,7 @@
 //    VILibrary.InnerObjects.bindDataLine(robot910scVI.id, instructionCompiling.id, 1, 2);
 
     let val=[0],ang;
-    let s=[],
-        indexI=0;
+
     function changeAng(input) {
         let currentAng=[0,0,0,0];
         document.getElementById("angTxt"+input).value=document.getElementById("angInput"+input).value;
@@ -183,12 +183,18 @@
         let cmd=document.getElementById("instrInput").value.toString();
         instructionCompiling.toggleObserver(points,cmd);
     }
-    function points(type) {
-        let turnPoints;
+
+    let s=[],indexI=0;
+    function changePoints(type) {
+        let turnPoints,Instruction;
+        let si;
         switch (type){
             case 0:/*清空*/
                 s=[];indexI=0;
-                document.getElementById("Robot__PointSet_points").setAttribute('point','');
+                /*----------------点集清空-------------------*/
+                turnPoints='';
+                Instruction='';
+                /*-----------------------------------*/
                 break;
             case 1:/*增加示教点*/
                 let x=parseFloat(document.getElementById("posX").value),
@@ -197,39 +203,55 @@
                     gamma=parseFloat(document.getElementById("eulerX").value),
                     beta=parseFloat(document.getElementById("eulerY").value),
                     alpha=parseFloat(document.getElementById("eulerZ").value);
-                let si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
+                si="p"+indexI+":["+x+","+y+","+z+","+gamma+"°,"
                     +beta+"°,"+alpha+"°];\n";
-                s.push(si);
+                s.push(si);indexI++;
                 /*----------------点集增加点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
                 turnPoints=turnPoints+" "+x+" "+z+" "+(-y);
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 /*-----------------------------------*/
-                indexI++;
                 break;
             case 2:/*删除示教点*/
-                s.pop();
+                if(s.length<=0){
+                    alert("已删除所有示教点");
+                    return
+                }
+                let last_s=s.pop();
+                if(last_s.indexOf('p')!=-1) indexI--;
                 /*----------------点集删除最后一点的坐标-------------------*/
                 turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
-                console.log(turnPoints.match(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/))
                 turnPoints=turnPoints.replace(/\s-?\d+\.?\d*\s-?\d+\.?\d*\s-?\d+\.?\d*$/,'');
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+               /*-----------------------------------*/
+                break;
+            case 3:
+                let q=[];
+                for(let i=0;i<4;i++){q[i]=parseFloat(document.getElementById("angTxt"+i).value);}
+                si="q"+(s.length-indexI)+":["+q[0]+"°," +q[1]+"°," +q[2]+"," +q[3]+"°];\n";
+                s.push(si);
+                /*----------------点集增加点的坐标-------------------*/
+                let xx=parseFloat(document.getElementById("posX").value),
+                    yy=parseFloat(document.getElementById("posY").value),
+                    zz=parseFloat(document.getElementById("posZ").value);
+                turnPoints=document.getElementById("Robot__PointSet_points").getAttribute('point');
+                turnPoints=turnPoints+" "+xx+" "+zz+" "+(-yy);
                 /*-----------------------------------*/
-                indexI--;
+
                 break;
             case -1:
                 s=["p0:,[450,0,130,180°,0°,0°];\n","p1:[300,300,130,180°,0°,0°];\n","p2:[300,300,20,180°,0°,0°];\n","p3:[400,0,130,180°,0°,0°];\n","p4:[400,0,20,180°,0°,0°];\n",]
 
-                document.getElementById("instrInput").value="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;";
+                Instruction="moveJ p0,v200;\nmoveJ p1,v200;\nmoveL p2,v200;\nset do1;\nmoveL p1,v200;\nmoveJ p3,v200;\nmoveL p4,v200;\nreset do1;\nmoveL p3,v200;";
                 turnPoints=" 300 130 -300 300 20 -300 400 130 0 400 20 0 450 130 0";
-                document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
                 indexI=5;
         }
         let str="";
-        for(let m=0;m<indexI;m++){
+        for(let m=0;m<s.length;m++){
             str= str + s[m] ;
         }
         document.getElementById("points").value=str;
+        if(Instruction)document.getElementById("instrInput").value=Instruction;
+        if(turnPoints)document.getElementById("Robot__PointSet_points").setAttribute('point',turnPoints);
+
     }
     function openTeachPendant() {
         layer.open({
